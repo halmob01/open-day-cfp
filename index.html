@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Prova il mestiere: tre mestieri, tre giochi guidati per ragazzi.">
+<title>Prova il mestiere</title>
+<style>[hidden]{display:none!important}body{margin:0}</style>
+</head>
+<body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Luce spenta = scuro con accenti rossi. Quando il gioco riesce, il sito "si accende": bianco, scritte nere, accenti rossi. */
+:root{ /* luce spenta: verde scuro con accenti rossi */
+  --bg:#0f1a17; --card:#17251f; --ink:#f1fff9; --muted:#a9c4b9; --line:#2d4a3f;
+  --accent:#d6404a; --accent-ink:#ffffff; --good:#4fd89a; --bad:#ff8a8f;
+  --bench:#162720; --bench-line:#2f5144; --plate:#1f3329; --plate-line:#47685a; --metal:#9aa7b0; --metal-dark:#4b5d6a;
+  --brown:#d08142; --blue:#63a7ff; --wire-g:#c9d6d0; --cable:#4fd1b8;
+  --font:'Fira Sans','Segoe UI',system-ui,-apple-system,sans-serif; color-scheme:dark;
+}
+:root.lit{ /* luce accesa: bianco, scritte nere, accenti rossi */
+  --bg:#ffffff; --card:#ffffff; --ink:#0b0b0b; --muted:#4d4d4d; --line:#e4e4e4;
+  --accent:#c8323a; --accent-ink:#ffffff; --good:#1b9a5a; --bad:#9c1520;
+  --bench:#f6f6f6; --bench-line:#e0e0e0; --plate:#ffffff; --plate-line:#c4c4c4; --metal:#d6d9dc; --metal-dark:#7d868c;
+  --brown:#8b4a1f; --blue:#2f7be0; --wire-g:#3a3f4b; --cable:#12806f; color-scheme:light;
+}
+body,.btn,.coach,.benchcard,.dot,.qr,.path,.card,.slot,.panel{transition:background-color .6s,color .6s,box-shadow .6s,border-color .6s}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.3;padding-inline:16px;padding-block:12px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{border:0;border-radius:999px;padding:12px 22px;font-weight:600;font-size:1.05rem;background:var(--card);color:var(--ink);box-shadow:0 0 0 2px var(--line) inset;display:inline-flex;align-items:center;gap:8px;min-height:48px;text-decoration:none}
+.btn.primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 rgba(120,0,15,.35)}
+.btn.big{font-size:1.4rem;padding:16px 34px;min-height:64px}
+.btn:active{transform:translateY(2px)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.wrap{max-width:1240px;margin-inline:auto;min-height:100%;display:flex;flex-direction:column;gap:12px}
+h1,h2,h3{text-wrap:balance}
+
+/* home */
+#home{flex:1;display:grid;grid-template-columns:1fr;gap:22px;align-content:center;justify-items:center;text-align:center;padding-block:10px}
+#home h1{font-size:clamp(2.3rem,5.5vw,4rem);line-height:1.02;margin:0}
+#home .sub{font-size:1.3rem;color:var(--muted);margin:0}
+.paths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;width:100%;max-width:1000px}
+.path{border:0;border-radius:28px;background:var(--card);box-shadow:0 0 0 3px var(--line) inset;padding:22px 16px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.path:hover{box-shadow:0 0 0 4px var(--accent) inset}
+.path svg{width:120px;height:120px}
+.path div b,.path div span{display:block}
+.path b{font-size:1.9rem}
+.path span{color:var(--muted);font-size:1.05rem}
+.shot{display:none;margin:4px 0 14px}
+#imgov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+#imgov[hidden]{display:none}
+#imgov .box{background:#fff;color:#0b0b0b;border-radius:20px;padding:16px;max-width:420px;width:100%;text-align:center}
+#imgov img{width:100%;border-radius:12px;box-shadow:0 0 0 2px #ddd;margin:8px 0 14px}
+#imgov p{margin:0 0 6px}
+@media (max-width:919px),(pointer:coarse){.shot{display:block}}
+.qr{display:flex;gap:14px;align-items:center;background:var(--card);padding:12px 16px;border-radius:18px;box-shadow:0 0 0 2px var(--line) inset;text-align:left}
+.qr svg{width:84px;height:84px;flex:none;background:#fff;border-radius:8px;padding:4px}
+.qr b{display:block}.qr span{color:var(--muted);font-size:.95rem}
+
+/* play */
+#play{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto 1fr;gap:12px 16px;min-height:0}
+.top{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top h2{margin:0;font-size:1.35rem;flex:1;min-width:0}
+.dots{display:flex;gap:8px}
+.dot{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--card);box-shadow:0 0 0 2px var(--line) inset;color:var(--muted)}
+.dot.now{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+.dot.done{background:var(--good);color:#fff;box-shadow:none}
+.ib{width:48px;height:48px;padding:0;justify-content:center}
+.benchwrap{position:relative;min-height:0;display:flex}
+.benchcard{flex:1;background:var(--bench);border-radius:24px;box-shadow:0 0 0 3px var(--bench-line) inset;display:flex;flex-direction:column;min-height:0;padding:8px}
+#bench{width:100%;height:100%;min-height:0;touch-action:none;user-select:none;-webkit-user-select:none;flex:1}
+.cap{text-align:center;color:var(--muted);font-size:.9rem;padding:2px 0 4px}
+.side{display:flex;flex-direction:column;gap:12px;min-height:0}
+.roomcard{border-radius:22px;overflow:hidden;box-shadow:0 0 0 3px var(--line);background:#13204a;line-height:0}
+.room{width:100%;height:auto;display:block}
+.room .hole,.room .glow{transition:opacity .6s}
+.room .bulb{transition:fill .4s}
+.coach{display:flex;gap:10px;align-items:flex-start;background:var(--card);border-radius:22px;padding:12px;box-shadow:0 0 0 2px var(--line) inset;flex:1}
+.coach svg{width:68px;height:68px;flex:none}
+.coach .bubble{font-size:1.25rem;font-weight:500;min-width:0}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns .btn{flex:1;justify-content:center}
+.plate{fill:var(--plate);stroke:var(--plate-line);stroke-width:3}
+.lbl{fill:var(--muted);font-size:15px;font-weight:600;text-anchor:middle}
+.ring{fill:var(--metal);stroke:var(--metal-dark);stroke-width:3}
+.ring.F{fill:var(--brown);stroke:#4a230a}.ring.N{fill:var(--blue);stroke:#123e82}
+.screw{fill:var(--metal-dark)}
+.term{cursor:pointer}
+.term .halo{fill:none;stroke:var(--accent);stroke-width:5;opacity:0}
+.term.sel .halo{opacity:1}
+.wireline{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hit{fill:transparent;stroke:transparent}
+.flow{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-dasharray:1 22;animation:flow .8s linear infinite;opacity:.9}
+.flow.rev{animation-direction:reverse}
+@keyframes flow{to{stroke-dashoffset:-23}}
+.pulse{fill:none;stroke:var(--accent);stroke-width:6;animation:pl 1s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pl{0%,100%{transform:scale(.85);opacity:1}50%{transform:scale(1.25);opacity:.45}}
+.ghost{fill:none;stroke:var(--accent);stroke-width:6;stroke-dasharray:4 14;stroke-linecap:round;animation:gh 1s linear infinite;opacity:.9}
+@keyframes gh{to{stroke-dashoffset:-18}}
+.nudge{animation:nd .9s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes nd{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.tog{cursor:pointer}
+#ops{position:absolute;inset:0;display:none;place-items:center;pointer-events:none;z-index:5}
+#ops.on{display:grid}
+#ops div{background:var(--bad);color:#fff;border-radius:28px;padding:18px 32px;text-align:center;font-size:2.4rem;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:shake .4s}
+#ops small{display:block;font-size:1.1rem;font-weight:500}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.tripped #bench{filter:grayscale(.8) brightness(.7)}
+#cf{position:fixed;inset:0;pointer-events:none;z-index:20}
+.scene{width:100%;height:auto;display:block}
+.scene .pre{transition:opacity .5s}.scene .post{opacity:0;transition:opacity .6s}
+.scene.ok .pre{opacity:0}.scene.ok .post{opacity:1}
+
+/* estetista */
+#cards{flex:1;display:flex;flex-direction:column;gap:14px;padding:10px;min-height:0;overflow:auto}
+.tray{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.slot{width:84px;height:84px;border-radius:18px;border:3px dashed var(--bench-line);display:grid;place-items:center;font-size:2.2rem;color:var(--muted);font-weight:600;background:transparent}
+.slot.full{border-style:solid;border-color:var(--good);background:var(--card)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;align-content:center;flex:1}
+.card{border:0;border-radius:22px;background:var(--card);box-shadow:0 0 0 3px var(--line) inset;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:1.2rem;font-weight:600;min-height:132px;justify-content:center}
+.card i{font-style:normal;font-size:3rem;line-height:1}
+.card:hover{box-shadow:0 0 0 4px var(--accent) inset}
+.card.done{opacity:.35;pointer-events:none;box-shadow:0 0 0 3px var(--good) inset}
+.card.shake{animation:shake .4s;box-shadow:0 0 0 4px var(--bad) inset}
+.card.hint{animation:nd .9s ease-in-out infinite;box-shadow:0 0 0 4px var(--accent) inset}
+
+/* contatti */
+#contacts{flex:1;display:flex;flex-direction:column;gap:18px;max-width:1000px;width:100%;margin-inline:auto;padding-block:8px 24px}
+#contacts h1{font-size:clamp(2rem,5vw,3.2rem);margin:0;line-height:1.05}
+#contacts .lead{font-size:1.25rem;color:var(--muted);margin:0}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.panel{background:var(--card);border-radius:22px;box-shadow:0 0 0 2px var(--line) inset;padding:18px 20px;min-width:0}
+.panel h3{margin:0 0 10px;font-size:1.3rem}
+.panel ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px}
+.panel p{margin:0 0 8px}
+.muted{color:var(--muted)}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-weight:600;font-size:.95rem}
+.field input,.field select,.field textarea{border:0;border-radius:14px;padding:12px 14px;background:var(--bg);color:var(--ink);box-shadow:0 0 0 2px var(--line) inset;min-height:48px;width:100%}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:0;border-radius:999px;padding:10px 16px;background:var(--bg);box-shadow:0 0 0 2px var(--line) inset;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+#fallback{display:none;margin-top:12px}
+#fallback.on{display:block}
+#fallback textarea{min-height:140px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+
+/* identità: titoli minuscoli e pesanti, anello rosso, linea con nodo */
+h1,h2,h3{font-weight:800;letter-spacing:-.01em}
+.eyebrow{color:var(--accent);font-weight:700;font-size:1.2rem;margin:0}
+#home{justify-items:start;text-align:left;max-width:1100px;margin-inline:auto;width:100%;gap:20px;align-content:center}
+#home h1{font-size:clamp(2.8rem,7vw,5rem);line-height:.95;font-weight:800}
+#home .sub{max-width:34ch}
+.paths{max-width:none}
+.path{align-items:flex-start;text-align:left;border-radius:20px;padding:22px 20px 20px;gap:14px}
+.path b{font-size:2rem;font-weight:800;line-height:1;margin-bottom:4px}
+.path svg{width:96px;height:96px}
+.path div b,.path div span{display:block}
+.dots{gap:0;align-items:center}
+.dot{position:relative;width:34px;height:34px;border:6px solid var(--line);background:transparent;box-shadow:none;font-size:.8rem;color:var(--muted);margin-left:16px}
+.dot:first-child{margin-left:0}
+.dot::before{content:'';position:absolute;right:100%;top:50%;width:16px;height:6px;margin-top:-3px;background:var(--line)}
+.dot:first-child::before{display:none}
+.dot.now{border-color:var(--accent);color:var(--accent);background:transparent}
+.dot.done{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.dot.done::before,.dot.now::before{background:var(--accent)}
+.panel h3{display:flex;gap:10px;align-items:center;font-size:1.4rem}
+.ico{width:26px;height:26px;flex:none;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+ul.dl{list-style:none;padding:0}
+ul.dl li{display:flex;gap:10px;align-items:flex-start}
+ul.dl li .ico{margin-top:2px}
+@media (max-width:919px){
+  body{padding-block:8px;font-size:16px}
+  .paths{grid-template-columns:1fr;gap:12px}
+  .path{flex-direction:row;text-align:left;padding:14px 16px;gap:16px}
+  .path svg{width:76px;height:76px;flex:none}
+  .path b{font-size:1.5rem;display:block}
+  .qr{display:none}
+  #play{grid-template-columns:1fr;grid-template-rows:none;display:flex;flex-direction:column}
+  .top h2{font-size:1.05rem;flex-basis:100%;order:3}
+  .dot{width:30px;height:30px;font-size:.9rem}
+  .side{display:contents}
+  .roomcard.sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;order:1}
+  .roomcard.sticky .room,.roomcard.sticky .scene{height:165px;width:100%}
+  .benchwrap{order:2;flex:none}
+  .benchcard{padding:4px}
+  #bench{height:auto;aspect-ratio:800/440}
+  .coach{order:3;flex:none}
+  .coach svg{width:54px;height:54px}
+  .coach .bubble{font-size:1.1rem}
+  .btns{order:4;padding-bottom:6px}
+  .cap{display:none}
+  .slot{width:62px;height:62px;font-size:1.7rem}
+  .cgrid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .card{min-height:104px;font-size:1.05rem}.card i{font-size:2.4rem}
+  .cols{grid-template-columns:1fr}
+}
+@media (max-width:919px) and (orientation:landscape) and (max-height:520px){
+  #play{display:grid;grid-template-columns:minmax(0,1fr) 250px;grid-template-rows:auto 1fr}
+  .side{display:flex}
+  .roomcard.sticky{position:static}
+  .roomcard.sticky .room,.roomcard.sticky .scene{height:auto}
+  .benchwrap{order:0}
+  #bench{aspect-ratio:auto;height:100%}
+  .top{flex-wrap:nowrap}.top h2{flex-basis:auto;order:0;font-size:1rem}
+  .coach{order:0;flex:1}.coach svg{width:42px;height:42px}.coach .bubble{font-size:1rem}
+  .btns{order:0;padding:0}.btn{min-height:42px;padding:8px 14px;font-size:.95rem}
+  .paths{grid-template-columns:repeat(3,1fr)}.path{flex-direction:column;text-align:center}
+}
+@media (max-width:919px){
+        #home h1{font-size:2.7rem}
+  .path{align-items:center}.path svg{width:76px;height:76px}.path b{font-size:1.6rem}
+  .dot{width:30px;height:30px;margin-left:12px;border-width:5px}.dot::before{width:12px;height:5px;margin-top:-2.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+</style>
+
+<div class="wrap" id="app">
+  <section id="home">
+    <h1>Cosa ti interessa?</h1>
+    <p class="sub">Scegli un mestiere e provalo: ci vogliono pochi minuti.</p>
+    <div class="paths">
+      <button class="path" data-path="el" type="button">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="52" r="34" fill="#ffd84d" stroke="#b58300" stroke-width="5"/><path d="M52 58l6-14 6 9 6-9 6 14" fill="none" stroke="#ff8a00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="46" y="86" width="28" height="16" rx="5" fill="#8b96ad"/><path d="M60 102v10" stroke="#8b96ad" stroke-width="5" stroke-linecap="round"/></svg>
+        <div><b>Elettricità</b><span>Accendi la luce</span></div>
+      </button>
+      <button class="path" data-path="net" type="button">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><rect x="22" y="26" width="76" height="52" rx="8" fill="#13204a" stroke="#8b96ad" stroke-width="5"/><path d="M42 46l-8 8 8 8M78 46l8 8-8 8M66 42l-12 24" fill="none" stroke="#4fd1b8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 92h96l-8 12H20z" fill="#8b96ad"/></svg>
+        <div><b>Informatica</b><span>Fai arrivare il messaggio</span></div>
+      </button>
+      <button class="path" data-path="est" type="button">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="64" rx="34" ry="42" fill="#f5cfb3" stroke="#c99a76" stroke-width="5"/><path d="M42 58q6-8 12 0M66 58q6-8 12 0" fill="none" stroke="#2b2140" stroke-width="4" stroke-linecap="round"/><path d="M46 80q14 14 28 0" fill="none" stroke="#d7263d" stroke-width="6" stroke-linecap="round"/><path d="M96 14l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#ffc400"/><path d="M18 30l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#ff4d5e"/></svg>
+        <div><b>Estetica</b><span>Prepara il trattamento</span></div>
+      </button>
+    </div>
+    <div class="cta" style="justify-content:center;margin-top:6px"><button class="btn" id="skipGame" type="button">Non vuoi giocare? Vai ai contatti</button></div>
+    <div class="qr"><svg role="img" aria-label="Codice QR del gioco" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h33v33H0z"/><path stroke="#000000" d="M0 0.5h7m1 0h2m3 0h1m2 0h3m3 0h1m3 0h7M0 1.5h1m5 0h1m1 0h1m1 0h1m2 0h2m1 0h1m1 0h3m3 0h1m1 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m1 0h1m3 0h5m2 0h4m3 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m2 0h2m3 0h3m1 0h1m1 0h3m3 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h3m1 0h2m1 0h2m4 0h3m2 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m5 0h1m2 0h5m3 0h1m2 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M12 7.5h5m5 0h2M0 8.5h1m2 0h6m2 0h1m2 0h1m2 0h1m2 0h1m1 0h1m1 0h2m2 0h1m1 0h3M0 9.5h2m1 0h1m1 0h1m4 0h4m1 0h1m1 0h3m2 0h2m4 0h4M0 10.5h2m1 0h4m3 0h1m2 0h1m1 0h2m3 0h1m2 0h1m2 0h1m1 0h3m1 0h1M0 11.5h1m4 0h1m2 0h1m1 0h4m1 0h1m2 0h2m3 0h1m1 0h3m2 0h3M2 12.5h3m1 0h5m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1m2 0h2M2 13.5h1m4 0h2m2 0h4m3 0h4m1 0h1m1 0h3m1 0h2M0 14.5h3m3 0h1m5 0h1m2 0h1m1 0h1m1 0h2m3 0h1m1 0h1m1 0h3M0 15.5h3m1 0h2m2 0h2m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1m1 0h4m2 0h3m1 0h1M1 16.5h1m1 0h8m1 0h2m1 0h2m5 0h2m1 0h5M2 17.5h1m2 0h1m2 0h2m1 0h1m3 0h8m3 0h1m1 0h1m1 0h3M0 18.5h1m5 0h2m1 0h1m3 0h3m1 0h3m1 0h3m2 0h2m1 0h4M2 19.5h4m2 0h1m1 0h1m4 0h2m2 0h2m3 0h3m1 0h5M0 20.5h1m1 0h1m1 0h4m1 0h1m1 0h3m2 0h1m1 0h2m1 0h1m6 0h2m1 0h2M0 21.5h2m2 0h2m2 0h2m1 0h1m10 0h4m1 0h2M0 22.5h1m2 0h1m2 0h1m2 0h2m3 0h1m2 0h5m1 0h2m1 0h3m1 0h3M0 23.5h1m2 0h1m3 0h2m3 0h1m1 0h2m1 0h1m1 0h2m2 0h1m1 0h4m1 0h2M0 24.5h4m2 0h1m1 0h2m3 0h1m2 0h1m3 0h1m2 0h7m1 0h2M8 25.5h4m2 0h2m1 0h2m5 0h1m3 0h1m1 0h3M0 26.5h7m1 0h1m3 0h1m2 0h3m1 0h2m1 0h3m1 0h1m1 0h1m1 0h1M0 27.5h1m5 0h1m1 0h1m2 0h1m2 0h1m2 0h3m3 0h2m3 0h3m1 0h1M0 28.5h1m1 0h3m1 0h1m1 0h3m4 0h3m1 0h2m1 0h7M0 29.5h1m1 0h3m1 0h1m1 0h3m2 0h2m1 0h3m2 0h5m1 0h1m3 0h2M0 30.5h1m1 0h3m1 0h1m3 0h1m1 0h4m2 0h2m1 0h2m2 0h1m1 0h2m2 0h2M0 31.5h1m5 0h1m3 0h1m8 0h1m2 0h1m3 0h7M0 32.5h7m1 0h3m2 0h1m1 0h1m1 0h1m4 0h3m1 0h4"/></svg><div><b>Gioca dal telefono</b><span>Inquadra il codice</span></div></div>
+  </section>
+
+  <section id="play" hidden>
+    <div class="top">
+      <h2 id="mtitle"></h2>
+      <div class="dots" id="dots"></div>
+      <button class="btn ib" id="mute" type="button" aria-label="Suono"></button>
+      <button class="btn ib" id="homeb" type="button" aria-label="Torna all’inizio"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    </div>
+    <div class="benchwrap">
+      <div class="benchcard">
+        <svg id="bench" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid meet"></svg>
+        <div id="cards" hidden></div>
+        <div class="cap" id="cap">Tocca un pallino e poi un altro per unirli con un filo. Tocca un filo per toglierlo.</div>
+      </div>
+      <div id="ops"><div>OPS!<small>Il salvavita ha staccato la corrente</small></div></div>
+    </div>
+    <div class="side">
+      <div class="roomcard sticky" id="playRoom"></div>
+      <div class="coach"><div id="mascot"></div><div class="bubble" id="say"></div></div>
+      <div class="btns">
+        <button class="btn" id="hint" type="button">Aiutami</button>
+        <button class="btn" id="reset" type="button">Ricomincia</button>
+        <button class="btn primary" id="ok" type="button" hidden>Avanti</button>
+        <button class="btn primary" id="next" type="button" hidden>Avanti</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacts" hidden>
+    <h1 id="cTitle">Ti è piaciuto? Vieni a trovarci!</h1>
+    <p class="lead" id="cLead"></p>
+    <div class="cols">
+      <div class="panel" id="pWhere"></div>
+      <div class="panel" id="pDates"></div>
+      <div class="panel" id="pLabs"></div>
+      <div class="panel" id="pBook"></div>
+    </div>
+    <div class="shot" id="shot"><button class="btn" id="saveImg" type="button">Salva queste informazioni come immagine</button></div>
+    <div id="imgov" hidden><div class="box"><p><b>Tieni premuto sull’immagine</b> e scegli «Salva».</p><img id="imgout" alt="Informazioni sull’open day"><button class="btn primary" id="imgclose" type="button">Chiudi</button></div></div>
+    <div class="cta"><button class="btn primary big" id="other" type="button">Prova un altro mestiere</button></div>
+  </section>
+</div>
+<canvas id="cf"></canvas>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const DESKTOP=!matchMedia('(max-width:919px)').matches && !matchMedia('(pointer:coarse)').matches;
+
+/* ======= DATI DELLA SCUOLA: da compilare ======= */
+const SCUOLA={
+  nome:'CFP',
+  indirizzo:'',            // es. 'Via ..., Rozzano (MI)'
+  telefono:'',
+  email:'',                // indirizzo a cui arrivano le prenotazioni
+  sito:'',
+  date:[],                 // es. [{quando:'Sabato 15 novembre, 9:30–13:30', note:'Open day'}]
+  laboratori:{el:'',net:'',est:''}   // es. {el:'Sabato 9:30–12:30, laboratorio impianti'}
+};
+const PNAME={el:'Elettricità',net:'Informatica',est:'Estetica'};
+
+/* ======= LIVELLI ======= */
+const SRC=[{id:'S.F',x:190,y:160,dir:1,kind:'F'},{id:'S.N',x:190,y:260,dir:1,kind:'N'}];
+const EL=[
+ {title:'Accendi la lampadina',
+  goal:'La corrente fa un giro: va alla lampadina e poi torna indietro. Servono due fili!',
+  win:'Evviva! La corrente esce dal marrone, passa nella lampadina e torna dal blu. Un giro completo!',
+  intro:[{t:'Questa è la corrente, come quella che esce dal muro di casa. Ha due uscite: una marrone e una blu.',box:['S']},
+         {t:'Questa è la lampadina. Ha due pallini: la corrente entra da uno e deve uscire dall’altro.',box:['L']},
+         {t:'I pallini si chiamano morsetti: ci si attaccano i fili. Il marrone porta la corrente, il blu la riporta indietro.',hl:['S.F','S.N']},
+         {t:'Tocca il pallino marrone, poi un pallino della lampadina. Poi fai lo stesso con il blu.'}],
+  comps:[{t:'lamp',id:'L',x:610,y:130}], room:[180],
+  sol:[['S.F','L.a'],['S.N','L.b']]},
+ {title:'Aggiungi l’interruttore',
+  goal:'L’interruttore apre e chiude la strada. Metti il filo marrone dentro l’interruttore.',
+  win:'Ottimo lavoro! Ora comandi tu la luce: premi l’interruttore.',
+  press:'Ora premi l’interruttore!',
+  intro:[{t:'Questo è l’interruttore. Quando è acceso la corrente passa, quando è spento si ferma.',box:['SW']},
+         {t:'Si mette sulla strada del filo marrone: prima l’interruttore, poi la lampadina. Il blu va dritto alla lampadina.',hl:['S.F','SW.in','SW.out','L.a']}],
+  comps:[{t:'sw',id:'SW',x:330,y:100},{t:'lamp',id:'L',x:610,y:130}], room:[180],
+  sol:[['S.F','SW.in'],['SW.out','L.a'],['S.N','L.b']]},
+ {title:'Due lampade, un interruttore',
+  goal:'Una sola mano sull’interruttore e si accendono tutte e due le lampade!',
+  win:'Fantastico! Un interruttore comanda due lampade insieme.',
+  press:'Premi l’interruttore!',
+  intro:[{t:'Adesso le lampade sono due. Prendono la corrente insieme: tutte e due vanno unite all’interruttore (marrone) e al blu.',box:['L1','L2']}],
+  comps:[{t:'sw',id:'SW',x:300,y:100},{t:'lamp',id:'L1',x:610,y:40},{t:'lamp',id:'L2',x:610,y:230}], room:[115,245],
+  sol:[['S.F','SW.in'],['SW.out','L1.a'],['SW.out','L2.a'],['S.N','L1.b'],['S.N','L2.b']]}
+];
+const NET=[
+ {title:'Due computer', mode:'lan', scene:'chat1',
+  goal:'Collega i due computer con un cavo: il messaggio deve arrivare.',
+  win:'Il messaggio è arrivato! Un cavo basta per far parlare due computer.',
+  intro:[{t:'Questi sono due computer. Ognuno ha una presa dove si attacca il cavo.',box:['A','B']},
+         {t:'Tocca la presa di un computer e poi quella dell’altro: il cavo li unisce.',hl:['A.p','B.p']}],
+  comps:[{t:'pc',id:'A',x:60,y:150,label:'Tu'},{t:'pc',id:'B',x:620,y:150,flip:true,label:'Il tuo amico'}],
+  sol:[['A.p','B.p']]},
+ {title:'Tre computer', mode:'lan', scene:'chat3',
+  goal:'Tre computer devono parlarsi. Ognuno ha una sola presa: serve un aiuto in mezzo.',
+  win:'Perfetto! Lo switch fa parlare tutti insieme.',
+  intro:[{t:'I computer sono tre, ma ognuno ha una sola presa. Come si fa?',box:['A','B','C']},
+         {t:'Si usa lo switch: è come una presa multipla per i cavi di rete. Ha quattro prese.',box:['SW']},
+         {t:'Collega ogni computer a una presa dello switch.',hl:['A.p','B.p','C.p']}],
+  comps:[{t:'pc',id:'A',x:60,y:50,label:'Tu'},{t:'pc',id:'B',x:60,y:270,label:'Anna'},{t:'nsw',id:'SW',x:325,y:150},{t:'pc',id:'C',x:620,y:150,flip:true,label:'Marco'}],
+  sol:[['A.p','SW.p1'],['B.p','SW.p2'],['C.p','SW.p3']]},
+ {title:'Vai su internet', mode:'web', scene:'web',
+  goal:'Porta i due computer su internet. Serve il router.',
+  win:'Sei online! Il router collega la tua rete a internet.',
+  intro:[{t:'Lo switch collega i computer tra loro. Per andare su internet serve anche il router.',box:['SW','R']},
+         {t:'Il router ha due prese diverse: una verso casa (i tuoi computer) e una verso internet. Non vanno mescolate!',hl:['R.lan','R.wan']},
+         {t:'Computer sullo switch, switch sulla presa “casa” del router, presa “internet” del router a internet.'}],
+  comps:[{t:'pc',id:'A',x:40,y:30,label:'Computer 1'},{t:'pc',id:'B',x:40,y:290,label:'Computer 2'},{t:'nsw',id:'SW',x:230,y:160},{t:'router',id:'R',x:450,y:160},{t:'web',id:'W',x:650,y:140}],
+  sol:[['A.p','SW.p1'],['B.p','SW.p2'],['SW.p3','R.lan'],['R.wan','W.p']]}
+];
+const EST=[
+ {title:'Il trattamento viso', ordered:true, face:'m1', show:[3,1,0,2],
+  goal:'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+  win:'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+  intro:[{t:'Questa è Giulia. Ha ancora il trucco della sera e la pelle stanca. Tocca a te.'},
+         {t:'Per prima cosa devi capire l’ordine: cosa si fa prima e cosa dopo? Se sbagli, ti spiego perché.'}],
+  items:[{e:'💄',t:'Struccante',done:'Via il trucco!'},
+         {e:'🫧',t:'Detergente',done:'Pelle pulita.',early:'Prima di pulire bene la pelle, bisogna togliere il trucco.'},
+         {e:'🧖',t:'Maschera',done:'La maschera nutre la pelle.',early:'La maschera si mette su una pelle già pulita.'},
+         {e:'🧴',t:'Crema',done:'La crema protegge e chiude il trattamento.',early:'La crema va per ultima, quando la pelle è pulita e curata.'}]},
+ {title:'Igiene prima di tutto', ordered:false, face:'m2', show:[3,0,5,1,4,2],
+  goal:'Scegli le 3 cose giuste da fare prima di cominciare. Le altre sono sbagliate!',
+  win:'Ottimo! Con mani e strumenti puliti si lavora in sicurezza.',
+  intro:[{t:'Si lavora a stretto contatto con la pelle delle persone. Per questo l’igiene è la prima cosa da fare.'},
+         {t:'Qui ci sono 6 cose. Solo 3 sono giuste da fare prima di cominciare. Trovale!'}],
+  items:[{e:'🧼',t:'Mani lavate',ok:true,done:'Si parte sempre con le mani pulite.'},
+         {e:'🧤',t:'Guanti nuovi',ok:true,done:'Guanti nuovi per ogni persona.'},
+         {e:'✨',t:'Strumenti puliti',ok:true,done:'Gli strumenti si puliscono e si disinfettano.'},
+         {e:'🧽',t:'Spugna già usata',why:'Una spugna usata su un’altra persona porta germi. Si usa materiale nuovo o pulito.'},
+         {e:'🍔',t:'Merenda sul tavolo',why:'Il cibo non sta dove si lavora: il tavolo deve restare pulito.'},
+         {e:'🖌️',t:'Pennello sporco',why:'Un pennello sporco può portare germi alla pelle. Va pulito prima.'}]},
+ {title:'Le unghie', ordered:true, face:'hand', show:[2,0,3,1],
+  goal:'Prepara le unghie e metti lo smalto nell’ordine giusto.',
+  win:'Che bel colore! Unghie perfette e lucide.',
+  intro:[{t:'Ora una manicure. Prima si preparano le unghie, poi si dà lo smalto, un pezzo alla volta.'}],
+  items:[{e:'✂️',t:'Taglia e lima',done:'Unghie in forma.'},
+         {e:'🖌️',t:'Base trasparente',done:'La base protegge l’unghia.',early:'Prima bisogna dare la forma alle unghie.'},
+         {e:'💅',t:'Colore',done:'Che colore!',early:'Il colore va sopra la base, non prima.'},
+         {e:'🌟',t:'Lucidante',done:'Il lucidante rende lo smalto brillante e lo fa durare di più.',early:'Il lucidante si mette per ultimo, sopra il colore.'}]}
+];
+const GAMES={el:EL,net:NET,est:EST};
+
+/* ======= STATO ======= */
+let game='el',L,li=0,level,TM={},IDS=[],wires=[],st={},SEL=null,hintOn=false,won=false,tripped=false,introStep=-1,lastIn=Date.now(),wid=0;
+let picked=[],shakeI=-1,flashMsg='',flashT=null,lastDone='';
+const isEl=()=>game==='el',isNet=()=>game==='net',isEst=()=>game==='est';
+const isSw=id=>level.comps.find(c=>c.id===id).t==='sw';
+
+function termsOf(c){
+  switch(c.t){
+  case'lamp':return[{id:c.id+'.a',x:c.x,y:c.y+30,dir:-1},{id:c.id+'.b',x:c.x,y:c.y+80,dir:-1}];
+  case'sw':return[{id:c.id+'.in',x:c.x,y:c.y+45,dir:-1},{id:c.id+'.out',x:c.x+110,y:c.y+45,dir:1}];
+  case'dev':return c.flip?[{id:c.id+'.C',x:c.x+100,y:c.y+80,dir:1},{id:c.id+'.1',x:c.x,y:c.y+40,dir:-1},{id:c.id+'.2',x:c.x,y:c.y+120,dir:-1}]
+    :[{id:c.id+'.C',x:c.x,y:c.y+80,dir:-1},{id:c.id+'.1',x:c.x+100,y:c.y+40,dir:1},{id:c.id+'.2',x:c.x+100,y:c.y+120,dir:1}];
+  case'pc':return[{id:c.id+'.p',x:c.flip?c.x:c.x+120,y:c.y+76,dir:c.flip?-1:1}];
+  case'nsw':return[{id:c.id+'.p1',x:c.x,y:c.y+25,dir:-1},{id:c.id+'.p2',x:c.x,y:c.y+65,dir:-1},{id:c.id+'.p3',x:c.x+150,y:c.y+25,dir:1},{id:c.id+'.p4',x:c.x+150,y:c.y+65,dir:1}];
+  case'router':return[{id:c.id+'.lan',x:c.x,y:c.y+45,dir:-1},{id:c.id+'.wan',x:c.x+130,y:c.y+45,dir:1}];
+  case'web':return[{id:c.id+'.p',x:c.x,y:c.y+55,dir:-1}];
+  }
+}
+function bbox(id){
+  if(id==='S')return[40,110,150,200];
+  const c=level.comps.find(c=>c.id===id);
+  return({lamp:[c.x,c.y,130,110],sw:[c.x,c.y,110,90],dev:[c.x,c.y,100,160],pc:[c.x,c.y,120,92],nsw:[c.x,c.y,150,90],router:[c.x,c.y,130,90],web:[c.x,c.y,120,110]})[c.t];
+}
+
+/* ======= CARICAMENTO ======= */
+function loadLevel(i){
+  li=i;level=GAMES[game][i];wires=[];st={};SEL=null;won=false;tripped=false;hintOn=false;introStep=level.intro?0:-1;
+  picked=[];shakeI=-1;flashMsg='';lastDone='';
+  $('#ok').hidden=true;$('#next').hidden=true;$('#ops').classList.remove('on');$('#app').classList.remove('tripped');
+  $('#mtitle').textContent='Missione '+(i+1)+': '+level.title;
+  document.documentElement.classList.remove('lit');
+  $('#bench').toggleAttribute('hidden',isEst());$('#cards').hidden=!isEst();
+  $('#cap').textContent=isEst()?'':'Tocca un pallino e poi un altro per unirli con un filo. Tocca un filo per toglierlo.';
+  $('#cap').hidden=isEst();
+  if(!isEst()){
+    TM={};if(isEl())SRC.forEach(t=>TM[t.id]=t);
+    level.comps.forEach(c=>termsOf(c).forEach(t=>TM[t.id]=t));
+    IDS=Object.keys(TM);
+    level.comps.forEach(c=>{if(c.t==='sw')st[c.id]=false;if(c.t==='dev')st[c.id]=c.flip?2:1});
+    if(isEl())buildRoom('#playRoom','p',level.room);else $('#playRoom').innerHTML=netScene(level.scene);
+  }
+  render();
+}
+
+/* ======= SIMULAZIONE ELETTRICA ======= */
+function UF(){const p={};IDS.forEach(i=>p[i]=i);const f=x=>p[x]===x?x:(p[x]=f(p[x]));return{f,u:(a,b)=>{a=f(a);b=f(b);if(a!==b)p[a]=b}}}
+function sim(s,ws){
+  const U=UF();ws.forEach(w=>U.u(w.a,w.b));
+  level.comps.forEach(c=>{if(c.t==='sw'&&s[c.id])U.u(c.id+'.in',c.id+'.out');if(c.t==='dev')U.u(c.id+'.C',c.id+'.'+s[c.id])});
+  const F=U.f('S.F'),N=U.f('S.N'),short=F===N,lit={};
+  level.comps.filter(c=>c.t==='lamp').forEach(c=>{const a=U.f(c.id+'.a'),b=U.f(c.id+'.b');lit[c.id]=!short&&((a===F&&b===N)||(a===N&&b===F))});
+  return{U,F,N,short,lit};
+}
+function combos(){
+  const ids=level.comps.filter(c=>c.t!=='lamp').map(c=>c.id),out=[];
+  for(let m=0;m<(1<<ids.length);m++){const s={};ids.forEach((id,i)=>{const b=(m>>i)&1;s[id]=isSw(id)?!!b:(b?2:1)});out.push({m,s})}
+  return{ids,out};
+}
+function works(ws){
+  const lamps=level.comps.filter(c=>c.t==='lamp').map(c=>c.id),{ids,out}=combos();
+  const R=out.map(o=>sim(o.s,ws));
+  if(R.some(r=>r.short))return false;
+  if(!lamps.every(l=>R.some(r=>r.lit[l])))return false;
+  for(let i=0;i<ids.length;i++)for(let m=0;m<out.length;m++){const m2=m^(1<<i);
+    if(!lamps.every(l=>R[m].lit[l]!==R[m2].lit[l]))return false}
+  return true;
+}
+/* ======= SIMULAZIONE RETE ======= */
+function evalNet(){
+  const U=UF();wires.forEach(w=>U.u(w.a,w.b));
+  level.comps.filter(c=>c.t==='nsw').forEach(c=>{U.u(c.id+'.p1',c.id+'.p2');U.u(c.id+'.p1',c.id+'.p3');U.u(c.id+'.p1',c.id+'.p4')});
+  const f=U.f,pcs=level.comps.filter(c=>c.t==='pc'),got={};let ok=true,why='';
+  if(level.mode==='lan'){
+    pcs.forEach(c=>{got[c.id]=pcs.every(o=>f(o.id+'.p')===f(c.id+'.p'))});
+  }else{
+    const lan=f('R.lan'),wan=f('R.wan'),web=f('W.p');
+    if(lan===wan)why='merged';
+    pcs.forEach(c=>{got[c.id]=!why&&f(c.id+'.p')===lan});
+    got.W=!why&&wan===web&&got.A&&got.B;
+  }
+  ok=Object.values(got).every(Boolean);
+  return{U,got,ok,why};
+}
+const hasW=(a,b)=>wires.some(w=>(w.a===a&&w.b===b)||(w.a===b&&w.b===a));
+function nextMissing(){
+  if(isNet()){const U=evalNet().U;return level.sol.find(([a,b])=>U.f(a)!==U.f(b))}
+  return level.sol.find(([a,b])=>!hasW(a,b));
+}
+
+/* ======= DISEGNO BANCO ======= */
+function wpath(a,b){
+  const k=Math.max(30,Math.min(110,Math.abs(b.x-a.x)/2));
+  return `M${a.x} ${a.y}C${a.x+a.dir*k} ${a.y} ${b.x+b.dir*k} ${b.y} ${b.x} ${b.y}`;
+}
+function drawSource(){return `<g><rect class="plate" x="40" y="110" width="150" height="200" rx="22"/>
+ <path d="M104 150l-26 50h22l-8 42 38-56H106l14-36z" fill="#ffc400" stroke="#b58300" stroke-width="3" stroke-linejoin="round" transform="translate(-6,0)"/>
+ <text class="lbl" x="115" y="292">Corrente</text><text class="lbl" x="170" y="165" style="text-anchor:end;fill:var(--brown)">va</text><text class="lbl" x="170" y="265" style="text-anchor:end;fill:var(--blue)">torna</text></g>`;}
+function drawLamp(c,lit){const cx=c.x+75,cy=c.y+48;
+ return `<g><rect class="plate" x="${c.x}" y="${c.y}" width="130" height="110" rx="18"/>
+ ${lit?`<circle cx="${cx}" cy="${cy}" r="62" fill="#ffd84d" opacity=".35"/><circle cx="${cx}" cy="${cy}" r="44" fill="#ffd84d" opacity=".4"/>`:''}
+ <circle cx="${cx}" cy="${cy}" r="27" fill="${lit?'#fff2a8':'#dfe6f2'}" stroke="${lit?'#e0a800':'#8b96ad'}" stroke-width="3"/>
+ <path d="M${cx-9} ${cy+10}l4-14 5 8 5-8 4 14" fill="none" stroke="${lit?'#ff8a00':'#7b869c'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+ <rect x="${cx-12}" y="${cy+25}" width="24" height="12" rx="3" fill="#8b96ad"/>
+ <text class="lbl" x="${c.x+65}" y="${c.y+104}" style="font-size:14px">Lampadina</text></g>`;}
+function drawSw(c,on,nudge){return `<g class="tog" data-toggle="${c.id}">
+ <rect class="plate" x="${c.x}" y="${c.y}" width="110" height="90" rx="16"/>
+ <g class="${nudge?'nudge':''}"><rect x="${c.x+33}" y="${c.y+14}" width="44" height="62" rx="10" fill="${on?'#2fbf71':'#c5ccda'}" stroke="${on?'#167a43':'#8b96ad'}" stroke-width="3"/>
+ <rect x="${c.x+39}" y="${on?c.y+19:c.y+43}" width="32" height="28" rx="7" fill="#fff" stroke="#8b96ad" stroke-width="2"/></g>
+ <text class="lbl" x="${c.x+55}" y="${c.y+112}">Interruttore</text></g>`;}
+function drawDev(c,s,nudge){
+  const T=Object.fromEntries(termsOf(c).map(t=>[t.id.split('.')[1],t]));
+  const cp={x:c.flip?c.x+78:c.x+22,y:c.y+80},tp=T[s];const tx=c.flip?c.x+22:c.x+78,ty=tp.y;
+  const o=T[s===1?2:1],oy=o.y;
+  return `<g class="tog" data-toggle="${c.id}"><rect class="plate" x="${c.x}" y="${c.y}" width="100" height="160" rx="16"/>
+  <circle cx="${tx}" cy="${oy}" r="6" fill="#8b96ad"/><circle cx="${tx}" cy="${ty}" r="6" fill="#8b96ad"/>
+  <g class="${nudge?'nudge':''}"><line x1="${cp.x}" y1="${cp.y}" x2="${tx}" y2="${ty}" stroke="#2fbf71" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="${cp.x}" cy="${cp.y}" r="10" fill="#fff" stroke="#8b96ad" stroke-width="3"/></g><text class="lbl" x="${c.x+50}" y="${c.y+180}">Deviatore</text></g>`;}
+function drawPc(c,on){
+  return `<g><rect class="plate" x="${c.x+8}" y="${c.y}" width="104" height="64" rx="10"/>
+  <rect x="${c.x+16}" y="${c.y+8}" width="88" height="46" rx="5" fill="${on?'#d9f6ee':'#13204a'}"/>
+  ${on?`<path d="M${c.x+46} ${c.y+32}l10 10 20-20" fill="none" stroke="#12806f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`:`<path d="M${c.x+34} ${c.y+31}h52" stroke="#4fd1b8" stroke-width="3" stroke-dasharray="2 8" opacity=".6"/>`}
+  <rect class="plate" x="${c.x}" y="${c.y+62}" width="120" height="30" rx="10"/>
+  <text class="lbl" x="${c.x+60}" y="${c.y+112}">${c.label||''}</text></g>`;}
+function drawNsw(c){return `<g><rect class="plate" x="${c.x}" y="${c.y}" width="150" height="90" rx="16"/>
+  <text class="lbl" x="${c.x+75}" y="${c.y+52}" style="font-size:18px">Switch</text>
+  ${[0,1,2,3].map(i=>`<circle cx="${c.x+45+i*20}" cy="${c.y+72}" r="4" fill="#2fbf71"/>`).join('')}</g>`;}
+function drawRouter(c){return `<g><rect class="plate" x="${c.x}" y="${c.y}" width="130" height="90" rx="16"/>
+  <path d="M${c.x+30} ${c.y}v-26M${c.x+100} ${c.y}v-26" stroke="var(--plate-line)" stroke-width="6" stroke-linecap="round"/>
+  <text class="lbl" x="${c.x+65}" y="${c.y+28}" style="font-size:18px">Router</text>
+  <text class="lbl" x="${c.x+40}" y="${c.y+68}" style="font-size:12px">casa</text><text class="lbl" x="${c.x+92}" y="${c.y+68}" style="font-size:12px">internet</text></g>`;}
+function drawWeb(c,on){const cx=c.x+70,cy=c.y+50;return `<g><rect class="plate" x="${c.x}" y="${c.y}" width="120" height="110" rx="18"/>
+  <circle cx="${cx}" cy="${cy}" r="34" fill="${on?'#4fb3ff':'#9ab0c8'}" stroke="#2f6fb0" stroke-width="3"/>
+  <ellipse cx="${cx}" cy="${cy}" rx="14" ry="34" fill="none" stroke="#2f6fb0" stroke-width="2.5"/><path d="M${cx-34} ${cy}h68M${cx-28} ${cy-16}h56M${cx-28} ${cy+16}h56" stroke="#2f6fb0" stroke-width="2.5" fill="none"/>
+  <text class="lbl" x="${c.x+65}" y="${c.y+104}" style="font-size:14px">Internet</text></g>`;}
+function drawTerm(t){const kind=t.kind||'';
+  return `<g class="term${SEL===t.id?' sel':''}" data-term="${t.id}"><circle class="hit" cx="${t.x}" cy="${t.y}" r="34"/><circle class="halo" cx="${t.x}" cy="${t.y}" r="26"/><circle class="ring ${kind}" cx="${t.x}" cy="${t.y}" r="16"/><circle class="screw" cx="${t.x}" cy="${t.y}" r="7"/><line x1="${t.x-5}" y1="${t.y-5}" x2="${t.x+5}" y2="${t.y+5}" stroke="var(--plate)" stroke-width="2.5"/></g>`;}
+
+/* ======= RENDER ======= */
+function render(){
+  if(isEst())return renderEst();
+  const svg=$('#bench');let g='',h='',wg='',fg='',msg,mood='hi',ok=false,needPress=false,allLit=false,lampsLit={},net=null,s=null,W=false;
+  if(isEl()){
+    s=sim(st,wires);
+    const lamps=level.comps.filter(c=>c.t==='lamp');
+    lampsLit=tripped?{}:s.lit;allLit=lamps.every(l=>lampsLit[l.id]);
+    W=works(wires);ok=!s.short&&W&&allLit;needPress=W&&!allLit&&!tripped;
+  }else{net=evalNet();ok=net.ok;}
+  // colori: unione con soli fili
+  const U0=UF();wires.forEach(w=>U0.u(w.a,w.b));const rF=isEl()?U0.f('S.F'):null,rN=isEl()?U0.f('S.N'):null;
+  if(isEl())g+=drawSource();
+  level.comps.forEach(c=>{
+    if(c.t==='lamp')g+=drawLamp(c,!!lampsLit[c.id]);
+    if(c.t==='sw')g+=drawSw(c,st[c.id],needPress);
+    if(c.t==='dev')g+=drawDev(c,st[c.id],needPress);
+    if(c.t==='pc')g+=drawPc(c,!!net.got[c.id]);
+    if(c.t==='nsw')g+=drawNsw(c);
+    if(c.t==='router')g+=drawRouter(c);
+    if(c.t==='web')g+=drawWeb(c,!!net.got.W);
+  });
+  wires.forEach(w=>{
+    let a=TM[w.a],b=TM[w.b];
+    let col='var(--cable)';
+    if(isEl()){const r=U0.f(w.a);col=r===rF?'var(--brown)':r===rN?'var(--blue)':'var(--wire-g)'}
+    if(a.x>b.x){const t=a;a=b;b=t}
+    const d=wpath(a,b);
+    wg+=`<g data-wire="${w.id}"><path class="wireline" d="${d}" stroke="rgba(0,0,0,.35)" stroke-width="15"/><path class="wireline" d="${d}" stroke="${col}" stroke-width="10"/><path class="wireline hit" d="${d}" stroke-width="30" style="cursor:pointer"/></g>`;
+    if(isEl()&&!s.short&&!tripped&&allLit){const f=s.U.f(w.a);if(f===s.F)fg+=`<path class="flow" d="${d}"/>`;else if(f===s.N)fg+=`<path class="flow rev" d="${d}"/>`}
+    if(isNet()&&ok)fg+=`<path class="flow" d="${d}"/>`;
+  });
+  g+=wg+fg;
+  if(introStep>=0){const sl=level.intro[introStep];
+    (sl.box||[]).forEach(id=>{const b=bbox(id);h+=`<rect class="pulse" x="${b[0]-10}" y="${b[1]-10}" width="${b[2]+20}" height="${b[3]+20}" rx="26"/>`});
+    (sl.hl||[]).forEach(id=>{const t=TM[id];h+=`<circle class="pulse" cx="${t.x}" cy="${t.y}" r="26"/>`});
+  }else if(hintOn&&!won&&!tripped){
+    const n=nextMissing();
+    if(n){const a=TM[n[0]],b=TM[n[1]];
+      h+=`<path class="ghost" d="${wpath(a.x<=b.x?a:b,a.x<=b.x?b:a)}"/><circle class="pulse" cx="${a.x}" cy="${a.y}" r="26"/><circle class="pulse" cx="${b.x}" cy="${b.y}" r="26"/>`}
+  }
+  g+=h;
+  const termList=isEl()?SRC.concat(Object.values(TM).filter(t=>!SRC.includes(t))):Object.values(TM);
+  termList.forEach(t=>g+=drawTerm(t));
+  g+=`<path id="prev" class="wireline" d="" stroke="var(--accent)" stroke-width="8" stroke-dasharray="2 14" style="pointer-events:none"/>`;
+  svg.innerHTML=g;
+  let lightOn=false;
+  if(isEl()){
+    const lamps=level.comps.filter(c=>c.t==='lamp');
+    setRoom('#playRoom',level.room.map((_,i)=>!!lampsLit[lamps[i].id]));
+    lightOn=lamps.some(l=>lampsLit[l.id]);
+  }else{
+    $('#playRoom').firstElementChild.classList.toggle('ok',ok);lightOn=ok;
+  }
+  $('#app').classList.toggle('tripped',tripped);
+  document.documentElement.classList.toggle('lit',lightOn);
+  // guida
+  if(introStep>=0)msg=level.intro[introStep].t;
+  else if(flashMsg)msg=flashMsg;
+  else if(isEl()&&tripped){msg='Ops! La corrente è tornata indietro senza passare dalla lampadina. Il salvavita ha staccato tutto.';mood='oops'}
+  else if(ok){msg=level.win;mood='happy'}
+  else if(isEl()&&needPress)msg=level.press||'Premi!';
+  else if(isEl()&&allLit&&!W&&level.comps.some(c=>c.t!=='lamp')){msg=li===3?'Si accende, ma gli interruttori non comandano bene. Controlla i fili.':'Si accende sempre: l’interruttore non comanda niente. Il filo marrone deve passare dentro l’interruttore.'}
+  else if(isNet()&&net.why==='merged'){msg='Il router ha due prese diverse: una per casa e una per internet. Non vanno unite!';mood='oops'}
+  else if(hintOn&&nextMissing()){msg='Collega i due pallini che pulsano.'}
+  else if(SEL){msg='Bene! Ora tocca dove vuoi arrivare.'}
+  else if(!wires.length){msg=level.goal}
+  else{const done=isNet()?level.sol.filter(([a,b])=>net.U.f(a)===net.U.f(b)).length:level.sol.filter(([a,b])=>hasW(a,b)).length;msg=done>=level.sol.length-1?'Ci sei quasi!':'Continua così. Se serve, tocca «Aiutami».'}
+  finishRender(msg,mood,ok);
+}
+function finishRender(msg,mood,ok){
+  $('#say').textContent=msg;$('#mascot').innerHTML=mascot(mood);
+  if(ok&&!won){won=true;celebrate()}
+  const inIntro=introStep>=0;
+  $('#ok').hidden=!inIntro;$('#ok').textContent=introStep===(level.intro||[]).length-1?'Ho capito, provo!':'Avanti';
+  $('#next').hidden=!won||inIntro;
+  $('#next').textContent=li===GAMES[game].length-1?'Fine':'Avanti';
+  $('#hint').hidden=won||inIntro;$('#reset').hidden=inIntro;
+  const n=GAMES[game].length;
+  $('#dots').innerHTML=GAMES[game].map((_,i)=>`<div class="dot ${i<li||(i===li&&won)?'done':i===li?'now':''}">${i<li||(i===li&&won)?'✓':i+1}</div>`).join('');
+}
+
+/* ======= ESTETISTA ======= */
+function renderEst(){
+  const it=level.items,total=it.length,need=level.ordered?total:it.filter(x=>x.ok).length;
+  const ok=picked.length>=need;
+  const nextI=level.ordered?picked.length:it.findIndex((x,i)=>x.ok&&!picked.includes(i));
+  let tray='';
+  if(level.ordered)for(let k=0;k<total;k++)tray+=`<div class="slot${picked[k]!==undefined?' full':''}">${picked[k]!==undefined?it[picked[k]].e:k+1}</div>`;
+  else for(let k=0;k<need;k++)tray+=`<div class="slot${picked[k]!==undefined?' full':''}">${picked[k]!==undefined?it[picked[k]].e:'?'}</div>`;
+  const order=level.show||it.map((_,i)=>i);
+  const grid=order.map(i=>`<button class="card${picked.includes(i)?' done':''}${shakeI===i?' shake':''}${hintOn&&!ok&&introStep<0&&i===nextI?' hint':''}" data-i="${i}" type="button"><i>${it[i].e}</i>${it[i].t}</button>`).join('');
+  $('#cards').innerHTML=`<div class="tray">${tray}</div><div class="cgrid">${grid}</div>`;
+  const prog=level.ordered?picked.length:(ok?1:0);
+  $('#playRoom').innerHTML=level.face==='hand'?handSVG(picked.length):faceSVG(level.face,prog,ok);
+  document.documentElement.classList.toggle('lit',ok);
+  let msg,mood='hi';
+  if(introStep>=0)msg=level.intro[introStep].t;
+  else if(flashMsg){msg=flashMsg;mood=shakeI>=0?'oops':'hi'}
+  else if(ok){msg=level.win;mood='happy'}
+  else if(hintOn&&nextI>=0)msg='Tocca il prodotto che pulsa.';
+  else if(lastDone)msg=lastDone;
+  else msg=level.goal;
+  finishRender(msg,mood,ok);
+}
+function flash(msg,ms=3200){flashMsg=msg;clearTimeout(flashT);flashT=setTimeout(()=>{flashMsg='';shakeI=-1;render()},ms)}
+function pickCard(i){
+  if(introStep>=0||won)return;lastIn=Date.now();ac();
+  const it=level.items[i];if(picked.includes(i))return;
+  if(level.ordered){
+    if(i===picked.length){picked.push(i);lastDone=it.done;shakeI=-1;flashMsg='';hintOn=false;sfx.wire();vib(15)}
+    else{shakeI=i;sfx.trip();vib(60);flash(it.early||'Non è ancora il momento.');return render()}
+  }else{
+    if(it.ok){picked.push(i);lastDone=it.done;shakeI=-1;flashMsg='';hintOn=false;sfx.wire();vib(15)}
+    else{shakeI=i;sfx.trip();vib(60);flash(it.why);return render()}
+  }
+  render();
+}
+function faceSVG(kind,p,ok){
+  const makeup=kind==='m1'&&p<1,dull=kind==='m1'&&p<2,mask=kind==='m1'&&p===3;
+  const skin='#f7d5bf',skinD='#ecb99c',hair='#f0c463',hairD='#d6a03e',hairL='#ffe49a',iris='#3d8fe0';
+  const openEye=(x)=>`<ellipse cx="${x}" cy="124" rx="11" ry="8.5" fill="#fff"/><circle cx="${x}" cy="124" r="6.5" fill="${iris}"/><circle cx="${x}" cy="124" r="3.2" fill="#1d2b44"/><circle cx="${x+2.4}" cy="121.6" r="2" fill="#fff"/>
+    <path d="M${x-12} 122q12-11 24 0" fill="none" stroke="#3a2a20" stroke-width="3" stroke-linecap="round"/><path d="M${x+10} 119l4-4M${x+6} 116.5l2-5" stroke="#3a2a20" stroke-width="2" stroke-linecap="round"/>`;
+  const shutEye=(x)=>`<path d="M${x-11} 124q11 9 22 0" fill="none" stroke="#3a2a20" stroke-width="3" stroke-linecap="round"/><path d="M${x-7} 129l-2 4M${x} 131v4M${x+7} 129l2 4" stroke="#3a2a20" stroke-width="2" stroke-linecap="round"/>`;
+  const eyes=mask?`<g><circle cx="155" cy="124" r="15" fill="#b9de8c" stroke="#7fb45a" stroke-width="3"/><circle cx="155" cy="124" r="9" fill="#e4f5c8"/><circle cx="205" cy="124" r="15" fill="#b9de8c" stroke="#7fb45a" stroke-width="3"/><circle cx="205" cy="124" r="9" fill="#e4f5c8"/>${[0,1,2,3,4,5].map(i=>{const a=i*Math.PI/3;return `<circle cx="${155+5*Math.cos(a)}" cy="${124+5*Math.sin(a)}" r="1.3" fill="#9cc477"/><circle cx="${205+5*Math.cos(a)}" cy="${124+5*Math.sin(a)}" r="1.3" fill="#9cc477"/>`}).join('')}</g>`
+     :ok?shutEye(155)+shutEye(205):openEye(155)+openEye(205);
+  const lip=makeup?'#c8102e':'#e07b86';
+  const mouth=ok?`<path d="M163 162q17 18 34 0z" fill="#b8404f"/><path d="M167 163q13 5 26 0" fill="#fff"/>`
+    :makeup?`<path d="M164 164q16 -5 32 0q-16 9 -32 0z" fill="${lip}"/><path d="M196 164q8 3 12 9" stroke="${lip}" stroke-width="5" stroke-linecap="round" opacity=".7"/>`
+    :`<path d="M166 163q14 8 28 0" fill="none" stroke="${lip}" stroke-width="4.5" stroke-linecap="round"/>`;
+  return `<svg class="scene" viewBox="0 0 360 240" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Giulia">
+  <rect width="360" height="240" fill="#fbe3e6"/><circle cx="300" cy="60" r="70" fill="#fdeef0"/><rect y="200" width="360" height="40" fill="#f4c9cf"/>
+  <path d="M104 120C96 60 264 60 256 120L274 232H86z" fill="${hairD}"/>
+  <path d="M112 120C106 70 254 70 248 120L262 226H98z" fill="${hair}"/>
+  <path d="M62 240q8-40 64-48h108q56 8 64 48z" fill="#fff"/><path d="M152 192l28 30 28-30" fill="none" stroke="#eadadd" stroke-width="4"/>
+  <path d="M162 170h36v28q-18 10-36 0z" fill="${skinD}"/>
+  <circle cx="117" cy="132" r="11" fill="${skin}"/><circle cx="243" cy="132" r="11" fill="${skin}"/><circle cx="116" cy="146" r="3.5" fill="#fff" stroke="#e5d6c8"/><circle cx="244" cy="146" r="3.5" fill="#fff" stroke="#e5d6c8"/>
+  <path d="M118 112C118 66 242 66 242 112C242 162 214 192 180 192C146 192 118 162 118 112z" fill="${skin}"/>
+  ${dull?`<path d="M118 112C118 66 242 66 242 112C242 162 214 192 180 192C146 192 118 162 118 112z" fill="#8c8a98" opacity=".22"/>`:''}
+  ${mask?`<path d="M124 108C130 82 230 82 236 108C240 150 214 184 180 184C146 184 120 150 124 108z" fill="#a8d9a0"/><ellipse cx="180" cy="163" rx="22" ry="11" fill="${skin}"/>`:''}
+  <circle cx="114" cy="40" r="0" fill="none"/>
+  <path d="M112 104C104 40 256 40 248 104C236 84 210 78 180 80C150 78 124 84 112 104z" fill="${hair}"/>
+  <path d="M140 58q30-18 74 0" fill="none" stroke="${hairL}" stroke-width="6" stroke-linecap="round" opacity=".8"/>
+  <circle cx="180" cy="34" r="22" fill="${hair}"/><path d="M168 28q12-10 24 0" fill="none" stroke="${hairL}" stroke-width="4" stroke-linecap="round"/>
+  <rect x="112" y="84" width="136" height="22" rx="11" fill="#fff"/><path d="M118 98h124" stroke="#f0e4e6" stroke-width="3"/>
+  ${mask?'':`<path d="M143 109q12-6 24 0M193 109q12-6 24 0" fill="none" stroke="#c49352" stroke-width="3.5" stroke-linecap="round"/>`}
+  ${makeup?`<path d="M144 132q11 10 22 2l-2 12q-9 2-18-6z" fill="#3b3048" opacity=".45"/><path d="M194 134q11 8 22-2l-4 14q-9 0-16-4z" fill="#3b3048" opacity=".45"/>`:''}
+  ${eyes}
+  ${mask?'':`<path d="M180 132q-4 12 0 16q5 2 8-1" fill="none" stroke="${skinD}" stroke-width="3" stroke-linecap="round"/>`}
+  ${!mask?`<ellipse cx="141" cy="148" rx="11" ry="7" fill="${makeup?'#e86a7a':'#ff9aa6'}" opacity="${makeup?.7:ok?.6:.35}"/><ellipse cx="219" cy="148" rx="11" ry="7" fill="${makeup?'#e86a7a':'#ff9aa6'}" opacity="${makeup?.7:ok?.6:.35}"/>`:''}
+  ${mouth}
+  ${ok?`<path d="M134 100l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#fff"/><path d="M300 56l5 12 12 5-12 5-5 12-5-12-12-5 12-5z" fill="#ffc400"/><path d="M52 92l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#ffc400"/>`:''}
+  </svg>`;
+}
+function handSVG(p){
+  const nailC=p>=3?'#c8323a':p>=2?'#fbe9ea':p>=1?'#f7e0d6':'#efdcc9',edge=p>=3?'#a11f2a':'#dcbca6';
+  const OUT='#d79f82';
+  const fpath=(x,t,wb,wt,yb)=>`M${x-wb/2} ${yb}L${x-wt/2} ${t+wt/2}A${wt/2} ${wt/2} 0 0 1 ${x+wt/2} ${t+wt/2}L${x+wb/2} ${yb}z`;
+  const F=[{x:155,t:38,wb:22,wt:17},{x:177,t:18,wb:22,wt:17},{x:199,t:32,wb:21,wt:16.5},{x:219,t:64,wb:19,wt:14}];
+  const palm='M145 132C147 122 225 122 228 134C231 172 226 205 222 260H153C149 215 143 172 145 132z';
+  const thumb='M158 206C138 192 113 157 106 130A9 9 0 0 1 122 121C130 138 140 151 152 161L172 175z';
+  const shapes=(attr)=>`<path d="${palm}" ${attr}/>${F.map(f=>`<path d="${fpath(f.x,f.t,f.wb,f.wt,150)}" ${attr}/>`).join('')}<path d="${thumb}" ${attr}/>`;
+  const nail=(x,t,wt)=>{const nw=wt*.74,yt=t+3,nh=p>=1?nw*1.75:nw*1.25,yb=yt+nh;
+    const body=p>=1?`M${x-nw/2} ${yb-4}V${yt+nw*.7}C${x-nw/2} ${yt+nw*.15} ${x-nw*.2} ${yt} ${x} ${yt}C${x+nw*.2} ${yt} ${x+nw/2} ${yt+nw*.15} ${x+nw/2} ${yt+nw*.7}V${yb-4}Q${x+nw/2} ${yb} ${x} ${yb}Q${x-nw/2} ${yb} ${x-nw/2} ${yb-4}z`
+      :`M${x-nw/2} ${yt+5}l${nw*.25}-2 ${nw*.25} 3 ${nw*.25}-3 ${nw*.25} 2V${yb-4}Q${x+nw/2} ${yb} ${x} ${yb}Q${x-nw/2} ${yb} ${x-nw/2} ${yb-4}z`;
+    return `<path d="M${x-nw/2-1.5} ${yb-1}Q${x} ${yb+5} ${x+nw/2+1.5} ${yb-1}" fill="none" stroke="${p>=1?'#fbe6da':'#e8a596'}" stroke-width="2.2" stroke-linecap="round"/>
+     <path d="${body}" fill="${nailC}" stroke="${edge}" stroke-width="1.3"/>
+     ${p<1?`<path d="M${x-nw/2+.5} ${yt+7}h${nw-1}" stroke="#fffaf0" stroke-width="4"/>`:''}
+     ${p>=2?`<path d="M${x-nw/2+3.2} ${yb-6}V${yt+nw*.6}" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity="${p>=4?.95:.6}"/>`:''}
+     ${p>=4?`<path d="M${x+nw*.2} ${yt+nw*.7}l1.2 2.6 2.6 1.2-2.6 1.2-1.2 2.6-1.2-2.6-2.6-1.2 2.6-1.2z" fill="#fff"/>`:''}`};
+  const creases=F.map(f=>{const y=f.t+(150-f.t)*.6;return `<path d="M${f.x-5} ${y}q5 2.5 10 0" fill="none" stroke="${OUT}" stroke-width="1.3" stroke-linecap="round" opacity=".6"/>`}).join('');
+  const hand=`<g transform="rotate(-6 186 150)">
+    <g fill="${OUT}" stroke="${OUT}" stroke-width="5" stroke-linejoin="round">${shapes('')}</g>
+    <g fill="url(#sk)">${shapes('')}</g>
+    
+    ${creases}
+    ${F.map(f=>nail(f.x,f.t,f.wt)).join('')}
+    <g transform="rotate(-30 114 125.5)">${nail(114,116.5,18)}</g>
+    <path d="M144 214Q188 226 232 214L228 260H148z" fill="#fff"/><path d="M144 214Q188 226 232 214" fill="none" stroke="#efc3ca" stroke-width="3"/>
+  </g>`;
+  return `<svg class="scene" viewBox="0 0 360 240" preserveAspectRatio="xMidYMin slice" role="img" aria-label="Le unghie di Giulia">
+  <defs><linearGradient id="sk" gradientUnits="userSpaceOnUse" x1="100" y1="0" x2="240" y2="0"><stop offset="0" stop-color="#fadfcc"/><stop offset="1" stop-color="#f0c3a6"/></linearGradient></defs>
+  <rect width="360" height="240" fill="#fbe3e6"/><circle cx="70" cy="60" r="62" fill="#fdeef0"/>
+  <rect y="200" width="360" height="40" fill="#fff"/><path d="M0 210h360M0 222h360" stroke="#f2e3e5" stroke-width="3"/>
+  ${hand}
+  <g><rect x="282" y="150" width="34" height="48" rx="9" fill="#c8323a"/><rect x="287" y="156" width="6" height="32" rx="3" fill="#fff" opacity=".35"/><rect x="289" y="126" width="20" height="26" rx="4" fill="#2a2a2a"/></g>
+  ${p>=4?`<path d="M64 70l5 12 12 5-12 5-5 12-5-12-12-5 12-5z" fill="#ffc400"/><path d="M300 60l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#ffc400"/>`:''}</svg>`;
+}
+
+/* ======= SCENE RETE ======= */
+function netScene(k){
+  const frame=(inner,title)=>`<svg class="scene" viewBox="0 0 360 240" role="img" aria-label="Schermo"><rect width="360" height="240" fill="#13204a"/><rect x="14" y="14" width="332" height="212" rx="12" fill="#f4f7ff"/><rect x="14" y="14" width="332" height="30" rx="12" fill="#d7dff0"/><rect x="14" y="30" width="332" height="14" fill="#d7dff0"/><text x="28" y="35" font-size="14" font-weight="600" fill="#33405c">${title}</text>${inner}</svg>`;
+  const bub=(x,y,w,t,me,cls)=>`<g class="${cls}"><rect x="${x}" y="${y}" width="${w}" height="30" rx="15" fill="${me?'#d7263d':'#dfe5f3'}"/><text x="${x+w/2}" y="${y+20}" text-anchor="middle" font-size="15" font-weight="600" fill="${me?'#fff':'#233'}">${t}</text></g>`;
+  if(k==='chat1')return frame(`<g class="pre"><text x="180" y="140" text-anchor="middle" font-size="16" fill="#6b7694">Nessun messaggio…</text></g>${bub(210,70,120,'Ciao!',true,'post')}${bub(30,120,170,'Ciao! Ti ricevo!',false,'post')}${bub(210,170,110,'Evviva!',true,'post')}`,'Chat');
+  if(k==='chat3')return frame(`<g class="pre"><text x="180" y="140" text-anchor="middle" font-size="16" fill="#6b7694">Nessun messaggio…</text></g>${bub(210,62,120,'Ciao a tutti!',true,'post')}${bub(30,106,100,'Ciao!',false,'post')}${bub(30,146,150,'Ci sono anch’io!',false,'post')}${bub(210,190,120,'Che bello!',true,'post')}`,'Chat di gruppo');
+  return frame(`<g class="pre"><circle cx="180" cy="120" r="34" fill="none" stroke="#9aa5c0" stroke-width="6"/><path d="M156 96l48 48" stroke="#d7263d" stroke-width="7" stroke-linecap="round"/><text x="180" y="190" text-anchor="middle" font-size="16" fill="#6b7694">Nessuna connessione</text></g>
+   <g class="post"><circle cx="180" cy="112" r="44" fill="#4fb3ff" stroke="#2f6fb0" stroke-width="4"/><ellipse cx="180" cy="112" rx="18" ry="44" fill="none" stroke="#2f6fb0" stroke-width="3"/><path d="M136 112h88M144 90h72M144 134h72" stroke="#2f6fb0" stroke-width="3" fill="none"/><text x="180" y="190" text-anchor="middle" font-size="20" font-weight="700" fill="#12806f">Sei online!</text></g>`,'www.openday.it');
+}
+
+/* ======= STANZA ======= */
+function roomSVG(p,xs){
+  return `<svg class="room" viewBox="0 0 360 240" preserveAspectRatio="xMidYMin slice" role="img" aria-label="Una stanza">
+  <defs>
+   <radialGradient id="${p}h"><stop offset="0" stop-color="#000" stop-opacity="1"/><stop offset=".55" stop-color="#000" stop-opacity=".75"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+   <radialGradient id="${p}g"><stop offset="0" stop-color="#ffd978" stop-opacity=".7"/><stop offset="1" stop-color="#ffd978" stop-opacity="0"/></radialGradient>
+   <mask id="${p}m" maskUnits="userSpaceOnUse" x="0" y="0" width="360" height="240"><rect width="360" height="240" fill="#fff"/>
+   ${xs.map((x,i)=>`<circle class="hole" data-i="${i}" cx="${x}" cy="70" r="200" fill="url(#${p}h)" opacity="0"/>`).join('')}</mask>
+  </defs>
+  <rect width="360" height="240" fill="#f3d9a8"/>
+  <rect y="172" width="360" height="68" fill="#b9825a"/><rect y="168" width="360" height="6" fill="#8d5a38"/>
+  <rect x="246" y="38" width="76" height="86" rx="6" fill="#6b4a2d"/><rect x="252" y="44" width="64" height="74" fill="#13204a"/>
+  <circle cx="294" cy="68" r="11" fill="#fff6c2"/><circle cx="290" cy="65" r="9" fill="#13204a"/>
+  <g fill="#fff" opacity=".8"><circle cx="262" cy="58" r="1.5"/><circle cx="270" cy="96" r="1.5"/><circle cx="306" cy="100" r="1.5"/></g>
+  <line x1="284" y1="44" x2="284" y2="118" stroke="#6b4a2d" stroke-width="3"/>
+  <rect x="62" y="70" width="58" height="44" rx="4" fill="#fff" stroke="#6b4a2d" stroke-width="5"/><path d="M68 108l16-20 12 12 8-8 12 16z" fill="#5fae6b"/><circle cx="106" cy="84" r="6" fill="#ffb347"/>
+  <ellipse cx="170" cy="206" rx="110" ry="20" fill="#e4572e" opacity=".85"/>
+  <rect x="40" y="130" width="140" height="58" rx="14" fill="#3b82c4"/><rect x="40" y="112" width="140" height="34" rx="14" fill="#2f6ba3"/>
+  <rect x="52" y="138" width="56" height="34" rx="10" fill="#5a9bd8"/><rect x="112" y="138" width="56" height="34" rx="10" fill="#5a9bd8"/>
+  <ellipse cx="236" cy="200" rx="22" ry="11" fill="#6f6f7a"/><circle cx="256" cy="190" r="10" fill="#6f6f7a"/><path d="M249 184l3-9 5 6zM258 182l6-7 2 9z" fill="#6f6f7a"/>
+  <rect x="322" y="150" width="20" height="30" rx="3" fill="#a4553a"/><g fill="#3f9a4d"><ellipse cx="332" cy="138" rx="9" ry="16"/><ellipse cx="322" cy="146" rx="7" ry="13" transform="rotate(-25 322 146)"/><ellipse cx="342" cy="146" rx="7" ry="13" transform="rotate(25 342 146)"/></g>
+  <rect width="360" height="240" fill="#070a24" opacity=".86" mask="url(#${p}m)"/>
+  ${xs.map((x,i)=>`<circle class="glow" data-i="${i}" cx="${x}" cy="70" r="150" fill="url(#${p}g)" opacity="0"/>`).join('')}
+  ${xs.map(x=>`<line x1="${x}" y1="0" x2="${x}" y2="47" stroke="#555" stroke-width="3"/><circle class="bulb" data-x="${x}" cx="${x}" cy="60" r="14" fill="#9aa3b5" stroke="#555" stroke-width="3"/>`).join('')}
+  </svg>`;
+}
+function buildRoom(sel,p,xs){$(sel).innerHTML=roomSVG(p,xs)}
+function setRoom(sel,arr){
+  const el=$(sel);if(!el)return;
+  el.querySelectorAll('.hole').forEach((c,i)=>c.style.opacity=arr[i]?1:0);
+  el.querySelectorAll('.glow').forEach((c,i)=>c.style.opacity=arr[i]?1:0);
+  el.querySelectorAll('.bulb').forEach((c,i)=>c.setAttribute('fill',arr[i]?'#ffe066':'#9aa3b5'));
+}
+
+/* ======= MASCOTTE ======= */
+function mascot(m){
+  const eyes=m==='oops'?'<circle cx="25" cy="27" r="4.5" fill="#2b2140"/><circle cx="39" cy="27" r="4.5" fill="#2b2140"/><circle cx="26" cy="26" r="1.5" fill="#fff"/><circle cx="40" cy="26" r="1.5" fill="#fff"/>':
+   m==='happy'?'<path d="M20 28q5-8 10 0M34 28q5-8 10 0" fill="none" stroke="#2b2140" stroke-width="3" stroke-linecap="round"/>':
+   '<circle cx="25" cy="27" r="3.5" fill="#2b2140"/><circle cx="39" cy="27" r="3.5" fill="#2b2140"/>';
+  const mouth=m==='oops'?'<path d="M26 42q6-7 12 0" fill="none" stroke="#2b2140" stroke-width="3" stroke-linecap="round"/>':
+   m==='happy'?'<path d="M23 36q9 14 18 0z" fill="#2b2140"/>':'<path d="M25 37q7 7 14 0" fill="none" stroke="#2b2140" stroke-width="3" stroke-linecap="round"/>';
+  return `<svg viewBox="0 0 64 70"><circle cx="32" cy="30" r="26" fill="${m==='oops'?'#c9ccd8':'#ffd84d'}" stroke="#b58300" stroke-width="3"/>${eyes}${mouth}<rect x="22" y="54" width="20" height="12" rx="4" fill="#8b96ad"/></svg>`;
+}
+
+/* ======= SUONI ======= */
+let AC=null,muted=false;
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,t,d,type='sine',v=.18){if(muted)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(a.destination);const T=a.currentTime+t;g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+.02);g.gain.exponentialRampToValueAtTime(.001,T+d);o.start(T);o.stop(T+d+.05)}
+const sfx={click:()=>tone(660,0,.1),wire:()=>{tone(520,0,.08);tone(780,.07,.1)},tog:()=>tone(300,0,.08,'square',.1),
+ win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.35,'triangle',.2)),trip:()=>{tone(110,0,.5,'sawtooth',.2);tone(90,.1,.5,'sawtooth',.15)},rm:()=>tone(330,0,.1)};
+const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+function setMute(){$('#mute').innerHTML=muted?'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>':'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>'}
+function celebrate(){
+  sfx.win();vib([60,40,120]);
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const cv=$('#cf'),ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+  const P=[];for(let i=0;i<150;i++)P.push({x:innerWidth/2+(Math.random()-.5)*240,y:innerHeight*.5,vx:(Math.random()-.5)*15,vy:-Math.random()*15-4,r:4+Math.random()*5,c:['#d7263d','#ff4d5e','#ffffff','#ffd1d5','#ffc400'][i%5],a:Math.random()*6,va:(Math.random()-.5)*.4});
+  let t=0;(function f(){ctx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.vx*=.99;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore()});if(++t<110)requestAnimationFrame(f);else ctx.clearRect(0,0,cv.width,cv.height)})();
+}
+
+/* ======= SALVAVITA E FILI ======= */
+function trip(undo){
+  tripped=true;SEL=null;sfx.trip();vib([90,60,90]);$('#ops').classList.add('on');render();
+  setTimeout(()=>{undo();tripped=false;$('#ops').classList.remove('on');render()},2600);
+}
+function say(msg,ms){flash(msg,ms||2600)}
+function addWire(a,b){
+  if(!a||!b||a===b||tripped||hasW(a,b))return;
+  if(isNet()){
+    const used=t=>wires.some(w=>w.a===t||w.b===t);
+    if(used(a)||used(b)){sfx.trip();vib(40);return say('Questa presa ha già un cavo. Tocca il cavo per toglierlo.')}
+  }
+  wires.push({id:++wid,a,b});hintOn=false;flashMsg='';sfx.wire();vib(15);
+  if(isEl()&&sim(st,wires).short)trip(()=>{wires=wires.filter(w=>!(w.a===a&&w.b===b))});else render();
+}
+
+/* ======= INTERAZIONE ======= */
+const bench=$('#bench');
+function svgPt(e){const p=bench.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(bench.getScreenCTM().inverse())}
+let dragging=false,reselect=false;
+function showPrev(e){const t=TM[SEL];if(!t)return;const p=svgPt(e),pv=$('#prev');if(!pv)return;
+  pv.setAttribute('d',`M${t.x} ${t.y}C${t.x+t.dir*50} ${t.y} ${p.x} ${p.y} ${p.x} ${p.y}`)}
+function hidePrev(){const pv=$('#prev');if(pv)pv.setAttribute('d','')}
+function clearSel(){SEL=null;hidePrev();bench.querySelectorAll('.term.sel').forEach(x=>x.classList.remove('sel'))}
+bench.addEventListener('pointerdown',e=>{
+  lastIn=Date.now();ac();dragging=false;if(tripped||introStep>=0)return;
+  const t=e.target.closest('[data-term]');if(!t)return;const id=t.dataset.term;
+  if(SEL&&SEL!==id){const a=SEL;clearSel();addWire(a,id);return}
+  reselect=(SEL===id);clearSel();SEL=id;dragging=true;t.classList.add('sel');sfx.click();$('#say').textContent='Bene! Ora tocca dove vuoi arrivare.';
+});
+bench.addEventListener('pointermove',e=>{if(SEL)showPrev(e)});
+window.addEventListener('pointerup',e=>{
+  if(!dragging)return;dragging=false;
+  const el=document.elementFromPoint(e.clientX,e.clientY),t=el&&el.closest?el.closest('[data-term]'):null;
+  if(SEL&&t&&t.dataset.term!==SEL){const a=SEL;clearSel();addWire(a,t.dataset.term)}
+  else if(SEL&&t&&t.dataset.term===SEL&&reselect){clearSel();render()}
+  else hidePrev();
+});
+window.addEventListener('pointercancel',()=>{dragging=false;hidePrev()});
+bench.addEventListener('click',e=>{
+  lastIn=Date.now();if(tripped||introStep>=0)return;
+  const tg=e.target.closest('[data-toggle]');
+  if(tg){const id=tg.dataset.toggle;const prev=st[id];st[id]=isSw(id)?!prev:(prev===1?2:1);sfx.tog();vib(20);
+    if(sim(st,wires).short)trip(()=>{st[id]=prev});else render();return}
+  const w=e.target.closest('[data-wire]');
+  if(w){wires=wires.filter(x=>x.id!==+w.dataset.wire);sfx.rm();render()}
+});
+$('#cards').addEventListener('click',e=>{const c=e.target.closest('[data-i]');if(c)pickCard(+c.dataset.i)});
+
+$('#ok').onclick=()=>{lastIn=Date.now();sfx.click();introStep++;if(introStep>=level.intro.length){introStep=-1;hintOn=(li===0&&!isEst())}render()};
+$('#hint').onclick=()=>{lastIn=Date.now();hintOn=true;SEL=null;sfx.click();render()};
+$('#reset').onclick=()=>{lastIn=Date.now();if(tripped)return;wires=[];SEL=null;picked=[];lastDone='';flashMsg='';shakeI=-1;hintOn=(li===0&&!isEst());won=false;sfx.rm();render()};
+$('#next').onclick=()=>{lastIn=Date.now();sfx.click();if(li<GAMES[game].length-1)loadLevel(li+1);else toContacts()};
+$('#mute').onclick=()=>{muted=!muted;setMute();ac()};
+$('#homeb').onclick=()=>toHome();
+document.querySelectorAll('.path').forEach(b=>b.onclick=()=>{ac();sfx.click();game=b.dataset.path;toPlay()});
+
+function makeImage(){
+  const S=SCUOLA,W=1080,P=64,c=document.createElement('canvas'),x=c.getContext('2d');
+  const F='Fira Sans, Arial, sans-serif',INK='#0b0b0b',RED='#c8323a',MUT='#555';
+  const items=[];
+  const add=(t,sz,w,col,gap)=>items.push({t,sz,w,col,gap:gap||0});
+  add('Open day: vieni a trovarci!',64,800,INK,10);
+  add(S.nome,40,700,RED,36);
+  const info=[['Indirizzo',S.indirizzo],['Telefono',S.telefono],['Email',S.email],['Sito',S.sito]].filter(r=>r[1]);
+  info.forEach(r=>{add(r[0],30,600,MUT);add(r[1],38,700,INK,14)});
+  if(S.date.length){add('Date degli open day',34,800,RED,6);S.date.forEach(d=>{add(d.quando,38,700,INK);if(d.note)add(d.note,30,400,MUT);items[items.length-1].gap=14})}
+  add('Laboratori aperti',34,800,RED,6);
+  Object.keys(PNAME).forEach(k=>{add(PNAME[k],38,700,INK);if(S.laboratori[k])add(S.laboratori[k],30,400,MUT);items[items.length-1].gap=12});
+  const lines=[];x.textBaseline='top';
+  items.forEach(it=>{x.font=it.w+' '+it.sz+'px '+F;const words=it.t.split(' ');let cur='';
+    words.forEach(w=>{const t=cur?cur+' '+w:w;if(x.measureText(t).width>W-2*P&&cur){lines.push({...it,t:cur});cur=w}else cur=t});
+    lines.push({...it,t:cur})});
+  let H=P;lines.forEach(l=>H+=l.sz*1.25+l.gap);H+=P;
+  c.width=W;c.height=Math.ceil(H);x.fillStyle='#fff';x.fillRect(0,0,W,c.height);x.textBaseline='top';
+  let y=P;lines.forEach(l=>{x.font=l.w+' '+l.sz+'px '+F;x.fillStyle=l.col;x.fillText(l.t,P,y);y+=l.sz*1.25+l.gap});
+  x.fillStyle=RED;x.fillRect(0,0,W,14);
+  return c;
+}
+$('#saveImg').onclick=async()=>{
+  sfx.click();const c=makeImage();
+  const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+  try{const f=new File([blob],'open-day.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Open day'});return}}catch(e){if(e&&e.name==='AbortError')return}
+  $('#imgout').src=c.toDataURL('image/png');$('#imgov').hidden=false;
+};
+$('#imgclose').onclick=()=>{$('#imgov').hidden=true};
+$('#skipGame').onclick=()=>{sfx.click();game=null;toContacts()};
+$('#other').onclick=()=>{sfx.click();toHome()};
+
+/* ======= SCHERMATE ======= */
+function show(id){['home','play','contacts'].forEach(s=>$('#'+s).hidden=s!==id);window.scrollTo(0,0)}
+function toHome(){show('home');document.documentElement.classList.add('lit')}
+function toPlay(){show('play');lastIn=Date.now();loadLevel(0)}
+
+/* ======= CONTATTI E PRENOTAZIONE ======= */
+const ICO={cal:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>',
+ pin:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+ lab:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/></svg>',
+ mail:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'};
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function toContacts(){
+  show('contacts');lastIn=Date.now();document.documentElement.classList.add('lit');
+  $('#cLead').textContent=!game?'Vieni a vedere i laboratori dal vivo e prova i mestieri con le tue mani.':{el:'Hai provato a lavorare con l’elettricità.',net:'Hai provato a lavorare con computer e reti.',est:'Hai provato a prenderti cura della pelle e delle mani.'}[game]+' Se ti è piaciuto, vieni a vedere i laboratori dal vivo.';
+  const S=SCUOLA,row=(k,v)=>v?`<p><b>${k}</b><br>${esc(v)}</p>`:'';
+  $('#pWhere').innerHTML=`<h3>${ICO.pin}Dove siamo</h3><p><b>${esc(S.nome)}</b></p>`+row('Indirizzo',S.indirizzo)+row('Telefono',S.telefono)+row('Email',S.email)+row('Sito',S.sito)+(S.indirizzo||S.telefono||S.email?'':'<p class="muted">Contatti in aggiornamento.</p>');
+  $('#pDates').innerHTML=`<h3>${ICO.cal}Date degli open day</h3>`+(S.date.length?`<ul class="dl">${S.date.map(d=>`<li>${ICO.cal}<div><b>${esc(d.quando)}</b>${d.note?'<br><span class="muted">'+esc(d.note)+'</span>':''}</div></li>`).join('')}</ul>`:'<p class="muted">Le date sono in aggiornamento. Scrivici o chiamaci per saperle.</p>');
+  $('#pLabs').innerHTML=`<h3>${ICO.lab}Laboratori aperti</h3><ul class="dl">${Object.keys(PNAME).map(k=>`<li>${ICO.lab}<div><b>${PNAME[k]}</b>${S.laboratori[k]?'<br><span class="muted">'+esc(S.laboratori[k])+'</span>':''}</div></li>`).join('')}</ul>`;
+  $('#pBook').innerHTML=`<h3>${ICO.mail}Scrivici</h3>`+(S.email?`<p>Per prenotare la visita al laboratorio scrivi a:</p><p><b>${esc(S.email)}</b></p><div class="cta"><a class="btn primary" href="mailto:${esc(S.email)}?subject=${encodeURIComponent('Open day: vorrei visitare il laboratorio')}" target="_top">Scrivi una email</a></div>`:'<p class="muted">L’indirizzo email non è ancora stato inserito.</p>');
+}
+
+/* ======= INATTIVITA' (solo PC allo stand) ======= */
+setInterval(()=>{
+  const idle=Date.now()-lastIn;
+  if(!$('#play').hidden&&!tripped){
+    if(DESKTOP&&idle>90000){toHome();return}
+    if(idle>15000&&introStep<0&&!hintOn&&!won&&(isEst()?!won:nextMissing())){hintOn=true;render()}
+  }
+  if(!$('#contacts').hidden&&DESKTOP&&idle>90000)toHome();
+},2000);
+['keydown','pointerdown'].forEach(ev=>addEventListener(ev,()=>lastIn=Date.now()));
+setMute();toHome();
+})();
+</script>
+
+</body>
+</html>
