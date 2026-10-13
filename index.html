@@ -32,7 +32,7 @@
 
    Cosa si può cambiare senza rischi (prima di tutto: salva una copia del file):
      - indirizzo, email, date e laboratori: blocco SCUOLA;
-     - titoli e frasi del coach: dentro i livelli, solo il testo tra gli apici;
+     - titoli e frasi del prof: dentro i livelli, solo il testo tra gli apici;
      - colori: variabili in cima allo stile (--accent e le altre).
    Regola d'oro: cambia solo il testo dentro gli apici ' ' oppure i valori dei colori. Non
    togliere virgole, apici, parentesi o graffe: sono la punteggiatura del codice.
@@ -556,7 +556,7 @@ const PNAME={el:'Elettricità',net:'Informatica',est:'Estetica'};
 /*
    I LIVELLI
    Ogni missione è descritta da dati, non da codice: il programma legge i dati e costruisce da
-   solo la missione. Per cambiare un titolo o una frase del coach basta cambiare il testo tra
+   solo la missione. Per cambiare un titolo o una frase del prof basta cambiare il testo tra
    gli apici. Per aggiungere una missione si copia un blocco e si modificano i dati.
 
    SRC sono le due uscite della presa di corrente del gioco Elettricità: F è la fase (filo
@@ -567,8 +567,8 @@ const SRC=[{id:'S.F',x:190,y:160,dir:1,kind:'F'},{id:'S.N',x:190,y:260,dir:1,kin
 /*
    MISSIONI DI ELETTRICITÀ. Ogni missione è un blocco {...} con:
      title  il titolo mostrato in alto
-     goal   la frase del coach all'inizio
-     win    la frase del coach quando la missione riesce
+     goal   la frase del prof all'inizio
+     win    la frase del prof quando la missione riesce
      press  la frase che invita a premere l'interruttore
      intro  le spiegazioni iniziali, una alla volta. t è il testo; box dice quali componenti
             far pulsare; hl dice quali morsetti far pulsare
@@ -650,7 +650,7 @@ const NET=[
    MISSIONI DI ESTETICA. Qui non ci sono fili ma carte (items). Ogni carta ha:
      e      il disegnino (emoji) mostrato sulla carta
      t      il nome
-     done   la frase del coach quando la scelta è giusta
+     done   la frase del prof quando la scelta è giusta
      early  (solo se ordered:true) la frase se la carta viene scelta troppo presto
      ok     (solo nei livelli senza ordine) true per le tre scelte giuste
      why    (solo per le scelte sbagliate) la spiegazione dell'errore
@@ -720,7 +720,7 @@ const GAMES={el:EL,net:NET,est:EST};
 */
 let game='el',L,li=0,level,TM={},IDS=[],wires=[],st={},SEL=null,hintOn=false,won=false,tripped=false,introStep=-1,lastIn=Date.now(),wid=0;
 // Variabili del gioco di Estetica: picked sono le carte scelte finora, shakeI la carta che sta
-// tremando, flashMsg la frase temporanea del coach, lastDone l'ultima frase di scelta giusta.
+// tremando, flashMsg la frase temporanea del prof, lastDone l'ultima frase di scelta giusta.
 let picked=[],shakeI=-1,flashMsg='',flashT=null,lastDone='';
 // Tre domande a risposta vera o falsa: si sta giocando a Elettricità, a Informatica o a Estetica?
 const isEl=()=>game==='el',isNet=()=>game==='net',isEst=()=>game==='est';
@@ -745,7 +745,7 @@ function termsOf(c){
   }
 }
 // Il riquadro (x, y, larghezza, altezza) occupato da un componente. Serve a far pulsare un
-// anello attorno ad esso quando il coach lo presenta.
+// anello attorno ad esso quando il prof lo presenta.
 function bbox(id){
   if(id==='S')return[40,110,150,200];
   const c=level.comps.find(c=>c.id===id);
@@ -956,9 +956,9 @@ function drawTerm(t){const kind=t.kind||'';
    posato, un interruttore girato, un pulsante premuto. I passi sono:
      1. calcola la situazione (simulazione elettrica o di rete);
      2. disegna i componenti e poi i fili;
-     3. aggiunge gli anelli che pulsano, se il coach sta spiegando o se l'aiuto è acceso;
+     3. aggiunge gli anelli che pulsano, se il prof sta spiegando o se l'aiuto è acceso;
      4. accende o spegne la luce della pagina e della stanza;
-     5. sceglie la frase del coach (in ordine di importanza);
+     5. sceglie la frase del prof (in ordine di importanza);
      6. chiama finishRender per mascotte, pulsanti e pallini.
 */
 function render(){
@@ -1003,7 +1003,7 @@ function render(){
   });
   // I fili si aggiungono dopo i componenti, così stanno sopra.
   g+=wg+fg;
-  // Se il coach sta spiegando, fa pulsare i componenti o i morsetti di cui parla.
+  // Se il prof sta spiegando, fa pulsare i componenti o i morsetti di cui parla.
   if(introStep>=0){const sl=level.intro[introStep];
     (sl.box||[]).forEach(id=>{const b=bbox(id);h+=`<rect class="pulse" x="${b[0]-10}" y="${b[1]-10}" width="${b[2]+20}" height="${b[3]+20}" rx="26"/>`});
     (sl.hl||[]).forEach(id=>{const t=TM[id];h+=`<circle class="pulse" cx="${t.x}" cy="${t.y}" r="26"/>`});
@@ -1034,7 +1034,7 @@ function render(){
   }
   $('#app').classList.toggle('tripped',tripped);
   document.documentElement.classList.toggle('lit',lightOn);
-  // LA FRASE DEL COACH. Si sceglie la prima situazione che è vera, in questo ordine:
+  // LA FRASE DEL PROF. Si sceglie la prima situazione che è vera, in questo ordine:
   // spiegazione iniziale, messaggio temporaneo, salvavita scattato, missione riuscita, invito a
   // premere, lampada sempre accesa, router sbagliato, aiuto acceso, morsetto selezionato, nessun
   // filo ancora, e infine l'incoraggiamento.
@@ -1099,14 +1099,14 @@ function renderEst(){
   else msg=level.goal;
   finishRender(msg,mood,ok);
 }
-// Mostra una frase del coach per qualche secondo, poi la toglie e ridisegna.
+// Mostra una frase del prof per qualche secondo, poi la toglie e ridisegna.
 function flash(msg,ms=3200){flashMsg=msg;clearTimeout(flashT);flashT=setTimeout(()=>{flashMsg='';shakeI=-1;render()},ms)}
 /*
    Cosa succede quando si tocca una carta di Estetica.
    Se l'ordine conta (ordered): la carta è giusta solo se è la prossima in elenco, cioè se il
-   suo numero è uguale a quante carte sono già state scelte. Altrimenti trema e il coach
+   suo numero è uguale a quante carte sono già state scelte. Altrimenti trema e il prof
    spiega perché è troppo presto (early).
-   Se l'ordine non conta: la carta è giusta se ha ok:true, altrimenti trema e il coach spiega
+   Se l'ordine non conta: la carta è giusta se ha ok:true, altrimenti trema e il prof spiega
    l'errore (why).
 */
 function pickCard(i){
@@ -1259,7 +1259,7 @@ function setRoom(sel,arr){
 }
 
 /* ======= MASCOTTE ======= */
-// LA MASCOTTE. Disegna la faccina del coach in tre espressioni: hi (normale), oops (errore)
+// LA MASCOTTE. Disegna la faccina del prof in tre espressioni: hi (normale), oops (errore)
 // e happy (successo).
 function mascot(m){
   const eyes=m==='oops'?'<circle cx="25" cy="27" r="4.5" fill="#2b2140"/><circle cx="39" cy="27" r="4.5" fill="#2b2140"/><circle cx="26" cy="26" r="1.5" fill="#fff"/><circle cx="40" cy="26" r="1.5" fill="#fff"/>':
@@ -1315,7 +1315,7 @@ function trip(undo){
   tripped=true;SEL=null;sfx.trip();vib([90,60,90]);$('#ops').classList.add('on');render();
   setTimeout(()=>{undo();tripped=false;$('#ops').classList.remove('on');render()},2600);
 }
-// Mostra una frase del coach per un po'.
+// Mostra una frase del prof per un po'.
 function say(msg,ms){flash(msg,ms||2600)}
 /*
    Posa un filo tra due morsetti. Ignora le richieste senza senso (stesso morsetto, filo già

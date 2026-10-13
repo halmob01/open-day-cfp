@@ -74,7 +74,7 @@ indipendenti: i due gruppi si possono svolgere in parallelo.
 - [ ] **T07 · Controllo degli errori**
   Piano: sezione 5.3.
   I tre controllori e la tabella di traduzione degli errori JavaScript.
-  Il primo errore evidenzia la riga e fa parlare il coach con l'espressione
+  Il primo errore evidenzia la riga e fa parlare il prof con l'espressione
   `oops`.
   Accettazione: una funzione di prova (da riusare in T09) con almeno 8 casi
   di HTML sbagliato, 8 di CSS e 5 di JavaScript, ciascuno con la riga attesa;

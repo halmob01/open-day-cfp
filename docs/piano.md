@@ -17,7 +17,7 @@ Due obiettivi:
 | Linguaggi | HTML, CSS e JavaScript, gli stessi del sito | Si ricostruisce davvero il sito; il browser li esegue già |
 | WebAssembly | Non serve | Nessun linguaggio da tradurre. Il «compilatore» è il browser più i controlli degli errori scritti a mano (sezione 5.3) |
 | Cosa si ricostruisce | Home e gioco di Estetica | È il gioco con la logica più leggibile; la sua struttura (livelli come dati, una regola che li controlla) è la stessa degli altri due giochi, e l'ultimo capitolo lo mostra |
-| Forma | Capitoli e passi guidati dal coach, come i capitoli di sito-feudo | Indicato dal committente. Niente quiz, niente pannello docente, niente traduzione |
+| Forma | Capitoli e passi guidati dal prof, come i capitoli di sito-feudo | Indicato dal committente. Niente quiz, niente pannello docente, niente traduzione |
 | Internet | Non necessaria | Nessuna libreria esterna; solo il font si scarica, con font di riserva |
 | Dispositivo | PC (da 920 px di larghezza in su) | Scrivere codice al telefono non è praticabile; sotto i 920 px la pagina funziona impilata e mostra un avviso |
 | File | `impara.html` separato, un solo file | Stessa convenzione di `index.html`; il sito dell'open day resta leggero |
@@ -116,7 +116,7 @@ Valgono gli stessi elementi di `index.html`, senza nuovi colori.
 - **Ciclo infinito**: prima di eseguire il JavaScript si salva il codice e si
   mette un segnale in `sessionStorage`; lo si toglie quando l'anteprima ha
   finito di caricare. Se la pagina si blocca e l'allievo la ricarica, il
-  segnale è ancora lì: il coach spiega che probabilmente c'era un ciclo che
+  segnale è ancora lì: il prof spiega che probabilmente c'era un ciclo che
   non finiva, e il codice salvato è al suo posto.
 
 ### 5.3 Controllo degli errori
@@ -144,7 +144,7 @@ il primo.
   visibile in piccolo sotto quello italiano.
 
 Gli errori hanno la precedenza sui controlli del passo: finché c'è un errore,
-il coach parla di quello.
+il prof parla di quello.
 
 ### 5.4 Passi e controlli
 
@@ -155,7 +155,7 @@ e i livelli in `index.html`. Formato:
 {
   id: 'c3p2',                     // capitolo 3, passo 2
   titolo: 'Il fondo della pagina',
-  intro: [                        // fumetti del coach prima di cominciare,
+  intro: [                        // fumetti del prof prima di cominciare,
     { t: 'Testo del fumetto.' },  // come level.intro in index.html;
     { t: '...', riga: 4 }         // riga: evidenzia una riga dell'editor
   ],
@@ -216,8 +216,8 @@ quotidiano, poi passa ai passi. I termini tecnici si introducono uno alla volta.
 | 4 | Luce spenta, luce accesa | 4.1 Valori chiari in `:root.lit` (css) · 4.2 Transizione morbida (css) · 4.3 Un pulsante che accende e spegne con `classList.toggle` (js) | Classi che cambiano l'aspetto; primo JavaScript |
 | 5 | Cambiare schermata | 5.1 Due `section`, `home` e `play`, la seconda `hidden` (html) · 5.2 La funzione `show(id)` (js) · 5.3 Clic su Estetica porta al gioco (js) · 5.4 La X riporta alla home (js) | Funzioni, eventi, `querySelector` |
 | 6 | I dati del gioco | 6.1 Un prodotto come oggetto `{ e, t }` (js) · 6.2 Quattro prodotti in un elenco (js) · 6.3 Le carte disegnate dall'elenco con `map` (js) · 6.4 Il livello come oggetto con `title`, `goal`, `items` (js) | Oggetti, elenchi, codice che crea HTML, `console.log` |
-| 7 | La regola del gioco | 7.1 L'elenco `picked` e il clic sulle carte (js) · 7.2 Ordine giusto: `if (i === picked.length)` (js) · 7.3 Ordine sbagliato: la carta trema e il coach spiega (js) · 7.4 Il vassoio si riempie (js) · 7.5 Vittoria: la pagina si accende (js) | Condizioni, stato del gioco, ridisegnare dopo ogni mossa |
-| 8 | Più livelli, stessa regola | 8.1 Elenco dei livelli e «Avanti» (js) · 8.2 Il livello Igiene, senza ordine, con `ok: true` sui prodotti giusti (js) · 8.3 Un livello nuovo scritto solo come dati: Le unghie (js) | Separare dati e regole. Chiusura: il coach mostra che `index.html` fa lo stesso con `GAMES = { el, net, est }` per tutti e tre i mestieri |
+| 7 | La regola del gioco | 7.1 L'elenco `picked` e il clic sulle carte (js) · 7.2 Ordine giusto: `if (i === picked.length)` (js) · 7.3 Ordine sbagliato: la carta trema e il prof spiega (js) · 7.4 Il vassoio si riempie (js) · 7.5 Vittoria: la pagina si accende (js) | Condizioni, stato del gioco, ridisegnare dopo ogni mossa |
+| 8 | Più livelli, stessa regola | 8.1 Elenco dei livelli e «Avanti» (js) · 8.2 Il livello Igiene, senza ordine, con `ok: true` sui prodotti giusti (js) · 8.3 Un livello nuovo scritto solo come dati: Le unghie (js) | Separare dati e regole. Chiusura: il prof mostra che `index.html` fa lo stesso con `GAMES = { el, net, est }` per tutti e tre i mestieri |
 
 Il codice dei capitoli 5-8 riprende nomi e struttura di `index.html`
 (`show`, `level`, `items`, `picked`, `ordered`, `done`, `early`, `win`), in

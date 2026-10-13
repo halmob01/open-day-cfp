@@ -43,7 +43,10 @@ Leggilo tutto prima di cominciare.
 - **Lingua**: tutto in italiano (testi, commenti, nomi dei capitoli, messaggi
   di commit). Nomi di variabili e funzioni: segui lo stile già presente nel
   file in cui lavori.
-- **Niente emoji** in commenti, documentazione e messaggi del coach. Le carte
+- **Il personaggio che guida si chiama «il prof»**, mai «coach», in tutti i testi e
+  commenti. Le classi CSS e gli id (`.coach`, `#mascot`) restano com'erano:
+  sono nomi di codice, non si vedono.
+- **Niente emoji** in commenti, documentazione e messaggi del prof. Le carte
   del gioco di Estetica le usano già: lì restano come sono.
 - **Design**: `impara.html` usa gli stessi colori, font, pulsanti, mascotte,
   suoni e coriandoli di `index.html`. Vedi `docs/piano.md`, sezione «Design».
