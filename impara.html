@@ -119,6 +119,12 @@ ul.dl li .ico{margin-top:2px}
 .runrow .muted{font-size:.85rem}
 #view{flex:1;width:100%;min-height:0;border:0;border-radius:14px;background:#fff;box-shadow:0 0 0 2px var(--line)}
 
+.logbox{background:var(--card);border-radius:12px;box-shadow:0 0 0 2px var(--line) inset;padding:8px 12px;font-family:var(--mono);font-size:14px;line-height:1.4;max-height:96px;overflow:auto;white-space:pre-wrap}
+.logbox::before{content:'Messaggi (console.log)';display:block;color:var(--muted);font-family:var(--font);font-size:.8rem;font-weight:600}
+/* contenitore fuori schermo per le anteprime di controllo: devono avere una dimensione vera, altrimenti il browser non calcola gli stili */
+#sonde{position:fixed;left:-9999px;top:0;width:640px;height:480px;visibility:hidden;pointer-events:none}
+#sonde iframe{width:640px;height:480px;border:0}
+
 /* l'editor: schede, numeri di riga a sinistra, testo a destra (carattere a spaziatura fissa) */
 .tabs{display:flex;gap:6px;flex-wrap:wrap}
 .tab{border:0;border-radius:999px;padding:6px 14px;min-height:36px;background:var(--card);box-shadow:0 0 0 2px var(--line) inset;font-weight:600;display:inline-flex;align-items:center;gap:6px}
@@ -200,7 +206,8 @@ ul.dl li .ico{margin-top:2px}
         </div>
         <div class="pane" id="paneView">
           <div class="cap">Anteprima</div>
-          <div class="edph" id="view">Qui comparirà il sito.</div>
+          <iframe id="view" title="Anteprima del sito" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
+          <div class="logbox" id="logbox" hidden aria-live="polite"></div>
         </div>
       </div>
     </div>
@@ -230,6 +237,30 @@ ul.dl li .ico{margin-top:2px}
   </section>
 </div>
 <canvas id="cf"></canvas>
+<div id="sonde" aria-hidden="true"></div>
+
+<!-- SPIA: piccolo script che viene messo in cima a ogni anteprima. Ascolta gli errori e i console.log del codice
+     dell'allievo e li passa alla pagina. È testo semplice (text/plain): il browser non lo esegue qui. -->
+<script type="text/plain" id="spia">
+window.__err=[];window.__log=[];
+window.onerror=function(m,s,l,c,e){
+  var o={m:String(m),l:l,n:(e&&e.name)||''};
+  window.__err.push(o);
+  try{parent.postMessage({impara:'err',e:o},'*')}catch(x){}
+};
+window.addEventListener('unhandledrejection',function(ev){
+  var o={m:'Uncaught (in promise) '+String(ev.reason),l:0,n:'PromiseError'};
+  window.__err.push(o);
+  try{parent.postMessage({impara:'err',e:o},'*')}catch(x){}
+});
+var _log=console.log;
+console.log=function(){
+  var t=Array.prototype.map.call(arguments,function(a){try{return typeof a==='string'?a:JSON.stringify(a)}catch(x){return String(a)}}).join(' ');
+  window.__log.push(t);
+  try{parent.postMessage({impara:'log',t:t},'*')}catch(x){}
+  try{_log.apply(console,arguments)}catch(x){}
+};
+</script>
 
 <script>
 (()=>{
@@ -391,6 +422,63 @@ const Editor={
   }
 };
 
+/* ======= L'ANTEPRIMA =======
+   Il sito dell'allievo gira dentro un iframe: una finestrella con una pagina dentro la pagina.
+   Il documento si costruisce così: l'HTML dell'allievo nel body, il CSS in un tag style nell'head e
+   il JavaScript come file separato (un "blob", cioè un file creato al volo in memoria) alla fine
+   del body. Tenere il JavaScript in un file a parte fa sì che i numeri di riga degli errori
+   coincidano con quelli dell'editor. In cima all'head c'è la "spia" (vedi sopra) che raccoglie
+   errori e messaggi. */
+const SPIA=$('#spia').textContent;
+const GUARDIA='impara.run'; /* segnale nel browser: "sto eseguendo il JavaScript di questo passo" */
+const guardia={
+  arma(id){try{sessionStorage.setItem(GUARDIA,id)}catch(e){}},
+  libera(){try{sessionStorage.removeItem(GUARDIA)}catch(e){}},
+  leggi(){try{return sessionStorage.getItem(GUARDIA)}catch(e){return null}}
+};
+const Anteprima={
+  frame:null,
+  onErrore:()=>{},
+  doc(c,url){
+    return '<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script>'+SPIA+'<\/script><style>\n'+c.css+'\n</style></head><body>\n'+c.html+'\n'+(url?'<script src="'+url+'"><\/script>':'')+'</body></html>';
+  },
+  /* Carica il codice in un iframe e aspetta che abbia finito. Restituisce la finestra dell'iframe. */
+  carica(iframe,c,conJs){
+    return new Promise(ris=>{
+      const url=conJs&&c.js.trim()?URL.createObjectURL(new Blob([c.js],{type:'text/javascript'})):null;
+      iframe.onload=()=>{iframe.onload=null;if(url)URL.revokeObjectURL(url);ris(iframe.contentWindow)};
+      iframe.srcdoc=this.doc(c,url);
+    });
+  },
+  /* Aggiorna l'anteprima visibile. Prima di eseguire il JavaScript arma la guardia contro i cicli
+     infiniti; la toglie solo quando il caricamento è finito. */
+  async mostra(c,conJs,idPasso){
+    this.ripulisciLog();
+    guardia.arma(idPasso);
+    const win=await this.carica(this.frame,c,conJs);
+    guardia.libera();
+    return {win,errori:(win.__err||[]).slice()};
+  },
+  /* Crea un'anteprima nascosta, usa-e-getta, per i controlli che devono cliccare o modificare
+     la pagina senza disturbare quella che l'allievo vede. */
+  async sonda(c,idPasso){
+    const f=document.createElement('iframe');f.name='sonda';f.setAttribute('sandbox','allow-scripts allow-same-origin allow-modals');
+    $('#sonde').appendChild(f);
+    guardia.arma(idPasso);
+    const win=await this.carica(f,c,true);
+    guardia.libera();
+    return {win,doc:win.document,errori:(win.__err||[]).slice(),chiudi:()=>f.remove()};
+  },
+  ripulisciLog(){const b=$('#logbox');b.hidden=true;b.textContent=''},
+  logga(t){const b=$('#logbox');b.hidden=false;b.appendChild(document.createTextNode((b.childNodes.length?'\n':'')+t));b.scrollTop=b.scrollHeight}
+};
+/* Messaggi che arrivano dall'anteprima visibile (le sonde si ignorano). */
+window.addEventListener('message',e=>{
+  const d=e.data;if(!d||!d.impara||e.source!==Anteprima.frame.contentWindow)return;
+  if(d.impara==='log')Anteprima.logga(d.t);
+  if(d.impara==='err')Anteprima.onErrore(d.e);
+});
+
 /* ======= SCHERMATE =======
    Come in index.html: una sola schermata è visibile alla volta. L'indice e la fine capitolo
    sono "accese" (colori chiari); il passo parte "spento" e si accende quando riesce. */
@@ -408,24 +496,51 @@ function renderIndice(){
    S è lo stato del passo in corso: capitolo (ci), passo (pi), a che punto sono le spiegazioni
    iniziali (introStep, -1 se finite), quante volte è stato chiesto aiuto (hintN), se è
    riuscito (won) e la frase temporanea del prof (flash). */
-let S={ci:0,pi:0,passo:null,introStep:-1,hintN:0,won:false,flash:''};
+let S={ci:0,pi:0,passo:null,introStep:-1,hintN:0,won:false,flash:'',errore:null,conJs:true};
 let flashT=null;
+/* Se la pagina è stata ricaricata mentre girava il JavaScript di un passo, quel passo ha bloccato
+   il browser (di solito un ciclo che non finisce mai): ci ricordiamo l'id del passo. */
+const bloccoPrec=guardia.leggi();guardia.libera();
 
 function caricaPasso(ci,pi){
   const c=CAPITOLI[ci],p=c.passi[pi];
   /* nel primo passo di un capitolo, le spiegazioni del capitolo vengono prima di quelle del passo */
   const intro=(pi===0?c.intro:[]).concat(p.intro||[]);
-  S={ci,pi,passo:Object.assign({},p,{intro}),introStep:intro.length?0:-1,hintN:0,won:false,flash:''};
+  S={ci,pi,passo:Object.assign({},p,{intro}),introStep:intro.length?0:-1,hintN:0,won:false,flash:'',errore:null,conJs:bloccoPrec!==p.id};
   mostra('passo');
   $('#mtitle').textContent=`Capitolo ${ci+1} · Passo ${pi+1}: ${p.titolo}`;
   $('#compito').textContent=p.compito;
   Editor.imposta(p.inizio,p.file);
+  if(!S.conJs)S.flash='La volta scorsa la pagina si è bloccata: forse c’era un ciclo che non finiva mai. Ho tenuto da parte il tuo codice: correggilo e premi «Prova il codice».';
+  render();
+  provaCodice(S.conJs);
+}
+
+/* Aggiorna l'anteprima con il codice che c'è adesso negli editor. Se nel frattempo ne parte
+   un'altra (perché si continua a scrivere), il risultato di questa si scarta. */
+let seq=0;
+async function provaCodice(conJs){
+  const n=++seq,c=Editor.leggi();
+  const r=await Anteprima.mostra(c,conJs,S.passo.id);
+  if(n!==seq)return r;
+  S.errore=null;Editor.pulisci('err');
+  if(r.errori.length)erroreRuntime(r.errori[0]);else render();
+  return r;
+}
+function erroreRuntime(e){
+  S.errore={tab:'js',riga:e.l||0,msg:e.m};
+  if(e.l)Editor.segna('js',e.l,'err');
   render();
 }
+Anteprima.onErrore=e=>{if(!S.errore)erroreRuntime(e)};
+/* HTML e CSS si aggiornano da soli 400 millisecondi dopo l'ultimo tasto; il JavaScript solo con «Prova il codice». */
+let rit=null;
+Editor.onChange=n=>{if(n==='js')return;clearTimeout(rit);rit=setTimeout(()=>provaCodice(S.conJs),400)};
 
 function render(){
   const p=S.passo,intro=p.intro;let msg,mood='hi';
   if(S.introStep>=0)msg=intro[S.introStep].t;
+  else if(S.errore){msg=(S.errore.riga?`Riga ${S.errore.riga}: `:'')+S.errore.msg;mood='oops'}
   else if(S.flash)msg=S.flash;
   else if(S.won){msg=p.bravo;mood='happy'}
   else msg=p.compito;
@@ -464,7 +579,7 @@ $('#chapters').addEventListener('click',e=>{const b=e.target.closest('[data-c]')
 $('#ok').onclick=()=>{sfx.click();S.introStep++;if(S.introStep>=S.passo.intro.length)S.introStep=-1;render()};
 $('#hint').onclick=()=>{sfx.click();S.hintN++;render()};
 $('#reset').onclick=()=>{sfx.rm();S.won=false;S.flash='';render()};
-$('#prova').onclick=()=>{ac();sfx.click();vinto()}; /* provvisorio: il vero controllo arriva con il motore dei passi */
+$('#prova').onclick=async()=>{ac();sfx.click();S.conJs=true;S.flash='';await provaCodice(true);if(!S.errore)vinto()}; /* provvisorio: il vero controllo arriva con il motore dei passi */
 $('#next').onclick=()=>{sfx.click();if(S.pi<CAPITOLI[S.ci].passi.length-1)caricaPasso(S.ci,S.pi+1);else toFine()};
 $('#mute').onclick=()=>{muted=!muted;setMute();ac()};
 $('#homeb').onclick=()=>{renderIndice();mostra('indice')};
@@ -481,6 +596,7 @@ $('#azzera').onclick=()=>{
 };
 
 /* ======= AVVIO ======= */
+Anteprima.frame=$('#view');
 Editor.crea();
 Editor.onRun=()=>$('#prova').click();
 store.load();setMute();renderIndice();mostra('indice');
