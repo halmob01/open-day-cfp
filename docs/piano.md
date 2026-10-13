@@ -217,7 +217,7 @@ quotidiano, poi passa ai passi. I termini tecnici si introducono uno alla volta.
 | 5 | Cambiare schermata | 5.1 Due `section`, `home` e `play`, la seconda `hidden` (html) · 5.2 La funzione `show(id)` (js) · 5.3 Clic su Estetica porta al gioco (js) · 5.4 La X riporta alla home (js) | Funzioni, eventi, `querySelector` |
 | 6 | I dati del gioco | 6.1 Un prodotto come oggetto `{ e, t }` (js) · 6.2 Quattro prodotti in un elenco (js) · 6.3 Le carte disegnate dall'elenco con `map` (js) · 6.4 Il livello come oggetto con `title`, `goal`, `items` (js) | Oggetti, elenchi, codice che crea HTML, `console.log` |
 | 7 | La regola del gioco | 7.1 L'elenco `picked` e il clic sulle carte (js) · 7.2 Ordine giusto: `if (i === picked.length)` (js) · 7.3 Ordine sbagliato: la carta trema e il prof spiega (js) · 7.4 Il vassoio si riempie (js) · 7.5 Vittoria: la pagina si accende (js) | Condizioni, stato del gioco, ridisegnare dopo ogni mossa |
-| 8 | Più livelli, stessa regola | 8.1 Elenco dei livelli e «Avanti» (js) · 8.2 Il livello Igiene, senza ordine, con `ok: true` sui prodotti giusti (js) · 8.3 Un livello nuovo scritto solo come dati: Le unghie (js) | Separare dati e regole. Chiusura: il prof mostra che `index.html` fa lo stesso con `GAMES = { el, net, est }` per tutti e tre i mestieri |
+| 8 | Più livelli, stessa regola | 8.1 Un livello nuovo scritto solo come dati: Le unghie (js) · 8.2 Elenco `LIVELLI` e pulsante «Avanti» (js) · 8.3 Il livello Igiene, senza ordine, con `ok: true` sui prodotti giusti e la funzione `eGiusta` (js) | Separare dati e regole. Chiusura: il prof rimanda a `GAMES = { el, net, est }` in `index.html`, che fa lo stesso per tutti e tre i mestieri |
 
 Il codice dei capitoli 5-8 riprende nomi e struttura di `index.html`
 (`show`, `level`, `items`, `picked`, `ordered`, `done`, `early`, `win`), in
@@ -253,3 +253,16 @@ riconosce quello che ha scritto.
 - I controlli di HTML e CSS coprono gli errori più comuni, non tutti.
 - Il codice degli allievi gira nella stessa origine della pagina. È un
   rischio accettabile in una pagina didattica senza dati personali.
+
+## 9. Scelte fatte durante la realizzazione
+
+- I prodotti dei capitoli 6-8 sono oggetti `{ t, done, early }` senza emoji (`e` non c'è): nei
+  testi del prof non si usano emoji.
+- Dal capitolo 6 l'anteprima mostra solo la schermata di gioco (la home sparisce) per vedere
+  subito le carte; il capitolo 5 ha già insegnato a passare da una schermata all'altra.
+- Le carte hanno `data-i` (posizione in `items`) e `livello.show` dà l'ordine mescolato in
+  cui compaiono, come `show` in `index.html`.
+- Nel capitolo 3 il carattere Fira Sans non viene scaricato nell'anteprima: il controllo
+  verifica il nome nel CSS; se il font manca, il browser usa quello di riserva.
+- Il passo 3.5 (`:hover`) si controlla leggendo le regole CSS, perché uno script non può
+  simulare il passaggio del mouse.
