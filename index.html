@@ -506,26 +506,81 @@ ul.dl li .ico{margin-top:2px}
    il gioco.
 -->
 <script>
+// Tutto il programma sta dentro una funzione che si esegue subito: (()=>{ ... })();
+// Serve a tenere i nomi delle variabili dentro il programma, senza mescolarli con quelli
+// del resto della pagina.
 (()=>{
+// Una scorciatoia: $('#home') trova nella pagina l'elemento con id="home".
+// querySelector è la funzione del browser che cerca un elemento a partire da un selettore CSS.
 const $=s=>document.querySelector(s);
+// DESKTOP è vero se si sta usando un computer (schermo largo e mouse), falso su telefono.
+// Serve per tornare da soli alla home dopo 90 secondi di inattività, ma solo sul PC allo stand.
 const DESKTOP=!matchMedia('(max-width:919px)').matches && !matchMedia('(pointer:coarse)').matches;
 
 /* ======= DATI DELLA SCUOLA: da compilare ======= */
+/*
+   DATI DELLA SCUOLA: la parte che si può modificare
+   Qui sono scritte le informazioni che compaiono nella pagina finale. Per cambiarle basta
+   cambiare il testo tra gli apici ' '. NON togliere apici, virgole, graffe o parentesi quadre.
+   Un po' di vocabolario:
+     const   dà un nome a un valore che non cambia. Qui il nome è SCUOLA.
+     { ... } un oggetto: un insieme di coppie nome:valore, separate da virgole.
+     [ ... ] un elenco: più valori in fila, separati da virgole.
+     nome, indirizzo, telefono, email, sito   testi semplici. Se il testo è vuoto ('') la
+                                              riga corrispondente non compare nella pagina.
+     email   se è vuota, il riquadro Scrivici avvisa che l'indirizzo non c'è ancora.
+*/
 const SCUOLA={
   nome:'Afol Metropolitana Rozzano',
   indirizzo:'Via degli Oleandri, 48',
   telefono:'',
   email:'segreteria.cfprozzano@afolmet.it',
   sito:'',
+  // Le date degli open day. Ogni riga è {quando:'...'}. Per aggiungerne una, copia una riga,
+  // mettila dopo una virgola e cambia il testo. Si può aggiungere anche una nota:
+  // {quando:'...', note:'...'}.
   date:[{quando:'Sabato 28 novembre, 9:00–12:00'},{quando:'Sabato 16 gennaio, 9:00–12:00'}],
+  // La frase che compare sotto i laboratori.
   labNote:'Dalle 15 alle 16, su prenotazione, per tutti e tre i corsi: 1/12/26, 15/12/26, 12/01/27, 19/01/27.',
+  // Una descrizione per ogni mestiere: el è Elettricità, net è Informatica, est è Estetica.
+  // Se è vuota, nel riquadro compare solo il nome del mestiere.
   laboratori:{el:'',net:'',est:''}
 };
+// I nomi dei mestieri come compaiono nei testi. Le sigle el, net ed est sono usate in tutto il
+// programma per riconoscere i tre giochi.
 const PNAME={el:'Elettricità',net:'Informatica',est:'Estetica'};
 
 /* ======= LIVELLI ======= */
+/*
+   I LIVELLI
+   Ogni missione è descritta da dati, non da codice: il programma legge i dati e costruisce da
+   solo la missione. Per cambiare un titolo o una frase del coach basta cambiare il testo tra
+   gli apici. Per aggiungere una missione si copia un blocco e si modificano i dati.
+
+   SRC sono le due uscite della presa di corrente del gioco Elettricità: F è la fase (filo
+   marrone, la corrente va), N è il neutro (filo blu, la corrente torna). x e y sono la
+   posizione nel disegno; dir è il lato da cui esce il filo (1 destra, -1 sinistra).
+*/
 const SRC=[{id:'S.F',x:190,y:160,dir:1,kind:'F'},{id:'S.N',x:190,y:260,dir:1,kind:'N'}];
+/*
+   MISSIONI DI ELETTRICITÀ. Ogni missione è un blocco {...} con:
+     title  il titolo mostrato in alto
+     goal   la frase del coach all'inizio
+     win    la frase del coach quando la missione riesce
+     press  la frase che invita a premere l'interruttore
+     intro  le spiegazioni iniziali, una alla volta. t è il testo; box dice quali componenti
+            far pulsare; hl dice quali morsetti far pulsare
+     comps  i componenti presenti. t è il tipo (lamp lampadina, sw interruttore), id il nome,
+            x e y la posizione sul banco
+     room   la posizione delle lampade nella stanza di destra
+     sol    una soluzione possibile: l'elenco dei fili, ognuno è una coppia di morsetti, per
+            esempio ['S.F','L.a'] = dalla fase al morsetto a della lampada L.
+   sol serve solo all'aiuto, per suggerire il prossimo filo. La vittoria invece si decide
+   guardando se le lampade si accendono davvero (funzione works): per questo sono valide anche
+   soluzioni diverse da quella scritta.
+*/
 const EL=[
+ // Missione 1: due fili, dalla fase alla lampadina e dalla lampadina al neutro.
  {title:'Accendi la lampadina',
   goal:'La corrente fa un giro: va alla lampadina e poi torna indietro. Servono due fili!',
   win:'Evviva! La corrente esce dal marrone, passa nella lampadina e torna dal blu. Un giro completo!',
@@ -535,6 +590,7 @@ const EL=[
          {t:'Tocca il pallino marrone, poi un pallino della lampadina. Poi fai lo stesso con il blu.'}],
   comps:[{t:'lamp',id:'L',x:610,y:130}], room:[180],
   sol:[['S.F','L.a'],['S.N','L.b']]},
+ // Missione 2: l'interruttore va messo sulla strada del filo marrone (la fase).
  {title:'Aggiungi l’interruttore',
   goal:'L’interruttore apre e chiude la strada. Metti il filo marrone dentro l’interruttore.',
   win:'Ottimo lavoro! Ora comandi tu la luce: premi l’interruttore.',
@@ -543,6 +599,7 @@ const EL=[
          {t:'Si mette sulla strada del filo marrone: prima l’interruttore, poi la lampadina. Il blu va dritto alla lampadina.',hl:['S.F','SW.in','SW.out','L.a']}],
   comps:[{t:'sw',id:'SW',x:330,y:100},{t:'lamp',id:'L',x:610,y:130}], room:[180],
   sol:[['S.F','SW.in'],['SW.out','L.a'],['S.N','L.b']]},
+ // Missione 3: due lampade comandate dallo stesso interruttore.
  {title:'Due lampade, un interruttore',
   goal:'Una sola mano sull’interruttore e si accendono tutte e due le lampade!',
   win:'Fantastico! Un interruttore comanda due lampade insieme.',
@@ -551,7 +608,16 @@ const EL=[
   comps:[{t:'sw',id:'SW',x:300,y:100},{t:'lamp',id:'L1',x:610,y:40},{t:'lamp',id:'L2',x:610,y:230}], room:[115,245],
   sol:[['S.F','SW.in'],['SW.out','L1.a'],['SW.out','L2.a'],['S.N','L1.b'],['S.N','L2.b']]}
 ];
+/*
+   MISSIONI DI INFORMATICA. Stessa idea, con qualche campo in più:
+     mode   lan = i computer devono parlarsi tra loro; web = i computer devono arrivare a internet
+     scene  la scena animata a destra (chat1, chat3 o web)
+     comps  i componenti. pc = computer (flip:true lo rovescia, con la presa a sinistra),
+            nsw = switch, router, web = internet. label è il nome scritto sotto
+     sol    una soluzione possibile, usata solo dall'aiuto. La vittoria si decide con evalNet.
+*/
 const NET=[
+ // Missione 1: un cavo tra due computer.
  {title:'Due computer', mode:'lan', scene:'chat1',
   goal:'Collega i due computer con un cavo: il messaggio deve arrivare.',
   win:'Il messaggio è arrivato! Un cavo basta per far parlare due computer.',
@@ -559,6 +625,7 @@ const NET=[
          {t:'Tocca la presa di un computer e poi quella dell’altro: il cavo li unisce.',hl:['A.p','B.p']}],
   comps:[{t:'pc',id:'A',x:60,y:150,label:'Tu'},{t:'pc',id:'B',x:620,y:150,flip:true,label:'Il tuo amico'}],
   sol:[['A.p','B.p']]},
+ // Missione 2: tre computer, ognuno con una sola presa: serve lo switch.
  {title:'Tre computer', mode:'lan', scene:'chat3',
   goal:'Tre computer devono parlarsi. Ognuno ha una sola presa: serve un aiuto in mezzo.',
   win:'Perfetto! Lo switch fa parlare tutti insieme.',
@@ -567,6 +634,7 @@ const NET=[
          {t:'Collega ogni computer a una presa dello switch.',hl:['A.p','B.p','C.p']}],
   comps:[{t:'pc',id:'A',x:60,y:50,label:'Tu'},{t:'pc',id:'B',x:60,y:270,label:'Anna'},{t:'nsw',id:'SW',x:325,y:150},{t:'pc',id:'C',x:620,y:150,flip:true,label:'Marco'}],
   sol:[['A.p','SW.p1'],['B.p','SW.p2'],['C.p','SW.p3']]},
+ // Missione 3: computer, switch, router e internet. Il router ha due prese diverse.
  {title:'Vai su internet', mode:'web', scene:'web',
   goal:'Porta i due computer su internet. Serve il router.',
   win:'Sei online! Il router collega la tua rete a internet.',
@@ -576,7 +644,23 @@ const NET=[
   comps:[{t:'pc',id:'A',x:40,y:30,label:'Computer 1'},{t:'pc',id:'B',x:40,y:290,label:'Computer 2'},{t:'nsw',id:'SW',x:230,y:160},{t:'router',id:'R',x:450,y:160},{t:'web',id:'W',x:650,y:140}],
   sol:[['A.p','SW.p1'],['B.p','SW.p2'],['SW.p3','R.lan'],['R.wan','W.p']]}
 ];
+/*
+   MISSIONI DI ESTETICA. Qui non ci sono fili ma carte (items). Ogni carta ha:
+     e      il disegnino (emoji) mostrato sulla carta
+     t      il nome
+     done   la frase del coach quando la scelta è giusta
+     early  (solo se ordered:true) la frase se la carta viene scelta troppo presto
+     ok     (solo se ordered non c'è) true per le tre scelte giuste
+     why    (solo per le scelte sbagliate) la spiegazione dell'errore
+   Il livello ha poi:
+     ordered:true  le carte vanno toccate nell'ordine in cui sono scritte in items
+     face          quale scena mostrare a destra (m1 e m2 il viso, hand la mano)
+     show          l'ordine in cui le carte compaiono sullo schermo: sono posizioni dell'elenco
+                   items, contate da zero. [3,1,0,2] mostra per prime la quarta carta, poi la
+                   seconda, poi la prima, poi la terza: così l'ordine giusto non si vede.
+*/
 const EST=[
+ // Missione 1: prodotti da usare in un ordine preciso.
  {title:'Il trattamento viso', ordered:true, face:'m1', show:[3,1,0,2],
   goal:'Tocca i prodotti uno alla volta, nell’ordine giusto.',
   win:'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
@@ -586,6 +670,7 @@ const EST=[
          {e:'🫧',t:'Detergente',done:'Pelle pulita.',early:'Prima di pulire bene la pelle, bisogna togliere il trucco.'},
          {e:'🧖',t:'Maschera',done:'La maschera nutre la pelle.',early:'La maschera si mette su una pelle già pulita.'},
          {e:'🧴',t:'Crema',done:'La crema protegge e chiude il trattamento.',early:'La crema va per ultima, quando la pelle è pulita e curata.'}]},
+ // Missione 2: sei carte, solo tre giuste, in qualunque ordine.
  {title:'Igiene prima di tutto', ordered:false, face:'m2', show:[3,0,5,1,4,2],
   goal:'Scegli le 3 cose giuste da fare prima di cominciare. Le altre sono sbagliate!',
   win:'Ottimo! Con mani e strumenti puliti si lavora in sicurezza.',
@@ -597,6 +682,7 @@ const EST=[
          {e:'🧽',t:'Spugna già usata',why:'Una spugna usata su un’altra persona porta germi. Si usa materiale nuovo o pulito.'},
          {e:'🍔',t:'Merenda sul tavolo',why:'Il cibo non sta dove si lavora: il tavolo deve restare pulito.'},
          {e:'🖌️',t:'Pennello sporco',why:'Un pennello sporco può portare germi alla pelle. Va pulito prima.'}]},
+ // Missione 3: ancora un ordine da rispettare, questa volta per la manicure.
  {title:'Le unghie', ordered:true, face:'hand', show:[2,0,3,1],
   goal:'Prepara le unghie e metti lo smalto nell’ordine giusto.',
   win:'Che bel colore! Unghie perfette e lucide.',
@@ -606,14 +692,44 @@ const EST=[
          {e:'💅',t:'Colore',done:'Che colore!',early:'Il colore va sopra la base, non prima.'},
          {e:'🌟',t:'Lucidante',done:'Il lucidante rende lo smalto brillante e lo fa durare di più.',early:'Il lucidante si mette per ultimo, sopra il colore.'}]}
 ];
+// GAMES collega la sigla del mestiere al suo elenco di missioni. È la tabella che il programma
+// consulta per sapere quali missioni far giocare.
 const GAMES={el:EL,net:NET,est:EST};
 
 /* ======= STATO ======= */
+/*
+   STATO DEL GIOCO
+   Sono variabili: scatole con un nome, il cui contenuto cambia mentre si gioca. Servono a
+   ricordare a che punto si è:
+     game      il mestiere in corso: 'el', 'net' o 'est'
+     li        il numero della missione in corso (0 è la prima)
+     level     i dati della missione in corso (uno dei blocchi di EL, NET o EST)
+     TM        la mappa dei morsetti: da ogni nome (per esempio 'L.a') alla sua posizione
+     IDS       l'elenco dei nomi di tutti i morsetti
+     wires     i fili posati finora. Ognuno è {id, a, b}: i due morsetti che collega
+     st        lo stato degli interruttori (acceso o spento)
+     SEL       il morsetto toccato per primo, in attesa del secondo
+     hintOn    vero se l'aiuto è acceso
+     won       vero se la missione è riuscita
+     tripped   vero se è appena saltato il salvavita
+     introStep a quale spiegazione iniziale siamo (-1 vuol dire finite)
+     lastIn    l'ora dell'ultimo tocco (serve per l'inattività)
+     wid       il contatore che dà un numero a ogni filo
+*/
 let game='el',L,li=0,level,TM={},IDS=[],wires=[],st={},SEL=null,hintOn=false,won=false,tripped=false,introStep=-1,lastIn=Date.now(),wid=0;
+// Variabili del gioco di Estetica: picked sono le carte scelte finora, shakeI la carta che sta
+// tremando, flashMsg la frase temporanea del coach, lastDone l'ultima frase di scelta giusta.
 let picked=[],shakeI=-1,flashMsg='',flashT=null,lastDone='';
+// Tre domande a risposta vera o falsa: si sta giocando a Elettricità, a Informatica o a Estetica?
 const isEl=()=>game==='el',isNet=()=>game==='net',isEst=()=>game==='est';
+// Dice se il componente con quel nome è un interruttore.
 const isSw=id=>level.comps.find(c=>c.id===id).t==='sw';
 
+/*
+   I MORSETTI di ogni componente. I morsetti sono i pallini a cui si attaccano i fili. Il nome è
+   composto dal componente e dalla lettera del morsetto: 'L.a' è il morsetto a della lampada L.
+   x e y dicono dove si trova, dir da quale lato esce il filo (-1 sinistra, 1 destra).
+*/
 function termsOf(c){
   switch(c.t){
   case'lamp':return[{id:c.id+'.a',x:c.x,y:c.y+30,dir:-1},{id:c.id+'.b',x:c.x,y:c.y+80,dir:-1}];
@@ -626,6 +742,8 @@ function termsOf(c){
   case'web':return[{id:c.id+'.p',x:c.x,y:c.y+55,dir:-1}];
   }
 }
+// Il riquadro (x, y, larghezza, altezza) occupato da un componente. Serve a far pulsare un
+// anello attorno ad esso quando il coach lo presenta.
 function bbox(id){
   if(id==='S')return[40,110,150,200];
   const c=level.comps.find(c=>c.id===id);
@@ -633,39 +751,82 @@ function bbox(id){
 }
 
 /* ======= CARICAMENTO ======= */
+/*
+   CARICAMENTO DI UNA MISSIONE
+   Prepara tutto per la missione numero i: azzera fili e stato, scrive il titolo, mostra il
+   banco (o le carte di Estetica), costruisce la mappa dei morsetti, disegna la stanza o la
+   scena a destra e infine chiama render(), che disegna tutto.
+*/
 function loadLevel(i){
   li=i;level=GAMES[game][i];wires=[];st={};SEL=null;won=false;tripped=false;hintOn=false;introStep=level.intro?0:-1;
   picked=[];shakeI=-1;flashMsg='';lastDone='';
+  // Nasconde i pulsanti Avanti e il messaggio OPS, e toglie l'effetto grigio del salvavita.
   $('#ok').hidden=true;$('#next').hidden=true;$('#ops').classList.remove('on');$('#app').classList.remove('tripped');
   $('#mtitle').textContent='Missione '+(i+1)+': '+level.title;
+  // Spegne la luce: la pagina torna ai colori scuri (si toglie la classe lit dall'elemento html).
   document.documentElement.classList.remove('lit');
+  // Elettricità e Informatica usano il banco; Estetica usa le carte. Si nasconde quello che non serve.
   $('#bench').toggleAttribute('hidden',isEst());$('#cards').hidden=!isEst();
   $('#cap').textContent=isEst()?'':'Tocca un pallino e poi un altro per unirli con un filo. Tocca un filo per toglierlo.';
   $('#cap').hidden=isEst();
   if(!isEst()){
+    // Costruisce la mappa dei morsetti: per ogni componente chiede i suoi morsetti e li annota.
     TM={};if(isEl())SRC.forEach(t=>TM[t.id]=t);
     level.comps.forEach(c=>termsOf(c).forEach(t=>TM[t.id]=t));
     IDS=Object.keys(TM);
+    // Gli interruttori partono spenti.
     level.comps.forEach(c=>{if(c.t==='sw')st[c.id]=false;if(c.t==='dev')st[c.id]=c.flip?2:1});
+    // Elettricità mostra la stanza con le lampade; Informatica mostra la scena della chat.
     if(isEl())buildRoom('#playRoom','p',level.room);else $('#playRoom').innerHTML=netScene(level.scene);
   }
   render();
 }
 
 /* ======= SIMULAZIONE ELETTRICA ======= */
+/*
+   SIMULAZIONE ELETTRICA
+   Il programma non conosce la soluzione: simula. L'idea è questa. Due morsetti uniti da un
+   filo diventano lo stesso punto, come se fossero un unico pezzo di rame. UF (unisci e trova)
+   tiene i gruppi di punti collegati tra loro: u(a,b) unisce due gruppi, f(x) dice a quale
+   gruppo appartiene x.
+   Se la fase (F) e il neutro (N) finiscono nello stesso gruppo c'è un cortocircuito: la
+   corrente passa senza attraversare niente e il salvavita stacca tutto.
+   Una lampada si accende se un suo morsetto sta nel gruppo della fase e l'altro in quello del
+   neutro: la corrente entra da una parte ed esce dall'altra.
+*/
 function UF(){const p={};IDS.forEach(i=>p[i]=i);const f=x=>p[x]===x?x:(p[x]=f(p[x]));return{f,u:(a,b)=>{a=f(a);b=f(b);if(a!==b)p[a]=b}}}
+/*
+   sim(s, ws) fa la simulazione. s è lo stato degli interruttori, ws sono i fili. Restituisce
+   i gruppi (U), il gruppo della fase (F) e del neutro (N), se c'è cortocircuito (short) e
+   quali lampade sono accese (lit).
+*/
 function sim(s,ws){
+  // Primo passo: ogni filo unisce i suoi due morsetti.
   const U=UF();ws.forEach(w=>U.u(w.a,w.b));
+  // Un interruttore acceso è come un filo: unisce il suo ingresso (in) con la sua uscita (out).
   level.comps.forEach(c=>{if(c.t==='sw'&&s[c.id])U.u(c.id+'.in',c.id+'.out');if(c.t==='dev')U.u(c.id+'.C',c.id+'.'+s[c.id])});
+  // Cerca i gruppi della fase e del neutro. Se sono lo stesso gruppo, c'è cortocircuito.
   const F=U.f('S.F'),N=U.f('S.N'),short=F===N,lit={};
+  // Per ogni lampada: accesa se un morsetto è sulla fase e l'altro sul neutro, in qualunque
+  // verso, e se non c'è cortocircuito.
   level.comps.filter(c=>c.t==='lamp').forEach(c=>{const a=U.f(c.id+'.a'),b=U.f(c.id+'.b');lit[c.id]=!short&&((a===F&&b===N)||(a===N&&b===F))});
   return{U,F,N,short,lit};
 }
+// Elenca tutte le combinazioni acceso/spento degli interruttori (con due interruttori sono
+// quattro). Serve a works() per provarle una per una.
 function combos(){
   const ids=level.comps.filter(c=>c.t!=='lamp').map(c=>c.id),out=[];
   for(let m=0;m<(1<<ids.length);m++){const s={};ids.forEach((id,i)=>{const b=(m>>i)&1;s[id]=isSw(id)?!!b:(b?2:1)});out.push({m,s})}
   return{ids,out};
 }
+/*
+   works(ws) controlla che il circuito sia fatto bene, provando tutte le combinazioni:
+     1. non deve mai esserci un cortocircuito;
+     2. ogni lampada deve accendersi in almeno una combinazione;
+     3. ogni interruttore, quando lo giri, deve cambiare lo stato di tutte le lampade.
+   La terza regola serve a non accettare una lampada che resta sempre accesa, o un interruttore
+   che non comanda niente.
+*/
 function works(ws){
   const lamps=level.comps.filter(c=>c.t==='lamp').map(c=>c.id),{ids,out}=combos();
   const R=out.map(o=>sim(o.s,ws));
@@ -676,6 +837,15 @@ function works(ws){
   return true;
 }
 /* ======= SIMULAZIONE RETE ======= */
+/*
+   SIMULAZIONE DI RETE
+   evalNet() controlla chi riesce a parlare con chi. Anche qui i fili uniscono i punti in
+   gruppi. Lo switch è come una ciabatta: le sue quattro prese diventano un unico gruppo.
+   Nel modo lan tutti i computer devono stare nello stesso gruppo. Nel modo web i computer
+   devono stare con la presa casa (lan) del router, la presa internet (wan) deve stare con
+   internet, e le due prese del router NON devono finire insieme (why='merged').
+   got dice quali computer hanno ricevuto il messaggio e ok se vanno bene tutti.
+*/
 function evalNet(){
   const U=UF();wires.forEach(w=>U.u(w.a,w.b));
   level.comps.filter(c=>c.t==='nsw').forEach(c=>{U.u(c.id+'.p1',c.id+'.p2');U.u(c.id+'.p1',c.id+'.p3');U.u(c.id+'.p1',c.id+'.p4')});
@@ -691,7 +861,12 @@ function evalNet(){
   ok=Object.values(got).every(Boolean);
   return{U,got,ok,why};
 }
+// Dice se c'è già un filo tra due morsetti.
 const hasW=(a,b)=>wires.some(w=>(w.a===a&&w.b===b)||(w.a===b&&w.b===a));
+/*
+   Trova il primo filo della soluzione ancora mancante: è quello che l'aiuto suggerisce.
+   In Informatica conta il risultato (i due punti sono già collegati?), in Elettricità il filo preciso.
+*/
 function nextMissing(){
   if(isNet()){const U=evalNet().U;return level.sol.find(([a,b])=>U.f(a)!==U.f(b))}
   return level.sol.find(([a,b])=>!hasW(a,b));
