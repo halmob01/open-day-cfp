@@ -118,7 +118,7 @@ indipendenti: i due gruppi si possono svolgere in parallelo.
   Come T10. L'ultimo passo del capitolo 8 chiude con il confronto con
   `GAMES` in `index.html`.
 
-- [ ] **T14 · Revisione finale**
+- [x] **T14 · Revisione finale**
   Rilettura di tutti i testi (refusi, frasi ripetute, registro uguale a quello
   del gioco), accessibilità di base (etichette dei pulsanti, focus visibile,
   editor usabile da tastiera), `prefers-reduced-motion`, aggiornamento del
