@@ -114,6 +114,10 @@ ul.dl li .ico{margin-top:2px}
 .cap{text-align:center;color:var(--muted);font-size:.9rem;padding:2px 0 4px}
 .task p{margin:0;font-size:1.1rem;font-weight:500}
 .task .eyebrow{font-size:1rem;margin-bottom:4px}
+.chk{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:5px;font-size:.95rem}
+.chk:empty{display:none}
+.chk li::before{content:'';display:inline-block;width:14px;height:14px;border:3px solid var(--line);border-radius:50%;margin-right:8px;vertical-align:-2px}
+.chk li.ok::before{background:var(--good);border-color:var(--good)}
 .edph{flex:1;display:grid;place-items:center;border-radius:14px;background:var(--card);box-shadow:0 0 0 2px var(--line) inset;color:var(--muted);text-align:center;padding:12px}
 .runrow{display:flex;gap:10px;align-items:center}
 .runrow .btn{min-height:42px;padding:8px 18px;flex:none;white-space:nowrap}
@@ -213,7 +217,7 @@ ul.dl li .ico{margin-top:2px}
       </div>
     </div>
     <div class="side">
-      <div class="panel task"><p class="eyebrow">Il tuo compito</p><p id="compito"></p></div>
+      <div class="panel task"><p class="eyebrow">Il tuo compito</p><p id="compito"></p><ul class="chk" id="chk"></ul></div>
       <div class="coach"><div id="mascot"></div><div class="bubble" id="say"></div></div>
       <div class="btns">
         <button class="btn" id="hint" type="button">Aiutami</button>
@@ -239,6 +243,25 @@ ul.dl li .ico{margin-top:2px}
 </div>
 <canvas id="cf"></canvas>
 <div id="sonde" aria-hidden="true"></div>
+
+<!-- CODICE DEI PASSI: i pezzi di codice che compaiono negli editor (vedi «I PEZZI DI CODICE» nel JavaScript).
+     Il contenuto è testo semplice: il browser non lo esegue. -->
+<script type="text/plain" data-k="demo-html-inizio">
+<h1>Ciao, mondo</h1>
+<p>Scrivi qui.</p>
+</script>
+<script type="text/plain" data-k="demo-html-soluzione">
+<h1>Ciao, classe</h1>
+<p>Scrivi qui.</p>
+</script>
+<script type="text/plain" data-k="demo-css">
+h1 {
+  color: red;
+}
+</script>
+<script type="text/plain" data-k="demo-js">
+// qui non c'è ancora niente
+</script>
 
 <!-- SPIA: piccolo script che viene messo in cima a ogni anteprima. Ascolta gli errori e i console.log del codice
      dell'allievo e li passa alla pagina. È testo semplice (text/plain): il browser non lo esegue qui. -->
@@ -268,19 +291,54 @@ console.log=function(){
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
+/* ======= I PEZZI DI CODICE =======
+   Il codice che gli allievi vedono negli editor è scritto in fondo alla pagina, in blocchi
+   <script type="text/plain" data-k="nome">: così si può scrivere senza usare simboli speciali.
+   Ogni blocco è un "pezzo" con un nome. Un passo dice quali pezzi mettere nell'editor (all'inizio
+   e nella soluzione) e il programma li unisce. */
+const PEZZI={};
+document.querySelectorAll('script[data-k]').forEach(s=>{PEZZI[s.dataset.k]=s.textContent.replace(/^\n/,'').replace(/\s+$/,'')});
+const unisci=v=>(Array.isArray(v)?v:[v]).map(id=>{if(!(id in PEZZI))throw new Error('Pezzo di codice mancante: '+id);return PEZZI[id]}).join('\n\n');
+
 /* ======= I CAPITOLI =======
    Ogni capitolo ha un titolo, una descrizione, le spiegazioni iniziali (intro), l'elenco dei
-   passi e tre frasi su cosa si è imparato (imparato). Per ora c'è solo un capitolo di prova:
-   i veri otto capitoli arrivano nei compiti successivi. */
+   passi e tre frasi su cosa si è imparato (imparato).
+   Ogni PASSO ha:
+     id        un nome unico (c3p2 = capitolo 3, passo 2)
+     titolo    il titolo mostrato in alto
+     file      la scheda in cui si scrive: 'html', 'css' o 'js'
+     intro     le spiegazioni del prof prima di cominciare: t è il testo; riga (facoltativo)
+               evidenzia una riga dell'editor, tab dice in quale scheda
+     compito   la frase del compito, sempre visibile
+     inizio    il codice di partenza: per ogni scheda un nome di pezzo (o un elenco di pezzi).
+               Le schede non indicate restano come alla fine del passo prima
+     soluzione il codice finale: stessa forma di inizio, solo per le schede che cambiano
+     controlli l'elenco delle verifiche. Ognuna ha: cosa (frase breve mostrata nel compito),
+               ok(d, w, s) (la verifica vera: d è il documento dell'anteprima, w la sua finestra,
+               s il codice delle tre schede; deve restituire vero o falso) e aiuto (la frase che
+               guida senza dare la soluzione)
+     bravo     la frase quando il passo riesce */
 const CAPITOLI=[
  {id:'c0',titolo:'Capitolo di prova',descr:'Serve a provare le schermate.',
   intro:[{t:'Ciao! Io sono il prof. Ti accompagno passo dopo passo.'}],
   passi:[{id:'c0p1',titolo:'Passo di prova',file:'html',
-    inizio:{html:'<h1>Ciao, mondo</h1>\n<p>Scrivi qui.</p>\n',css:'h1 {\n  color: red;\n}\n',js:'// qui non c’è ancora niente\n'},
-    intro:[{t:'Questo è un passo di prova: premi «Prova il codice» per vedere cosa succede quando un passo riesce.'}],
-    compito:'Premi «Prova il codice».',bravo:'Ecco: quando un passo riesce la pagina si accende.'}],
+    inizio:{html:'demo-html-inizio',css:'demo-css',js:'demo-js'},soluzione:{html:'demo-html-soluzione'},
+    intro:[{t:'Questo è un passo di prova. Cambia il testo del titolo.',riga:1}],
+    compito:'Scrivi un testo diverso nel titolo.',
+    controlli:[{cosa:'Il titolo ha un testo nuovo',ok:d=>{const t=d.querySelector('h1');return !!t&&t.textContent.trim()!==''&&t.textContent.trim()!=='Ciao, mondo'},aiuto:'Cambia le parole tra <h1> e </h1>.'}],
+    bravo:'Ecco: quando un passo riesce la pagina si accende.'}],
   imparato:['Come è fatta una schermata.','Come si passa da un passo al successivo.','Cosa succede quando un passo riesce.']}
 ];
+
+/* Per ogni passo si calcolano il codice di partenza (codIni) e la soluzione (codSol). Ogni passo
+   parte dalla soluzione del passo prima, salvo dove dice altro: così un errore non si trascina. */
+(function(){
+  let prec={html:'',css:'',js:''};
+  CAPITOLI.forEach(c=>c.passi.forEach(p=>{
+    const fa=(base,def)=>{const r=Object.assign({},base);['html','css','js'].forEach(t=>{if(def&&def[t]){const x=unisci(def[t]);r[t]=x?x+'\n':''}});return r};
+    p.codIni=fa(prec,p.inizio);p.codSol=fa(p.codIni,p.soluzione);prec=p.codSol;
+  }));
+})();
 
 /* ======= SALVATAGGIO =======
    I progressi si salvano nel browser (localStorage). Se il browser lo blocca, la pagina funziona
@@ -393,6 +451,8 @@ const Editor={
     const alto=PAD+(riga-1)*ALT;
     if(alto<o.ta.scrollTop||alto+ALT>o.ta.scrollTop+o.ta.clientHeight-ALT)o.ta.scrollTop=Math.max(0,alto-ALT*3);
   },
+  /* Durante le spiegazioni iniziali non si può scrivere. */
+  pausa(on){const o=this.t[this.attiva];if(o)o.ta.readOnly=o.bloccata||on},
   pulisci(tipo){Object.keys(this.t).forEach(n=>{const o=this.t[n];if(tipo)delete o.marks[tipo];else o.marks={};this.aggiorna(n)})},
 
   /* Tasti speciali: Tab scrive due spazi, Invio mantiene il rientro, Ctrl+Invio prova il codice,
@@ -660,11 +720,20 @@ function renderIndice(){
 }
 
 /* ======= UN PASSO =======
-   S è lo stato del passo in corso: capitolo (ci), passo (pi), a che punto sono le spiegazioni
-   iniziali (introStep, -1 se finite), quante volte è stato chiesto aiuto (hintN), se è
-   riuscito (won) e la frase temporanea del prof (flash). */
-let S={ci:0,pi:0,passo:null,introStep:-1,hintN:0,won:false,flash:'',errore:null,conJs:true};
-let flashT=null;
+   S è lo stato del passo in corso:
+     ci, pi        capitolo e passo
+     passo         i dati del passo (con le spiegazioni del capitolo aggiunte nel primo passo)
+     introStep     a che punto sono le spiegazioni iniziali (-1 se sono finite)
+     hintN         quante volte si è chiesto aiuto in questo passo
+     falliti       i controlli non ancora superati (numeri d'ordine); null se non ancora valutati
+     won           il passo è riuscito
+     errore        l'errore da mostrare ({tab, riga, msg}), se c'è
+     aiuto         la frase d'aiuto da mostrare, se c'è
+     flash         una frase temporanea del prof
+     conJs         se il JavaScript può girare nell'anteprima (falso dopo un blocco)
+     apertoFinito  il passo era già finito quando è stato aperto (niente festa se riesce di nuovo) */
+let S={ci:0,pi:0,passo:null,introStep:-1,hintN:0,falliti:null,won:false,errore:null,aiuto:'',flash:'',conJs:true,apertoFinito:false};
+let lastIn=Date.now();
 /* Se la pagina è stata ricaricata mentre girava il JavaScript di un passo, quel passo ha bloccato
    il browser (di solito un ciclo che non finisce mai): ci ricordiamo l'id del passo. */
 const bloccoPrec=guardia.leggi();guardia.libera();
@@ -673,32 +742,64 @@ function caricaPasso(ci,pi){
   const c=CAPITOLI[ci],p=c.passi[pi];
   /* nel primo passo di un capitolo, le spiegazioni del capitolo vengono prima di quelle del passo */
   const intro=(pi===0?c.intro:[]).concat(p.intro||[]);
-  S={ci,pi,passo:Object.assign({},p,{intro}),introStep:intro.length?0:-1,hintN:0,won:false,flash:'',errore:null,conJs:bloccoPrec!==p.id};
+  S={ci,pi,passo:Object.assign({},p,{intro}),introStep:intro.length?0:-1,hintN:0,falliti:null,won:false,errore:null,aiuto:'',flash:'',
+     conJs:bloccoPrec!==p.id,apertoFinito:!!store.mem.finiti[p.id]};
   mostra('passo');
   $('#mtitle').textContent=`Capitolo ${ci+1} · Passo ${pi+1}: ${p.titolo}`;
   $('#compito').textContent=p.compito;
-  Editor.imposta(p.inizio,p.file);
+  /* se l'allievo aveva già scritto qualcosa in questo passo, si riparte da lì */
+  const cod=Object.assign({},p.codIni),salv=store.mem.codice[p.id];
+  if(salv&&salv.f===p.file&&typeof salv.t==='string')cod[p.file]=salv.t;
+  Editor.imposta(cod,p.file);
   if(!S.conJs)S.flash='La volta scorsa la pagina si è bloccata: forse c’era un ciclo che non finiva mai. Ho tenuto da parte il tuo codice: correggilo e premi «Prova il codice».';
   render();
   provaCodice(S.conJs);
 }
 
-/* Aggiorna l'anteprima con il codice che c'è adesso negli editor. Se nel frattempo ne parte
-   un'altra (perché si continua a scrivere), il risultato di questa si scarta. */
+function salvaCodice(c){
+  store.mem.codice[S.passo.id]={f:S.passo.file,t:c[S.passo.file]};store.save();
+}
+
+/* Aggiorna l'anteprima con il codice che c'è adesso negli editor e poi controlla se il passo è
+   riuscito. Se nel frattempo ne parte un'altra (perché si continua a scrivere), il risultato di
+   questa si scarta (seq serve a riconoscerlo). */
 let seq=0;
 async function provaCodice(conJs){
   const n=++seq,c=Editor.leggi();
+  salvaCodice(c);
   const r=await Anteprima.mostra(c,conJs,S.passo.id);
-  if(n!==seq)return r;
+  if(n!==seq)return;
   S.errore=null;Editor.pulisci('err');
-  /* prima i controlli sul testo (HTML e CSS), poi gli errori dell'esecuzione (JavaScript) */
+  /* 1. prima i controlli sul testo (HTML e CSS), poi gli errori dell'esecuzione (JavaScript) */
   const tab=S.passo.file,testo=c[tab];
   const st=tab==='html'?controllaHtml(testo):tab==='css'?controllaCss(testo):[];
-  if(st.length){S.errore={tab,riga:st[0].riga,msg:st[0].msg};Editor.segna(tab,st[0].riga,'err');render()}
-  else if(r.errori.length)erroreRuntime(r.errori[0]);
-  else render();
-  return r;
+  if(st.length){S.errore={tab,riga:st[0].riga,msg:st[0].msg};Editor.segna(tab,st[0].riga,'err');render();return}
+  if(r.errori.length){erroreRuntime(r.errori[0]);return}
+  if(!conJs){render();return}
+  /* 2. nessun errore: si valutano i controlli del passo */
+  const falliti=await valuta(c);
+  if(n!==seq)return;
+  S.falliti=falliti;
+  if(!falliti.length)vinto(S.apertoFinito);else render();
 }
+
+/* Valuta i controlli del passo. Ognuno gira su un'anteprima nuova e nascosta, così può cliccare e
+   cambiare la pagina senza disturbare quella che l'allievo vede. Restituisce i numeri dei
+   controlli non superati. Un controllo che non risponde entro 3 secondi conta come non superato. */
+async function valuta(c){
+  const falliti=[],cs=S.passo.controlli;
+  for(let k=0;k<cs.length;k++){
+    const s=await Anteprima.sonda(c,S.passo.id);
+    let ok=false;
+    try{
+      ok=s.errori.length===0&&!!(await Promise.race([cs[k].ok(s.doc,s.win,c),new Promise(r=>setTimeout(()=>r(false),3000))]));
+    }catch(e){ok=false}
+    s.chiudi();
+    if(!ok)falliti.push(k);
+  }
+  return falliti;
+}
+
 function erroreRuntime(e){
   const t=traduciErroreJs(e);
   S.errore={tab:'js',riga:e.l||0,msg:t.it,orig:t.orig};
@@ -706,34 +807,50 @@ function erroreRuntime(e){
   render();
 }
 Anteprima.onErrore=e=>{if(!S.errore)erroreRuntime(e)};
-/* HTML e CSS si aggiornano da soli 400 millisecondi dopo l'ultimo tasto; il JavaScript solo con «Prova il codice». */
+
+/* Quando si scrive: si toglie l'aiuto, e HTML e CSS si aggiornano da soli 400 millisecondi dopo
+   l'ultimo tasto. Il JavaScript invece gira solo con «Prova il codice». */
 let rit=null;
-Editor.onChange=n=>{if(n==='js')return;clearTimeout(rit);rit=setTimeout(()=>provaCodice(S.conJs),400)};
+Editor.onChange=n=>{
+  lastIn=Date.now();S.aiuto='';Editor.pulisci('help');
+  if(n==='js')return;
+  clearTimeout(rit);rit=setTimeout(()=>provaCodice(S.conJs),400);
+};
+Editor.onRun=()=>{if(S.introStep<0)$('#prova').click()};
 
 function render(){
-  const p=S.passo,intro=p.intro;let msg,mood='hi',orig='';
-  if(S.introStep>=0)msg=intro[S.introStep].t;
+  const p=S.passo,intro=p.intro,inIntro=S.introStep>=0;let msg,mood='hi',orig='';
+  Editor.pausa(inIntro);
+  if(inIntro){
+    const sl=intro[S.introStep];msg=sl.t;Editor.pulisci('help');
+    if(sl.riga){const tab=sl.tab||p.file;Editor.vai(tab);Editor.segna(tab,sl.riga,'help')}
+  }
   else if(S.errore){msg=(S.errore.riga?`Riga ${S.errore.riga}: `:'')+S.errore.msg;mood='oops';orig=S.errore.orig||''}
-  else if(S.flash)msg=S.flash;
   else if(S.won){msg=p.bravo;mood='happy'}
+  else if(S.aiuto)msg=S.aiuto;
+  else if(S.flash)msg=S.flash;
   else msg=p.compito;
   $('#say').textContent=msg;
   if(orig){const o=document.createElement('small');o.className='orig';o.textContent='Messaggio originale: '+orig;$('#say').appendChild(o)}
   $('#mascot').innerHTML=mascot(mood);
-  const inIntro=S.introStep>=0;
+  /* l'elenco di cosa deve succedere, con la spunta per quello che è già a posto */
+  $('#chk').innerHTML=p.controlli.filter(k=>k.cosa).map((k,i)=>{const ok=S.won||(S.falliti&&!S.falliti.includes(p.controlli.indexOf(k)));return `<li${ok?' class="ok"':''}>${esc(k.cosa)}</li>`}).join('');
   $('#ok').hidden=!inIntro;$('#ok').textContent=S.introStep===intro.length-1?'Ho capito, provo!':'Avanti';
   $('#next').hidden=!S.won||inIntro;
   $('#next').textContent=S.pi===CAPITOLI[S.ci].passi.length-1?'Fine capitolo':'Avanti';
   $('#hint').hidden=S.won||inIntro;$('#reset').hidden=inIntro;
+  $('#sol').hidden=S.won||inIntro||S.hintN<3;
+  $('#prova').disabled=inIntro;
   $('#dots').innerHTML=CAPITOLI[S.ci].passi.map((_,i)=>{const done=i<S.pi||(i===S.pi&&S.won);
     return `<div class="dot ${done?'done':i===S.pi?'now':''}">${done?'✓':i+1}</div>`}).join('');
   document.documentElement.classList.toggle('lit',S.won);
 }
 
-function vinto(){
+function vinto(muto){
   if(S.won)return;
-  S.won=true;store.mem.finiti[S.passo.id]=true;store.save();
-  render();celebrate();
+  S.won=true;S.aiuto='';S.errore=null;Editor.pulisci();
+  store.mem.finiti[S.passo.id]=true;store.save();
+  render();if(!muto)celebrate();
 }
 
 function toFine(){
@@ -746,15 +863,50 @@ function toFine(){
   $('#fNext').hidden=ultimo;
 }
 
+/* La prima riga in cui il codice dell'allievo è diverso dalla soluzione: è lì che guarda l'aiuto. */
+function primaDifferenza(a,b){
+  const A=a.split('\n'),B=b.split('\n');let i=0;
+  while(i<A.length&&i<B.length&&A[i]===B[i])i++;
+  return Math.min(i+1,A.length);
+}
+
 /* ======= PULSANTI ======= */
 $('#chapters').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(!b)return;ac();sfx.click();
   const ci=+b.dataset.c,c=CAPITOLI[ci];
   const prossimo=c.passi.findIndex(p=>!store.mem.finiti[p.id]);
   caricaPasso(ci,prossimo<0?0:prossimo)});
-$('#ok').onclick=()=>{sfx.click();S.introStep++;if(S.introStep>=S.passo.intro.length)S.introStep=-1;render()};
-$('#hint').onclick=()=>{sfx.click();S.hintN++;render()};
-$('#reset').onclick=()=>{sfx.rm();S.won=false;S.flash='';render()};
-$('#prova').onclick=async()=>{ac();sfx.click();S.conJs=true;S.flash='';await provaCodice(true);if(!S.errore)vinto()}; /* provvisorio: il vero controllo arriva con il motore dei passi */
+$('#ok').onclick=()=>{lastIn=Date.now();sfx.click();S.introStep++;if(S.introStep>=S.passo.intro.length){S.introStep=-1;Editor.pulisci('help');Editor.vai(S.passo.file)}render()};
+$('#prova').onclick=()=>{if(S.introStep>=0)return;lastIn=Date.now();ac();sfx.click();S.conJs=true;S.flash='';provaCodice(true)};
+
+/* Aiutami: la prima volta una frase che guida; la seconda anche la riga da guardare; dalla terza
+   compare il pulsante per mostrare la soluzione. */
+$('#hint').onclick=()=>{
+  lastIn=Date.now();sfx.click();S.hintN++;
+  const p=S.passo,k=S.falliti&&S.falliti.length?S.falliti[0]:0;
+  S.aiuto=p.controlli[k].aiuto;
+  if(S.hintN>=2){
+    const riga=primaDifferenza(Editor.leggi()[p.file],p.codSol[p.file]);
+    Editor.vai(p.file);Editor.segna(p.file,riga,'help');S.aiuto+=' Guarda la riga evidenziata.';
+  }
+  render();
+};
+$('#sol').onclick=()=>{lastIn=Date.now();sfx.click();const p=S.passo;Editor.scrivi(p.file,p.codSol[p.file]);S.aiuto='';Editor.pulisci('help');provaCodice(true)};
+
+/* Ricomincia riporta il codice a com'era all'inizio del passo. Se l'allievo aveva scritto
+   qualcosa chiede conferma con un secondo clic, entro 3 secondi. */
+let resetT=null;
+$('#reset').onclick=()=>{
+  lastIn=Date.now();const b=$('#reset'),p=S.passo;
+  if(Editor.leggi()[p.file]!==p.codIni[p.file]&&!b.dataset.sicuro){
+    b.dataset.sicuro='1';b.textContent='Sicuro? Premi ancora';
+    resetT=setTimeout(()=>{delete b.dataset.sicuro;b.textContent='Ricomincia'},3000);return;
+  }
+  clearTimeout(resetT);delete b.dataset.sicuro;b.textContent='Ricomincia';
+  sfx.rm();Editor.imposta(p.codIni,p.file);
+  delete store.mem.codice[p.id];
+  Object.assign(S,{won:false,errore:null,aiuto:'',flash:'',hintN:0,falliti:null,conJs:true,apertoFinito:false});
+  render();provaCodice(true);
+};
 $('#next').onclick=()=>{sfx.click();if(S.pi<CAPITOLI[S.ci].passi.length-1)caricaPasso(S.ci,S.pi+1);else toFine()};
 $('#mute').onclick=()=>{muted=!muted;setMute();ac()};
 $('#homeb').onclick=()=>{renderIndice();mostra('indice')};
@@ -770,12 +922,27 @@ $('#azzera').onclick=()=>{
   azzeraT=setTimeout(()=>{delete b.dataset.sicuro;b.textContent='Cancella i miei progressi'},3000);
 };
 
+/* Dopo 30 secondi senza scrivere né toccare niente, se il passo non è ancora riuscito, il
+   pulsante Aiutami si anima leggermente (senza aprire l'aiuto da solo). */
+['keydown','pointerdown'].forEach(ev=>addEventListener(ev,()=>lastIn=Date.now()));
+setInterval(()=>{
+  if($('#passo').hidden)return;
+  const serve=S.introStep<0&&!S.won&&S.falliti&&S.falliti.length>0;
+  $('#hint').classList.toggle('nudge',serve&&Date.now()-lastIn>30000);
+},2000);
+
 /* ======= AVVIO ======= */
 /* per i test automatici (test/impara.test.mjs) */
-window.__impara={controllaHtml,controllaCss,traduciErroreJs,Anteprima,Editor,CAPITOLI,store,provaCodice:c=>provaCodice(c),stato:()=>S};
+/* Apre un passo, mette il codice dato negli editor e restituisce il risultato della valutazione. */
+async function valutaPasso(ci,pi,cod){
+  caricaPasso(ci,pi);S.introStep=-1;
+  Object.keys(cod).forEach(t=>Editor.scrivi(t,cod[t]));
+  await provaCodice(true);
+  return {falliti:S.falliti,errore:S.errore,won:S.won};
+}
+window.__impara={controllaHtml,controllaCss,traduciErroreJs,Anteprima,Editor,CAPITOLI,PEZZI,store,caricaPasso,valutaPasso,stato:()=>S};
 Anteprima.frame=$('#view');
 Editor.crea();
-Editor.onRun=()=>$('#prova').click();
 store.load();setMute();renderIndice();mostra('indice');
 })();
 </script>
