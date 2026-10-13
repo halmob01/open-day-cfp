@@ -101,7 +101,7 @@ indipendenti: i due gruppi si possono svolgere in parallelo.
   riepilogo leggibile; rompendo apposta una soluzione il test fallisce e dice
   quale passo.
 
-- [ ] **T10 · Contenuti: capitoli 1 e 2**
+- [x] **T10 · Contenuti: capitoli 1 e 2**
   Piano: sezione 6.
   Fumetti, compiti, codice di partenza, soluzioni, controlli e messaggi.
   Accettazione: test di T09 verde; ogni passo provato a mano facendo un errore

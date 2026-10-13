@@ -246,21 +246,98 @@ ul.dl li .ico{margin-top:2px}
 
 <!-- CODICE DEI PASSI: i pezzi di codice che compaiono negli editor (vedi «I PEZZI DI CODICE» nel JavaScript).
      Il contenuto è testo semplice: il browser non lo esegue. -->
-<script type="text/plain" data-k="demo-html-inizio">
+<script type="text/plain" data-k="c1-html">
 <h1>Ciao, mondo</h1>
-<p>Scrivi qui.</p>
+<p id="msg">Premi il pulsante.</p>
+<button id="premi" type="button">Premimi</button>
 </script>
-<script type="text/plain" data-k="demo-html-soluzione">
-<h1>Ciao, classe</h1>
-<p>Scrivi qui.</p>
-</script>
-<script type="text/plain" data-k="demo-css">
+<script type="text/plain" data-k="c1-css">
 h1 {
-  color: red;
+  color: black;
 }
 </script>
-<script type="text/plain" data-k="demo-js">
-// qui non c'è ancora niente
+<script type="text/plain" data-k="c1-js">
+const pulsante = document.querySelector('#premi');
+const msg = document.querySelector('#msg');
+
+pulsante.addEventListener('click', function () {
+  msg.textContent = 'Ciao!';
+});
+</script>
+<script type="text/plain" data-k="c1p1-html">
+<h1>Il mio primo sito</h1>
+<p id="msg">Premi il pulsante.</p>
+<button id="premi" type="button">Premimi</button>
+</script>
+<script type="text/plain" data-k="c1p2-css">
+h1 {
+  color: tomato;
+}
+</script>
+<script type="text/plain" data-k="c1p3-js">
+const pulsante = document.querySelector('#premi');
+const msg = document.querySelector('#msg');
+
+pulsante.addEventListener('click', function () {
+  msg.textContent = 'Evviva, funziona!';
+});
+</script>
+<script type="text/plain" data-k="c2-html">
+<!-- La home: scrivi qui sotto -->
+</script>
+<script type="text/plain" data-k="c2-css">
+/* Qui scriverai l’aspetto della pagina */
+</script>
+<script type="text/plain" data-k="c2-js">
+// Qui scriverai il comportamento della pagina
+</script>
+<script type="text/plain" data-k="c2p1-html">
+<h1>Cosa ti interessa?</h1>
+<p class="sub">Scegli un mestiere e provalo.</p>
+</script>
+<script type="text/plain" data-k="c2p2-html">
+<h1>Cosa ti interessa?</h1>
+<p class="sub">Scegli un mestiere e provalo.</p>
+<button>
+  <b>Elettricità</b>
+  <span>Accendi la luce</span>
+</button>
+</script>
+<script type="text/plain" data-k="c2p3-html">
+<h1>Cosa ti interessa?</h1>
+<p class="sub">Scegli un mestiere e provalo.</p>
+<div class="paths">
+  <button>
+    <b>Elettricità</b>
+    <span>Accendi la luce</span>
+  </button>
+  <button>
+    <b>Informatica</b>
+    <span>Fai arrivare il messaggio</span>
+  </button>
+  <button>
+    <b>Estetica</b>
+    <span>Prepara il trattamento</span>
+  </button>
+</div>
+</script>
+<script type="text/plain" data-k="c2p4-html">
+<h1>Cosa ti interessa?</h1>
+<p class="sub">Scegli un mestiere e provalo.</p>
+<div class="paths">
+  <button class="path" data-path="el" type="button">
+    <b>Elettricità</b>
+    <span>Accendi la luce</span>
+  </button>
+  <button class="path" data-path="net" type="button">
+    <b>Informatica</b>
+    <span>Fai arrivare il messaggio</span>
+  </button>
+  <button class="path" data-path="est" type="button">
+    <b>Estetica</b>
+    <span>Prepara il trattamento</span>
+  </button>
+</div>
 </script>
 
 <!-- SPIA: piccolo script che viene messo in cima a ogni anteprima. Ascolta gli errori e i console.log del codice
@@ -318,16 +395,109 @@ const unisci=v=>(Array.isArray(v)?v:[v]).map(id=>{if(!(id in PEZZI))throw new Er
                s il codice delle tre schede; deve restituire vero o falso) e aiuto (la frase che
                guida senza dare la soluzione)
      bravo     la frase quando il passo riesce */
+/* Piccoli aiuti per scrivere i controlli dei passi. Ricevono il documento d dell'anteprima. */
+const sel=(d,s)=>d.querySelector(s);
+const tutti=(d,s)=>[...d.querySelectorAll(s)];
+const testo=(d,s)=>{const e=d.querySelector(s);return e?e.textContent.replace(/\s+/g,' ').trim():null};
+const stile=(d,s)=>{const e=d.querySelector(s);return e?d.defaultView.getComputedStyle(e):null};
+const clic=(d,s)=>{const e=d.querySelector(s);if(e)e.click();return !!e};
+/* toglie transizioni e animazioni, così i colori letti subito dopo un cambio sono quelli finali */
+const senzaTransizioni=d=>{const s=d.createElement('style');s.textContent='*,*::before,*::after{transition:none!important;animation:none!important}';d.head.appendChild(s)};
+/* chiarezza di un colore "rgb(r, g, b)" da 0 (nero) a 255 (bianco) */
+const chiarezza=c=>{const m=/(\d+)\D+(\d+)\D+(\d+)/.exec(c||'');return m?(+m[1]+ +m[2]+ +m[3])/3:-1};
+const norm=t=>(t||'').replace(/\s+/g,' ').trim();
+
 const CAPITOLI=[
- {id:'c1',titolo:'Capitolo di prova',descr:'Serve a provare le schermate.',
-  intro:[{t:'Ciao! Io sono il prof. Ti accompagno passo dopo passo.'}],
-  passi:[{id:'c1p1',titolo:'Passo di prova',file:'html',
-    inizio:{html:'demo-html-inizio',css:'demo-css',js:'demo-js'},soluzione:{html:'demo-html-soluzione'},
-    intro:[{t:'Questo è un passo di prova. Cambia il testo del titolo.',riga:1}],
-    compito:'Scrivi un testo diverso nel titolo.',
-    controlli:[{cosa:'Il titolo ha un testo nuovo',ok:d=>{const t=d.querySelector('h1');return !!t&&t.textContent.trim()!==''&&t.textContent.trim()!=='Ciao, mondo'},aiuto:'Cambia le parole tra <h1> e </h1>.'}],
-    bravo:'Ecco: quando un passo riesce la pagina si accende.'}],
-  imparato:['Come è fatta una schermata.','Come si passa da un passo al successivo.','Cosa succede quando un passo riesce.']}
+{id:'c1',titolo:'Come è fatto un sito',descr:'I tre linguaggi di una pagina: struttura, aspetto e comportamento.',
+  intro:[
+   {t:'Ciao, sono il prof! Il sito «Prova il mestiere» che hai visto prima lo costruirai tu, un pezzo alla volta. Qui scrivi il codice e a destra vedi subito il risultato.'},
+   {t:'Una pagina web è fatta con tre linguaggi, cioè tre modi di scrivere istruzioni per il computer. L’HTML è lo scheletro: dice cosa c’è nella pagina, come titoli, testi e pulsanti.'},
+   {t:'Il CSS sono i vestiti: colori, misure, forme. Il JavaScript sono i muscoli: fa succedere qualcosa quando premi un pulsante. Li proviamo uno alla volta.'}],
+  passi:[
+   {id:'c1p1',titolo:'Cambia il testo del titolo',file:'html',
+    inizio:{html:'c1-html',css:'c1-css',js:'c1-js'},soluzione:{html:'c1p1-html'},
+    intro:[
+     {t:'Questa è la scheda HTML. A destra c’è la pagina che stai scrivendo: cambia appena scrivi.'},
+     {t:'La riga 1 è il titolo. Il tag <h1> lo apre, il tag </h1> lo chiude, e le parole che si vedono stanno in mezzo.',riga:1,tab:'html'},
+     {t:'Cambia le parole del titolo e guarda la pagina a destra.'}],
+    compito:'Scrivi un titolo tuo al posto di «Ciao, mondo».',
+    controlli:[
+     {cosa:'Il titolo ha un testo nuovo',ok:d=>{const t=testo(d,'h1');return !!t&&t!=='Ciao, mondo'},aiuto:'Cambia le parole che stanno tra <h1> e </h1>. I due tag devono restare.'}],
+    bravo:'Il titolo è tuo. Hai appena scritto HTML.'},
+   {id:'c1p2',titolo:'Cambia il colore del titolo',file:'css',
+    soluzione:{css:'c1p2-css'},
+    intro:[
+     {t:'Ora la scheda CSS. Qui c’è una regola: dice che i titoli h1 devono avere un certo aspetto.'},
+     {t:'La riga 2 ha una proprietà, color (il colore del testo), e un valore, black (nero). Sono separati da due punti e la riga finisce con un punto e virgola.',riga:2,tab:'css'},
+     {t:'I colori si scrivono in inglese: red, blue, green, tomato, purple... Cambia black con un altro colore.'}],
+    compito:'Dai al titolo un colore che non sia il nero.',
+    controlli:[
+     {cosa:'Il titolo non è più nero',ok:d=>{const s=stile(d,'h1');return !!s&&s.color!=='rgb(0, 0, 0)'},aiuto:'Sostituisci la parola black con il nome di un altro colore, in inglese.'},
+     {cosa:'Il titolo si legge sullo sfondo bianco',ok:d=>{const s=stile(d,'h1');return !!s&&chiarezza(s.color)<235},aiuto:'Il bianco su sfondo bianco non si vede. Scegli un colore più scuro.'}],
+    bravo:'Che colore! Il CSS cambia l’aspetto senza toccare il contenuto.'},
+   {id:'c1p3',titolo:'Cambia il messaggio del pulsante',file:'js',
+    soluzione:{js:'c1p3-js'},
+    intro:[
+     {t:'Ora il JavaScript. Il codice cerca nella pagina il pulsante e il paragrafo e li chiama pulsante e msg.'},
+     {t:'Quando il pulsante viene premuto (in inglese click) succede quello che c’è tra le graffe. Alla riga 5 la frase del paragrafo cambia.',riga:5,tab:'js'},
+     {t:'La frase sta tra apici e gli apici vanno sempre in coppia. Cambia le parole, lascia gli apici, poi premi «Prova il codice» e clicca il pulsante nella pagina.'}],
+    compito:'Cambia la frase che compare quando premi il pulsante.',
+    controlli:[
+     {cosa:'Premendo il pulsante compare una frase nuova',ok:d=>{const m=sel(d,'#msg'),b=sel(d,'#premi');if(!m||!b)return false;b.click();const t=norm(m.textContent);return t!==''&&t!=='Ciao!'&&t!=='Premi il pulsante.'},aiuto:'Cerca la riga con msg.textContent: la frase tra apici è quella che compare. Cambiala e lascia gli apici.'}],
+    bravo:'Funziona! Struttura, aspetto e comportamento: ora conosci tutti e tre.'}],
+  imparato:['L’HTML dice cosa c’è nella pagina.','Il CSS ne decide l’aspetto.','Il JavaScript fa succedere le cose quando premi qualcosa.']},
+{id:'c2',titolo:'Lo scheletro della home',descr:'Titolo, sottotitolo e tre carte: i tag, le classi e gli attributi.',
+  intro:[
+   {t:'Adesso ricostruiamo la home del sito: un titolo, una frase e tre carte, una per mestiere. Per ora senza colori: prima lo scheletro.'},
+   {t:'In HTML ogni elemento ha un tag di apertura, come <p>, e uno di chiusura, come </p>. Il testo sta in mezzo, come in una scatola con il coperchio.'},
+   {t:'Le scatole si possono mettere una dentro l’altra: si chiama annidamento. Regola da ricordare: si chiude sempre per prima la scatola aperta per ultima.'}],
+  passi:[
+   {id:'c2p1',titolo:'Titolo e sottotitolo',file:'html',
+    inizio:{html:'c2-html',css:'c2-css',js:'c2-js'},soluzione:{html:'c2p1-html'},
+    intro:[
+     {t:'Ripartiamo da una pagina vuota. Scrivi un titolo con <h1> e, sotto, una frase con il tag <p> (paragrafo).'},
+     {t:'Al paragrafo dai un’etichetta: una classe. Si scrive dentro il tag di apertura, così: <p class="sub">. Più avanti il CSS userà quel nome per trovare proprio questo paragrafo.'}],
+    compito:'Scrivi un titolo h1 e sotto un paragrafo p con classe sub, ognuno con le tue parole.',
+    controlli:[
+     {cosa:'C’è un titolo h1 con un testo',ok:d=>!!testo(d,'h1'),aiuto:'Il titolo si apre con <h1> e si chiude con </h1>. Le parole stanno in mezzo.'},
+     {cosa:'C’è un paragrafo con classe sub e un testo',ok:d=>!!testo(d,'p.sub'),aiuto:'Il paragrafo è un tag <p>. Per dargli la classe scrivi class="sub" nel tag di apertura, dopo la p.'},
+     {cosa:'Il paragrafo sta sotto il titolo',ok:d=>{const h=sel(d,'h1'),p=sel(d,'p.sub');return !!h&&!!p&&!!(h.compareDocumentPosition(p)&4)},aiuto:'Il codice si legge dall’alto: scrivi prima il titolo e dopo il paragrafo.'}],
+    bravo:'Titolo e sottotitolo al loro posto.'},
+   {id:'c2p2',titolo:'Una carta',file:'html',
+    soluzione:{html:'c2p2-html'},
+    intro:[
+     {t:'Una carta è un pulsante: il tag <button>. Dentro mettiamo due scatole più piccole.'},
+     {t:'<b> scrive il nome del mestiere in grassetto, <span> scrive una riga di spiegazione. Sono annidati dentro il pulsante, quindi vanno chiusi prima di chiudere </button>.'}],
+    compito:'Sotto il sottotitolo aggiungi un button con dentro un b (il mestiere) e uno span (la spiegazione).',
+    controlli:[
+     {cosa:'C’è un pulsante sotto il sottotitolo',ok:d=>{const p=sel(d,'p.sub'),b=sel(d,'button');return !!p&&!!b&&!!(p.compareDocumentPosition(b)&4)},aiuto:'Aggiungi <button> dopo il paragrafo e ricordati di chiuderlo con </button>.'},
+     {cosa:'Dentro il pulsante c’è un b con un testo',ok:d=>!!testo(d,'button b'),aiuto:'Tra <button> e </button> scrivi <b>Elettricità</b>, con il nome che vuoi.'},
+     {cosa:'Dentro il pulsante c’è uno span con un testo',ok:d=>!!testo(d,'button span'),aiuto:'Sempre dentro il pulsante, dopo il b, scrivi uno <span> con una breve spiegazione.'}],
+    bravo:'La prima carta c’è. Hai annidato due elementi dentro un terzo.'},
+   {id:'c2p3',titolo:'Tre carte',file:'html',
+    soluzione:{html:'c2p3-html'},
+    intro:[
+     {t:'Servono tre carte, una per mestiere. Le mettiamo tutte dentro una scatola più grande: un <div> con classe paths.'},
+     {t:'Il div non si vede e non fa niente da solo: serve solo a tenere insieme le carte, così più avanti il CSS le disporrà in fila.'}],
+    compito:'Metti le carte dentro un div con classe paths e aggiungine altre due: Informatica ed Estetica.',
+    controlli:[
+     {cosa:'C’è un div con classe paths',ok:d=>!!sel(d,'div.paths'),aiuto:'Scrivi <div class="paths"> prima delle carte e </div> dopo l’ultima.'},
+     {cosa:'Dentro il div ci sono tre carte',ok:d=>tutti(d,'div.paths > button').length===3,aiuto:'Le carte devono essere tre, e tutte dentro il div. Copia e incolla la prima, poi cambia le parole.'},
+     {cosa:'Ogni carta ha un b e uno span con un testo',ok:d=>{const c=tutti(d,'div.paths > button');return c.length>0&&c.every(x=>norm(x.querySelector('b')&&x.querySelector('b').textContent)!==''&&norm(x.querySelector('span')&&x.querySelector('span').textContent)!=='')},aiuto:'Controlla che ogni carta abbia sia <b> sia <span>, con del testo dentro.'}],
+    bravo:'Tre carte nella loro scatola.'},
+   {id:'c2p4',titolo:'Gli attributi',file:'html',
+    soluzione:{html:'c2p4-html'},
+    intro:[
+     {t:'La classe che hai scritto prima è un attributo: un’informazione extra scritta nel tag di apertura, nella forma nome="valore".'},
+     {t:'Ne servono altri due per ogni carta. type="button" dice al browser che è un pulsante semplice. data-path="..." è un’etichetta nostra che dirà al programma quale gioco aprire: el, net o est.'},
+     {t:'Aggiungi anche class="path" a ogni carta: il CSS la userà.'}],
+    compito:'Dai a ogni carta type="button", class="path" e data-path con el, net o est.',
+    controlli:[
+     {cosa:'Ogni carta ha type="button"',ok:d=>{const c=tutti(d,'div.paths > button');return c.length===3&&c.every(x=>x.getAttribute('type')==='button')},aiuto:'Nel tag <button> aggiungi type="button", con le virgolette.'},
+     {cosa:'Ogni carta ha class="path"',ok:d=>tutti(d,'div.paths > button.path').length===3,aiuto:'Nel tag <button> aggiungi anche class="path". Un tag può avere più attributi, separati da uno spazio.'},
+     {cosa:'I data-path sono el, net ed est',ok:d=>tutti(d,'div.paths > button').map(x=>x.getAttribute('data-path')).join(',')==='el,net,est',aiuto:'Prima carta data-path="el", seconda data-path="net", terza data-path="est".'}],
+    bravo:'Lo scheletro della home è completo. Ora gli manca solo il vestito.'}],
+  imparato:['Ogni elemento HTML ha un tag che lo apre e uno che lo chiude.','Gli elementi si annidano uno dentro l’altro.','Gli attributi, come class e data-path, aggiungono informazioni a un tag.']}
 ];
 
 /* Per ogni passo si calcolano il codice di partenza (codIni) e la soluzione (codSol). Ogni passo
