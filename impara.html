@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="it">
+<!--
+   IMPARA.HTML: COSTRUISCI IL SITO CON LE TUE MANI
+
+   Questa pagina è il corso che accompagna il sito dell'open day (index.html). Gli allievi
+   ricostruiscono una versione ridotta del sito, un passo alla volta: scrivono il codice in
+   un editor, vedono subito il risultato e, se sbagliano, la pagina indica la riga e spiega
+   l'errore. Tutto funziona dentro il browser, senza installare niente e senza internet.
+
+   Come per index.html, è un file solo con tre parti: HTML (la struttura delle schermate),
+   CSS (l'aspetto, copiato da index.html per avere lo stesso design) e JavaScript (il
+   funzionamento). Le sezioni del JavaScript hanno un titolo tra =======.
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Costruisci il sito: impara HTML, CSS e JavaScript ricostruendo il sito dell'open day.">
+<title>Costruisci il sito</title>
+<style>[hidden]{display:none!important}body{margin:0}</style>
+</head>
+<body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ======= STILE =======
+   La prima parte (colori, pulsanti, titoli, pallini, mascotte, riquadri) è copiata da
+   index.html: se cambi il design là, tienila allineata qui. */
+
+/* Luce spenta = scuro con accenti rossi. Quando un passo riesce, la pagina "si accende". */
+:root{
+  --bg:#0f1a17; --card:#17251f; --ink:#f1fff9; --muted:#a9c4b9; --line:#2d4a3f;
+  --accent:#d6404a; --accent-ink:#ffffff; --good:#4fd89a; --bad:#ff8a8f;
+  --bench:#162720; --bench-line:#2f5144; --plate:#1f3329; --plate-line:#47685a;
+  --font:'Fira Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace; /* solo per l'editor */
+  color-scheme:dark;
+}
+:root.lit{ /* luce accesa: bianco, scritte nere, accenti rossi */
+  --bg:#ffffff; --card:#ffffff; --ink:#0b0b0b; --muted:#4d4d4d; --line:#e4e4e4;
+  --accent:#c8323a; --accent-ink:#ffffff; --good:#1b9a5a; --bad:#9c1520;
+  --bench:#f6f6f6; --bench-line:#e0e0e0; --plate:#ffffff; --plate-line:#c4c4c4; color-scheme:light;
+}
+body,.btn,.coach,.benchcard,.dot,.chap,.panel,.ed,.tab{transition:background-color .6s,color .6s,box-shadow .6s,border-color .6s}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.3;padding-inline:16px;padding-block:12px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{border:0;border-radius:999px;padding:12px 22px;font-weight:600;font-size:1.05rem;background:var(--card);color:var(--ink);box-shadow:0 0 0 2px var(--line) inset;display:inline-flex;align-items:center;gap:8px;min-height:48px;text-decoration:none}
+.btn.primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 rgba(120,0,15,.35)}
+.btn.big{font-size:1.4rem;padding:16px 34px;min-height:64px}
+.btn:active{transform:translateY(2px)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.wrap{max-width:1240px;margin-inline:auto;min-height:100%;display:flex;flex-direction:column;gap:12px}
+h1,h2,h3{text-wrap:balance;font-weight:800;letter-spacing:-.01em}
+.eyebrow{color:var(--accent);font-weight:700;font-size:1.2rem;margin:0}
+.muted{color:var(--muted)}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.ib{width:48px;height:48px;padding:0;justify-content:center}
+.panel{background:var(--card);border-radius:22px;box-shadow:0 0 0 2px var(--line) inset;padding:18px 20px;min-width:0}
+.panel h3{display:flex;gap:10px;align-items:center;margin:0 0 10px;font-size:1.4rem}
+.panel p{margin:0 0 8px}
+.ico{width:26px;height:26px;flex:none;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+ul.dl{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+ul.dl li{display:flex;gap:10px;align-items:flex-start}
+ul.dl li .ico{margin-top:2px}
+
+/* pallini dei passi: anello collegato da una linea */
+.top{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top h2{margin:0;font-size:1.35rem;flex:1;min-width:0}
+.dots{display:flex;gap:0;align-items:center}
+.dot{position:relative;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.8rem;border:6px solid var(--line);background:transparent;color:var(--muted);margin-left:16px}
+.dot:first-child{margin-left:0}
+.dot::before{content:'';position:absolute;right:100%;top:50%;width:16px;height:6px;margin-top:-3px;background:var(--line)}
+.dot:first-child::before{display:none}
+.dot.now{border-color:var(--accent);color:var(--accent)}
+.dot.done{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.dot.done::before,.dot.now::before{background:var(--accent)}
+
+/* mascotte con fumetto e pulsanti */
+.side{display:flex;flex-direction:column;gap:12px;min-height:0}
+.coach{display:flex;gap:10px;align-items:flex-start;background:var(--card);border-radius:22px;padding:12px;box-shadow:0 0 0 2px var(--line) inset;flex:1}
+.coach svg{width:68px;height:68px;flex:none}
+.coach .bubble{font-size:1.25rem;font-weight:500;min-width:0}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns .btn{flex:1;justify-content:center}
+.nudge{animation:nd .9s ease-in-out infinite}
+@keyframes nd{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+#cf{position:fixed;inset:0;pointer-events:none;z-index:20}
+
+/* ======= SCHERMATA 1: INDICE DEI CAPITOLI ======= */
+#indice{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;max-width:1100px;margin-inline:auto;width:100%;padding-block:10px}
+#indice h1{font-size:clamp(2.6rem,6.5vw,4.6rem);line-height:.95;margin:0;max-width:15ch}
+.sub{font-size:1.3rem;color:var(--muted);margin:0;max-width:42ch}
+.chapters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.chap{border:0;border-radius:20px;background:var(--card);box-shadow:0 0 0 3px var(--line) inset;padding:20px 18px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:8px;min-height:190px}
+.chap:hover{box-shadow:0 0 0 4px var(--accent) inset}
+.chap .num{color:var(--accent);font-weight:700;font-size:1rem}
+.chap b{font-size:1.5rem;font-weight:800;line-height:1.05}
+.chap .d{color:var(--muted);font-size:1rem}
+.chap .st{margin-top:auto;font-weight:600;font-size:.95rem}
+.chap .st.fatto{color:var(--good)}
+.avviso{display:none;background:var(--card);border-radius:18px;box-shadow:0 0 0 2px var(--accent) inset;padding:12px 16px;font-weight:500}
+
+/* ======= SCHERMATA 2: UN PASSO (editor a sinistra, anteprima a destra) ======= */
+#passo{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto 1fr;gap:12px 16px;min-height:0}
+.benchwrap{position:relative;min-height:520px;display:flex}
+.benchcard{flex:1;background:var(--bench);border-radius:24px;box-shadow:0 0 0 3px var(--bench-line) inset;display:flex;gap:8px;min-height:0;padding:8px}
+.pane{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px}
+.cap{text-align:center;color:var(--muted);font-size:.9rem;padding:2px 0 4px}
+.task p{margin:0;font-size:1.1rem;font-weight:500}
+.task .eyebrow{font-size:1rem;margin-bottom:4px}
+.edph{flex:1;display:grid;place-items:center;border-radius:14px;background:var(--card);box-shadow:0 0 0 2px var(--line) inset;color:var(--muted);text-align:center;padding:12px}
+.runrow{display:flex;gap:10px;align-items:center}
+.runrow .btn{min-height:42px;padding:8px 18px}
+.runrow .muted{font-size:.85rem}
+#view{flex:1;width:100%;min-height:0;border:0;border-radius:14px;background:#fff;box-shadow:0 0 0 2px var(--line)}
+
+/* ======= SCHERMATA 3: FINE CAPITOLO ======= */
+#fine{flex:1;display:flex;flex-direction:column;gap:18px;max-width:1000px;width:100%;margin-inline:auto;padding-block:8px 24px}
+#fine h1{font-size:clamp(2rem,5vw,3.2rem);margin:0;line-height:1.05}
+#fine .lead{font-size:1.25rem;color:var(--muted);margin:0}
+
+@media (max-width:919px){
+  body{padding-block:8px;font-size:16px}
+  #indice h1{font-size:2.6rem}
+  .chapters{grid-template-columns:1fr}
+  .chap{min-height:0}
+  .avviso{display:block}
+  #passo{display:flex;flex-direction:column}
+  .top h2{font-size:1.05rem;flex-basis:100%;order:3}
+  .dot{width:30px;height:30px;margin-left:12px;border-width:5px}
+  .dot::before{width:12px;height:5px;margin-top:-2.5px}
+  .benchwrap{min-height:0}
+  .benchcard{flex-direction:column}
+  .pane{min-height:300px}
+  .coach svg{width:54px;height:54px}
+  .coach .bubble{font-size:1.1rem}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+</style>
+
+<div class="wrap" id="app">
+
+  <!-- SCHERMATA 1: l'indice. Una carta per capitolo, riempita dal JavaScript (renderIndice). -->
+  <section id="indice">
+    <p class="eyebrow">Costruisci il sito</p>
+    <h1>Rifai questo sito con le tue mani</h1>
+    <p class="sub">Otto capitoli, un passo alla volta: scrivi il codice, guarda il risultato e il coach ti aiuta se sbagli.</p>
+    <p class="avviso" role="note">Questa attività è pensata per il computer: su uno schermo piccolo l’editor è scomodo.</p>
+    <div class="chapters" id="chapters"></div>
+    <div class="cta">
+      <a class="btn" href="index.html">Torna al gioco</a>
+      <button class="btn" id="azzera" type="button">Cancella i miei progressi</button>
+    </div>
+  </section>
+
+  <!-- SCHERMATA 2: un passo. A sinistra l'editor, a destra l'anteprima; nella colonna laterale
+       il compito, il coach con la mascotte e i pulsanti. Editor e anteprima vengono riempiti dal JavaScript. -->
+  <section id="passo" hidden>
+    <div class="top">
+      <h2 id="mtitle"></h2>
+      <div class="dots" id="dots"></div>
+      <button class="btn ib" id="mute" type="button" aria-label="Suono"></button>
+      <button class="btn ib" id="homeb" type="button" aria-label="Torna all’indice dei capitoli"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    </div>
+    <div class="benchwrap">
+      <div class="benchcard">
+        <div class="pane" id="paneEd">
+          <div class="tabs" id="tabs" role="tablist"></div>
+          <div class="eds" id="eds"><div class="edph">L’editor arriva nel prossimo passo del lavoro.</div></div>
+          <div class="runrow"><button class="btn primary" id="prova" type="button">Prova il codice</button></div>
+        </div>
+        <div class="pane" id="paneView">
+          <div class="cap">Anteprima</div>
+          <div class="edph" id="view">Qui comparirà il sito.</div>
+        </div>
+      </div>
+    </div>
+    <div class="side">
+      <div class="panel task"><p class="eyebrow">Il tuo compito</p><p id="compito"></p></div>
+      <div class="coach"><div id="mascot"></div><div class="bubble" id="say"></div></div>
+      <div class="btns">
+        <button class="btn" id="hint" type="button">Aiutami</button>
+        <button class="btn" id="reset" type="button">Ricomincia</button>
+        <button class="btn" id="sol" type="button" hidden>Mostra la soluzione</button>
+        <button class="btn primary" id="ok" type="button" hidden>Avanti</button>
+        <button class="btn primary" id="next" type="button" hidden>Avanti</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHERMATA 3: fine capitolo. Cosa si è imparato e dove andare adesso. -->
+  <section id="fine" hidden>
+    <p class="eyebrow" id="fEye"></p>
+    <h1 id="fTitle"></h1>
+    <p class="lead" id="fLead"></p>
+    <div class="panel" id="fImparato"></div>
+    <div class="cta">
+      <button class="btn primary big" id="fNext" type="button">Capitolo successivo</button>
+      <button class="btn" id="fIndice" type="button">Torna all’indice</button>
+    </div>
+  </section>
+</div>
+<canvas id="cf"></canvas>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ======= I CAPITOLI =======
+   Ogni capitolo ha un titolo, una descrizione, le spiegazioni iniziali (intro), l'elenco dei
+   passi e tre frasi su cosa si è imparato (imparato). Per ora c'è solo un capitolo di prova:
+   i veri otto capitoli arrivano nei compiti successivi. */
+const CAPITOLI=[
+ {id:'c0',titolo:'Capitolo di prova',descr:'Serve a provare le schermate.',
+  intro:[{t:'Ciao! Io sono il coach. Ti accompagno passo dopo passo.'}],
+  passi:[{id:'c0p1',titolo:'Passo di prova',file:'html',
+    intro:[{t:'Questo è un passo di prova: premi «Prova il codice» per vedere cosa succede quando un passo riesce.'}],
+    compito:'Premi «Prova il codice».',bravo:'Ecco: quando un passo riesce la pagina si accende.'}],
+  imparato:['Come è fatta una schermata.','Come si passa da un passo al successivo.','Cosa succede quando un passo riesce.']}
+];
+
+/* ======= SALVATAGGIO =======
+   I progressi si salvano nel browser (localStorage). Se il browser lo blocca, la pagina funziona
+   lo stesso e i progressi restano in memoria fino alla chiusura. */
+const store={
+  mem:{finiti:{},codice:{}},
+  load(){try{const r=localStorage.getItem('impara.v1');if(r)this.mem=Object.assign({finiti:{},codice:{}},JSON.parse(r))}catch(e){}},
+  save(){try{localStorage.setItem('impara.v1',JSON.stringify(this.mem))}catch(e){}},
+  clear(){this.mem={finiti:{},codice:{}};try{localStorage.removeItem('impara.v1')}catch(e){}}
+};
+
+/* ======= MASCOTTE ======= (copiata da index.html) */
+function mascot(m){
+  const eyes=m==='oops'?'<circle cx="25" cy="27" r="4.5" fill="#2b2140"/><circle cx="39" cy="27" r="4.5" fill="#2b2140"/><circle cx="26" cy="26" r="1.5" fill="#fff"/><circle cx="40" cy="26" r="1.5" fill="#fff"/>':
+   m==='happy'?'<path d="M20 28q5-8 10 0M34 28q5-8 10 0" fill="none" stroke="#2b2140" stroke-width="3" stroke-linecap="round"/>':
+   '<circle cx="25" cy="27" r="3.5" fill="#2b2140"/><circle cx="39" cy="27" r="3.5" fill="#2b2140"/>';
+  const mouth=m==='oops'?'<path d="M26 42q6-7 12 0" fill="none" stroke="#2b2140" stroke-width="3" stroke-linecap="round"/>':
+   m==='happy'?'<path d="M23 36q9 14 18 0z" fill="#2b2140"/>':'<path d="M25 37q7 7 14 0" fill="none" stroke="#2b2140" stroke-width="3" stroke-linecap="round"/>';
+  return `<svg viewBox="0 0 64 70"><circle cx="32" cy="30" r="26" fill="${m==='oops'?'#c9ccd8':'#ffd84d'}" stroke="#b58300" stroke-width="3"/>${eyes}${mouth}<rect x="22" y="54" width="20" height="12" rx="4" fill="#8b96ad"/></svg>`;
+}
+
+/* ======= SUONI, VIBRAZIONE E CORIANDOLI ======= (copiati da index.html) */
+let AC=null,muted=false;
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,t,d,type='sine',v=.18){if(muted)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(a.destination);const T=a.currentTime+t;g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+.02);g.gain.exponentialRampToValueAtTime(.001,T+d);o.start(T);o.stop(T+d+.05)}
+const sfx={click:()=>tone(660,0,.1),wire:()=>{tone(520,0,.08);tone(780,.07,.1)},
+ win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.35,'triangle',.2)),trip:()=>{tone(110,0,.5,'sawtooth',.2);tone(90,.1,.5,'sawtooth',.15)},rm:()=>tone(330,0,.1)};
+const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+function setMute(){$('#mute').innerHTML=muted?'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>':'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>'}
+function celebrate(){
+  sfx.win();vib([60,40,120]);
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const cv=$('#cf'),ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+  const P=[];for(let i=0;i<150;i++)P.push({x:innerWidth/2+(Math.random()-.5)*240,y:innerHeight*.5,vx:(Math.random()-.5)*15,vy:-Math.random()*15-4,r:4+Math.random()*5,c:['#d7263d','#ff4d5e','#ffffff','#ffd1d5','#ffc400'][i%5],a:Math.random()*6,va:(Math.random()-.5)*.4});
+  let t=0;(function f(){ctx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.vx*=.99;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore()});if(++t<110)requestAnimationFrame(f);else ctx.clearRect(0,0,cv.width,cv.height)})();
+}
+
+/* ======= SCHERMATE =======
+   Come in index.html: una sola schermata è visibile alla volta. L'indice e la fine capitolo
+   sono "accese" (colori chiari); il passo parte "spento" e si accende quando riesce. */
+function mostra(id){['indice','passo','fine'].forEach(s=>$('#'+s).hidden=s!==id);window.scrollTo(0,0);
+  document.documentElement.classList.toggle('lit',id!=='passo')}
+
+function renderIndice(){
+  $('#chapters').innerHTML=CAPITOLI.map((c,i)=>{
+    const fatti=c.passi.filter(p=>store.mem.finiti[p.id]).length,tot=c.passi.length;
+    const st=fatti===tot?'<span class="st fatto">Finito</span>':fatti?`<span class="st">In corso: ${fatti} di ${tot}</span>`:'<span class="st">Da fare</span>';
+    return `<button class="chap" type="button" data-c="${i}"><span class="num">Capitolo ${i+1}</span><b>${esc(c.titolo)}</b><span class="d">${esc(c.descr)}</span>${st}</button>`}).join('');
+}
+
+/* ======= UN PASSO =======
+   S è lo stato del passo in corso: capitolo (ci), passo (pi), a che punto sono le spiegazioni
+   iniziali (introStep, -1 se finite), quante volte è stato chiesto aiuto (hintN), se è
+   riuscito (won) e la frase temporanea del coach (flash). */
+let S={ci:0,pi:0,passo:null,introStep:-1,hintN:0,won:false,flash:''};
+let flashT=null;
+
+function caricaPasso(ci,pi){
+  const c=CAPITOLI[ci],p=c.passi[pi];
+  /* nel primo passo di un capitolo, le spiegazioni del capitolo vengono prima di quelle del passo */
+  const intro=(pi===0?c.intro:[]).concat(p.intro||[]);
+  S={ci,pi,passo:Object.assign({},p,{intro}),introStep:intro.length?0:-1,hintN:0,won:false,flash:''};
+  mostra('passo');
+  $('#mtitle').textContent=`Capitolo ${ci+1} · Passo ${pi+1}: ${p.titolo}`;
+  $('#compito').textContent=p.compito;
+  render();
+}
+
+function render(){
+  const p=S.passo,intro=p.intro;let msg,mood='hi';
+  if(S.introStep>=0)msg=intro[S.introStep].t;
+  else if(S.flash)msg=S.flash;
+  else if(S.won){msg=p.bravo;mood='happy'}
+  else msg=p.compito;
+  $('#say').textContent=msg;$('#mascot').innerHTML=mascot(mood);
+  const inIntro=S.introStep>=0;
+  $('#ok').hidden=!inIntro;$('#ok').textContent=S.introStep===intro.length-1?'Ho capito, provo!':'Avanti';
+  $('#next').hidden=!S.won||inIntro;
+  $('#next').textContent=S.pi===CAPITOLI[S.ci].passi.length-1?'Fine capitolo':'Avanti';
+  $('#hint').hidden=S.won||inIntro;$('#reset').hidden=inIntro;
+  $('#dots').innerHTML=CAPITOLI[S.ci].passi.map((_,i)=>{const done=i<S.pi||(i===S.pi&&S.won);
+    return `<div class="dot ${done?'done':i===S.pi?'now':''}">${done?'✓':i+1}</div>`}).join('');
+  document.documentElement.classList.toggle('lit',S.won);
+}
+
+function vinto(){
+  if(S.won)return;
+  S.won=true;store.mem.finiti[S.passo.id]=true;store.save();
+  render();celebrate();
+}
+
+function toFine(){
+  const c=CAPITOLI[S.ci],ultimo=S.ci===CAPITOLI.length-1;
+  mostra('fine');
+  $('#fEye').textContent=`Capitolo ${S.ci+1} finito`;
+  $('#fTitle').textContent=c.titolo;
+  $('#fLead').textContent='Ecco cosa hai imparato.';
+  $('#fImparato').innerHTML='<ul class="dl">'+c.imparato.map(t=>`<li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><div>${esc(t)}</div></li>`).join('')+'</ul>';
+  $('#fNext').hidden=ultimo;
+}
+
+/* ======= PULSANTI ======= */
+$('#chapters').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(!b)return;ac();sfx.click();
+  const ci=+b.dataset.c,c=CAPITOLI[ci];
+  const prossimo=c.passi.findIndex(p=>!store.mem.finiti[p.id]);
+  caricaPasso(ci,prossimo<0?0:prossimo)});
+$('#ok').onclick=()=>{sfx.click();S.introStep++;if(S.introStep>=S.passo.intro.length)S.introStep=-1;render()};
+$('#hint').onclick=()=>{sfx.click();S.hintN++;render()};
+$('#reset').onclick=()=>{sfx.rm();S.won=false;S.flash='';render()};
+$('#prova').onclick=()=>{ac();sfx.click();vinto()}; /* provvisorio: il vero controllo arriva con il motore dei passi */
+$('#next').onclick=()=>{sfx.click();if(S.pi<CAPITOLI[S.ci].passi.length-1)caricaPasso(S.ci,S.pi+1);else toFine()};
+$('#mute').onclick=()=>{muted=!muted;setMute();ac()};
+$('#homeb').onclick=()=>{renderIndice();mostra('indice')};
+$('#fIndice').onclick=()=>{sfx.click();renderIndice();mostra('indice')};
+$('#fNext').onclick=()=>{sfx.click();caricaPasso(S.ci+1,0)};
+
+/* Il pulsante per cancellare i progressi chiede conferma con un secondo clic, entro 3 secondi. */
+let azzeraT=null;
+$('#azzera').onclick=()=>{
+  const b=$('#azzera');
+  if(b.dataset.sicuro){store.clear();delete b.dataset.sicuro;b.textContent='Cancella i miei progressi';clearTimeout(azzeraT);renderIndice();return}
+  b.dataset.sicuro='1';b.textContent='Sicuro? Premi ancora';
+  azzeraT=setTimeout(()=>{delete b.dataset.sicuro;b.textContent='Cancella i miei progressi'},3000);
+};
+
+/* ======= AVVIO ======= */
+store.load();setMute();renderIndice();mostra('indice');
+})();
+</script>
+
+</body>
+</html>
