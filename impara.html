@@ -85,6 +85,7 @@ ul.dl li .ico{margin-top:2px}
 .coach{display:flex;gap:10px;align-items:flex-start;background:var(--card);border-radius:22px;padding:12px;box-shadow:0 0 0 2px var(--line) inset;flex:1}
 .coach svg{width:68px;height:68px;flex:none}
 .coach .bubble{font-size:1.25rem;font-weight:500;min-width:0}
+.coach .bubble .orig{display:block;margin-top:8px;color:var(--muted);font-size:.8rem;font-weight:400;font-family:var(--mono);overflow-wrap:anywhere}
 .btns{display:flex;gap:8px;flex-wrap:wrap}
 .btns .btn{flex:1;justify-content:center}
 .nudge{animation:nd .9s ease-in-out infinite}
@@ -479,6 +480,172 @@ window.addEventListener('message',e=>{
   if(d.impara==='err')Anteprima.onErrore(d.e);
 });
 
+/* ======= IL CONTROLLO DEGLI ERRORI =======
+   Il browser è tollerante: se in HTML manca una chiusura o in CSS una proprietà è scritta male, non
+   segnala niente, ignora la parte sbagliata e va avanti. Per un allievo che impara questo è
+   frustrante: vede un risultato strano e non capisce perché. Qui ci sono tre controllori, scritti a
+   mano, che leggono il codice e spiegano gli errori più comuni in italiano semplice.
+   Ognuno restituisce un elenco di {riga, msg}; di solito si mostra il primo. */
+
+/* Distanza tra due parole (quante lettere cambiare per passare dall'una all'altra): serve a
+   suggerire "forse volevi scrivere..." quando c'è un refuso. */
+function distanza(a,b){
+  const d=Array.from({length:a.length+1},(_,i)=>[i]);
+  for(let j=1;j<=b.length;j++)d[0][j]=j;
+  for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return d[a.length][b.length];
+}
+function simile(parola,elenco){
+  let m=null,md=3;
+  elenco.forEach(x=>{const d=distanza(parola,x);if(d<md){md=d;m=x}});
+  return m;
+}
+
+/* ---- HTML ----
+   Si legge il testo da sinistra a destra. Ogni tag che si apre va in una pila; ogni tag che si
+   chiude deve corrispondere all'ultimo aperto, come con le scatole una dentro l'altra. */
+const TAG_VUOTI=new Set(['area','base','br','col','embed','hr','img','input','link','meta','source','track','wbr']);
+const TAG_NOTI=new Set(('html head body title meta link style script div span p h1 h2 h3 h4 h5 h6 a button ul ol li section header footer nav main article aside img br hr input label form textarea select option b i u strong em small canvas table thead tbody tr td th svg path rect circle ellipse line polyline polygon text g defs use pre code blockquote figure figcaption iframe video audio source details summary mark sub sup abbr time dl dt dd').split(' ').concat([...TAG_VUOTI]));
+const TAG_ELENCO=[...TAG_NOTI];
+function controllaHtml(src){
+  const err=[],pila=[],n=src.length;let i=0,riga=1;
+  const vai=k=>{for(let j=0;j<k;j++)if(src[i+j]==='\n')riga++;i+=k};
+  while(i<n){
+    if(src[i]!=='<'){vai(1);continue}
+    if(src.startsWith('<!--',i)){
+      const f=src.indexOf('-->',i+4);
+      if(f<0){err.push({riga,msg:'Il commento comincia con «<!--» ma non finisce mai: manca «-->».'});break}
+      vai(f+3-i);continue;
+    }
+    if(src.startsWith('<!',i)||src.startsWith('<?',i)){const f=src.indexOf('>',i);vai(f<0?n-i:f+1-i);continue}
+    const m=/^<(\/?)([A-Za-z][A-Za-z0-9-]*)/.exec(src.slice(i,i+60));
+    if(!m){err.push({riga,msg:'C’è un «<» che non comincia nessun tag. Se ti serve il simbolo, scrivi «&lt;»; se volevi un tag, il nome deve seguire subito il «<».'});vai(1);continue}
+    const chiusura=m[1]==='/',nome=m[2].toLowerCase(),rigaTag=riga;
+    /* si cerca la fine del tag («>»), saltando i testi tra virgolette */
+    let j=i+m[0].length,q=null;
+    while(j<n){const ch=src[j];if(q){if(ch===q)q=null}else if(ch==='"'||ch==="'")q=ch;else if(ch==='>'||ch==='<')break;j++}
+    if(q){err.push({riga:rigaTag,msg:`Nel tag «<${nome}>» c’è una virgoletta aperta e mai chiusa: ogni « " » ha bisogno della sua compagna.`});vai(j-i);continue}
+    if(j>=n||src[j]!=='>'){err.push({riga:rigaTag,msg:`Il tag «<${nome}» non è chiuso: manca il simbolo «>».`});vai(j-i);continue}
+    const autochiuso=src[j-1]==='/';
+    if(!TAG_NOTI.has(nome)){
+      const s=simile(nome,TAG_ELENCO);
+      err.push({riga:rigaTag,msg:`Il tag «${nome}» non esiste.`+(s?` Forse volevi scrivere «${s}»?`:'')});
+    }else if(chiusura){
+      if(TAG_VUOTI.has(nome))err.push({riga:rigaTag,msg:`«${nome}» è un tag che non si chiude: togli «</${nome}>».`});
+      else if(pila.length&&pila[pila.length-1].nome===nome)pila.pop();
+      else{
+        const k=pila.map(x=>x.nome).lastIndexOf(nome);
+        if(k<0)err.push({riga:rigaTag,msg:`Hai chiuso «</${nome}>» ma non l’hai mai aperto.`});
+        else{const t=pila[pila.length-1];err.push({riga:rigaTag,msg:`Hai chiuso «</${nome}>» ma prima va chiuso «<${t.nome}>», aperto alla riga ${t.riga}.`});pila.length=k}
+      }
+    }else if(!TAG_VUOTI.has(nome)&&!autochiuso){
+      pila.push({nome,riga:rigaTag});
+      /* dentro script, style e textarea il testo non è HTML: si salta fino alla chiusura */
+      if(nome==='script'||nome==='style'||nome==='textarea'){
+        const f=src.toLowerCase().indexOf('</'+nome,j);
+        if(f>=0){vai(f-i);continue}
+      }
+    }
+    vai(j+1-i);
+  }
+  if(pila.length){const t=pila[pila.length-1];err.push({riga:t.riga,msg:`Il tag «<${t.nome}>» aperto qui non viene mai chiuso: manca «</${t.nome}>».`})}
+  return err.sort((a,b)=>a.riga-b.riga);
+}
+
+/* ---- CSS ----
+   Si legge il testo contando le graffe. Dentro una regola ogni dichiarazione è «proprietà: valore;».
+   Per sapere se proprietà e valore esistono si chiede al browser stesso con CSS.supports. */
+const CSS_COMUNI=('color background background-color border border-radius border-color margin padding width height display flex grid gap font font-family font-size font-weight text-align transition box-shadow opacity position top left right bottom grid-template-columns justify-content align-items overflow cursor line-height letter-spacing text-decoration content min-height max-width min-width flex-direction animation transform').split(' ');
+function controllaCss(src){
+  const err=[];
+  /* si tolgono i commenti, lasciando gli a capo per non spostare i numeri di riga */
+  let t=src.replace(/\/\*[\s\S]*?\*\//g,m=>m.replace(/[^\n]/g,' '));
+  const ap=t.indexOf('/*');
+  if(ap>=0){err.push({riga:t.slice(0,ap).split('\n').length,msg:'Il commento comincia con «/*» ma non finisce mai: manca «*/».'});t=t.slice(0,ap)}
+  const pila=[];let cur='',curRiga=1,riga=1;
+  const dich=(testo,r)=>{
+    let d=testo.trim();if(!d)return;
+    const lines=d.split('\n');
+    /* due dichiarazioni senza «;» in mezzo, su righe diverse */
+    for(let k=1;k<lines.length;k++)if(/^\s*-{0,2}[a-z][a-z-]*\s*:/i.test(lines[k])&&!/url\(/.test(d)){err.push({riga:r+k-1,msg:'Manca il «;» alla fine di questa riga: ogni dichiarazione termina con un punto e virgola.'});return}
+    const c=d.indexOf(':');
+    if(c<0){err.push({riga:r,msg:`Manca il «:» tra la proprietà e il valore (hai scritto «${d.replace(/\s+/g,' ')}»).`});return}
+    const prop=d.slice(0,c).trim().toLowerCase();let val=d.slice(c+1).trim().replace(/\s*!important$/i,'');
+    if(!val){err.push({riga:r,msg:`La proprietà «${prop}» non ha nessun valore.`});return}
+    /* due dichiarazioni sulla stessa riga senza «;» */
+    if(!/url\(/.test(val)&&/\s[a-z][a-z-]{2,}\s*:\s*\S/i.test(val)){err.push({riga:r,msg:'Manca il «;» tra due dichiarazioni sulla stessa riga.'});return}
+    if(prop.startsWith('--'))return;
+    if(!CSS.supports(prop,'inherit')){
+      const s=simile(prop,CSS_COMUNI);
+      err.push({riga:r,msg:`La proprietà «${prop}» non esiste.`+(s?` Forse volevi scrivere «${s}»?`:'')});return;
+    }
+    if(/var\(/.test(val))return;
+    if(!CSS.supports(prop,val)){
+      let aiuto='';
+      if(/color/.test(prop)||prop==='background')aiuto=' I colori si scrivono in inglese (red, blue, green...) oppure con il cancelletto e sei cifre (#d6404a).';
+      else if(/^-?\d+(\.\d+)?$/.test(val)&&val!=='0')aiuto=' Dopo il numero manca l’unità, per esempio «px».';
+      err.push({riga:r,msg:`Il valore «${val}» non va bene per la proprietà «${prop}».`+aiuto});
+    }
+  };
+  for(let i=0;i<t.length;i++){
+    const ch=t[i];
+    if(ch==='\n')riga++;
+    if(ch==='{'){
+      const pre=cur.trim(),top=pila[pila.length-1];
+      if(top&&top.tipo==='dich'){top.segnata=true;err.push({riga:curRiga,msg:`Dentro la regola «${top.pre}» (riga ${top.riga}) compare un’altra «{»: forse manca la «}» che chiude la regola precedente.`})}
+      if(!pre)err.push({riga,msg:'Prima della «{» manca il selettore: a chi si applica questa regola?'});
+      pila.push({tipo:/^@(media|supports|keyframes|layer)/i.test(pre)?'at':'dich',riga:curRiga||riga,pre});
+      cur='';continue;
+    }
+    if(ch==='}'){
+      if(!pila.length){err.push({riga,msg:'C’è una «}» in più: non chiude nessuna regola.'});cur='';continue}
+      const top=pila[pila.length-1];
+      if(top.tipo==='dich')dich(cur,curRiga);
+      pila.pop();cur='';continue;
+    }
+    if(ch===';'){const top=pila[pila.length-1];if(top&&top.tipo==='dich')dich(cur,curRiga);cur='';continue}
+    if(!cur.trim()&&ch.trim())curRiga=riga;
+    cur+=ch;
+  }
+  /* se la regola è già stata segnalata (graffa nuova al suo interno), non si ripete la segnalazione */
+  if(pila.length&&!pila.some(x=>x.segnata)){const top=pila[pila.length-1];err.push({riga:top.riga,msg:`La regola «${top.pre}» comincia qui ma non viene mai chiusa: manca la «}».`})}
+  return err.sort((a,b)=>a.riga-b.riga);
+}
+
+/* ---- JavaScript ----
+   Qui non serve leggere il codice: lo esegue il browser, che segnala l'errore con la riga. Basta
+   tradurre i messaggi inglesi più comuni. Il messaggio originale resta visibile, in piccolo. */
+function traduciErroreJs(e){
+  const m=String(e.m||'').replace(/^Uncaught\s+/,'');let r;
+  let it;
+  if(r=/^ReferenceError:\s*(.+?) is not defined/.exec(m))
+    it=`Il nome «${r[1]}» non esiste. Controlla come l’hai scritto (le maiuscole contano) e ricorda che un nome va creato, con const o let, prima di usarlo.`;
+  else if(r=/Cannot read propert(?:y|ies) of (null|undefined) \(reading '(.+?)'\)/.exec(m)||/can't access property "(.+?)", (?:.+?) is (null|undefined)/.exec(m)){
+    const quale=r[1]==='null'||r[1]==='undefined'?r[1]:r[2],prop=r[1]==='null'||r[1]==='undefined'?r[2]:r[1];
+    it=quale==='null'?`Stai usando «${prop}» su qualcosa che non esiste. Di solito querySelector non ha trovato l’elemento: controlla il nome dell’id o della classe (con il # o con il punto) e che nell’HTML ci sia.`
+      :`Stai usando «${prop}» su un valore che non c’è ancora (undefined). Controlla il nome della variabile o la posizione nell’elenco.`;
+  }
+  else if(r=/^TypeError:\s*(.+?) is not a function/.exec(m))
+    it=`«${r[1]}» non è una funzione: controlla il nome e le parentesi.`;
+  else if(/Assignment to constant variable/.test(m))
+    it='Una variabile creata con const non si può cambiare. Se deve cambiare, creala con let.';
+  else if(r=/Identifier '(.+?)' has already been declared/.exec(m))
+    it=`Hai creato «${r[1]}» due volte: const e let si usano una volta sola per ogni nome.`;
+  else if(/Unexpected end of input|Unexpected end of script/.test(m))
+    it='Il codice finisce troppo presto: manca una parentesi o una graffa di chiusura.';
+  else if(/missing \) after argument list/.test(m))
+    it='Manca una parentesi «)» alla fine di una chiamata, oppure una virgola tra due valori.';
+  else if(/Invalid or unexpected token|unterminated string|illegal character/i.test(m))
+    it='C’è un carattere che JavaScript non capisce: spesso è una virgoletta o un apice che non è stato chiuso.';
+  else if(r=/Unexpected token '?(.+?)'?$/.exec(m)||/Unexpected token (.+)/.exec(m))
+    it=`Il simbolo «${r[1]}» non dovrebbe stare qui: controlla le parentesi, le graffe e le virgole attorno a questa riga e a quella prima.`;
+  else if(r=/Unexpected (identifier|string|number)(?: '?(.+?)'?)?$/.exec(m))
+    it=`Una parola${r[2]?' («'+r[2]+'»)':''} è fuori posto: forse manca una virgola, un punto e virgola o un operatore subito prima.`;
+  else it='JavaScript ha trovato un errore che qui non so spiegare bene. Rileggi con calma la riga indicata e quella prima.';
+  return {it,orig:m};
+}
+
 /* ======= SCHERMATE =======
    Come in index.html: una sola schermata è visibile alla volta. L'indice e la fine capitolo
    sono "accese" (colori chiari); il passo parte "spento" e si accende quando riesce. */
@@ -524,12 +691,18 @@ async function provaCodice(conJs){
   const r=await Anteprima.mostra(c,conJs,S.passo.id);
   if(n!==seq)return r;
   S.errore=null;Editor.pulisci('err');
-  if(r.errori.length)erroreRuntime(r.errori[0]);else render();
+  /* prima i controlli sul testo (HTML e CSS), poi gli errori dell'esecuzione (JavaScript) */
+  const tab=S.passo.file,testo=c[tab];
+  const st=tab==='html'?controllaHtml(testo):tab==='css'?controllaCss(testo):[];
+  if(st.length){S.errore={tab,riga:st[0].riga,msg:st[0].msg};Editor.segna(tab,st[0].riga,'err');render()}
+  else if(r.errori.length)erroreRuntime(r.errori[0]);
+  else render();
   return r;
 }
 function erroreRuntime(e){
-  S.errore={tab:'js',riga:e.l||0,msg:e.m};
-  if(e.l)Editor.segna('js',e.l,'err');
+  const t=traduciErroreJs(e);
+  S.errore={tab:'js',riga:e.l||0,msg:t.it,orig:t.orig};
+  if(e.l){Editor.vai('js');Editor.segna('js',e.l,'err')}
   render();
 }
 Anteprima.onErrore=e=>{if(!S.errore)erroreRuntime(e)};
@@ -538,13 +711,15 @@ let rit=null;
 Editor.onChange=n=>{if(n==='js')return;clearTimeout(rit);rit=setTimeout(()=>provaCodice(S.conJs),400)};
 
 function render(){
-  const p=S.passo,intro=p.intro;let msg,mood='hi';
+  const p=S.passo,intro=p.intro;let msg,mood='hi',orig='';
   if(S.introStep>=0)msg=intro[S.introStep].t;
-  else if(S.errore){msg=(S.errore.riga?`Riga ${S.errore.riga}: `:'')+S.errore.msg;mood='oops'}
+  else if(S.errore){msg=(S.errore.riga?`Riga ${S.errore.riga}: `:'')+S.errore.msg;mood='oops';orig=S.errore.orig||''}
   else if(S.flash)msg=S.flash;
   else if(S.won){msg=p.bravo;mood='happy'}
   else msg=p.compito;
-  $('#say').textContent=msg;$('#mascot').innerHTML=mascot(mood);
+  $('#say').textContent=msg;
+  if(orig){const o=document.createElement('small');o.className='orig';o.textContent='Messaggio originale: '+orig;$('#say').appendChild(o)}
+  $('#mascot').innerHTML=mascot(mood);
   const inIntro=S.introStep>=0;
   $('#ok').hidden=!inIntro;$('#ok').textContent=S.introStep===intro.length-1?'Ho capito, provo!':'Avanti';
   $('#next').hidden=!S.won||inIntro;
@@ -596,6 +771,8 @@ $('#azzera').onclick=()=>{
 };
 
 /* ======= AVVIO ======= */
+/* per i test automatici (test/impara.test.mjs) */
+window.__impara={controllaHtml,controllaCss,traduciErroreJs,Anteprima,Editor,CAPITOLI,store,provaCodice:c=>provaCodice(c),stato:()=>S};
 Anteprima.frame=$('#view');
 Editor.crea();
 Editor.onRun=()=>$('#prova').click();
