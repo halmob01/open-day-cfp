@@ -404,6 +404,13 @@ ul.dl li .ico{margin-top:2px}
    animazioni e transizioni quasi istantanee.
 */
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+/*
+   COLLEGAMENTO A impara.html. position:fixed lo stacca dal resto della pagina e lo ancora alla
+   finestra: top e right lo mettono in alto a destra. Sta dentro la home, quindi sparisce
+   quando si passa al gioco o ai contatti.
+*/
+#impara{position:fixed;top:14px;right:16px;z-index:5;min-height:40px;padding:8px 16px;font-size:.95rem}
+@media (max-width:919px){#impara{top:10px;right:10px;padding:6px 12px;font-size:.85rem;min-height:36px}}
 </style>
 
 <!--
@@ -440,7 +447,7 @@ ul.dl li .ico{margin-top:2px}
     </div>
     <div class="cta" style="justify-content:center;margin-top:6px"><button class="btn" id="skipGame" type="button">Non vuoi giocare? Vai ai contatti</button></div>
     <!-- Collegamento a impara.html: la pagina dove gli allievi ricostruiscono questo sito scrivendo il codice. -->
-    <div class="cta" style="justify-content:center"><a class="btn" id="impara" href="impara.html">Scopri come è fatto questo sito</a></div>
+    <a class="btn" id="impara" href="impara.html">Scopri come è fatto questo sito</a>
     <!--
        CODICE QR. È un disegno SVG, uguale al file qr-sito.svg. Inquadrato con il telefono porta
        all'indirizzo del sito. Per cambiarlo, sostituisci tutto l'elemento svg con quello nuovo.
