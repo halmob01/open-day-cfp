@@ -163,6 +163,7 @@ ul.dl li .ico{margin-top:2px}
 
 @media (max-width:919px){
   body{padding-block:8px;font-size:16px}
+  .ed{font-size:16px}
   #indice h1{font-size:2.6rem}
   .chapters{grid-template-columns:1fr}
   .chap{min-height:0}
@@ -177,6 +178,8 @@ ul.dl li .ico{margin-top:2px}
   .coach svg{width:54px;height:54px}
   .coach .bubble{font-size:1.1rem}
 }
+/* Sui dispositivi touch non ci sono Ctrl e Tab: si nasconde il suggerimento. */
+@media (hover:none){.runrow .muted{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
 </style>
 
@@ -1559,16 +1562,16 @@ const dati=(w,espr)=>{try{return w.eval(espr)}catch(e){return null}};
 const CAPITOLI=[
 {id:'c1',titolo:'Come è fatto un sito',descr:'I tre linguaggi di una pagina: struttura, aspetto e comportamento.',
   intro:[
-   {t:'Ciao, sono il prof! Il sito «Prova il mestiere» che hai visto prima lo costruirai tu, un pezzo alla volta. Qui scrivi il codice e a destra vedi subito il risultato.'},
+   {t:'Ciao, sono il prof! Il sito «Prova il mestiere» che hai visto prima lo costruirai tu, un pezzo alla volta. Qui scrivi il codice e nell’anteprima vedi subito il risultato.'},
    {t:'Una pagina web è fatta con tre linguaggi, cioè tre modi di scrivere istruzioni per il computer. L’HTML è lo scheletro: dice cosa c’è nella pagina, come titoli, testi e pulsanti.'},
    {t:'Il CSS sono i vestiti: colori, misure, forme. Il JavaScript sono i muscoli: fa succedere qualcosa quando premi un pulsante. Li proviamo uno alla volta.'}],
   passi:[
    {id:'c1p1',titolo:'Cambia il testo del titolo',file:'html',
     inizio:{html:'c1-html',css:'c1-css',js:'c1-js'},soluzione:{html:'c1p1-html'},
     intro:[
-     {t:'Questa è la scheda HTML. A destra c’è la pagina che stai scrivendo: cambia appena scrivi.'},
+     {t:'Questa è la scheda HTML. L’anteprima mostra la pagina che stai scrivendo: cambia appena scrivi.'},
      {t:'La riga 1 è il titolo. Il tag <h1> lo apre, il tag </h1> lo chiude, e le parole che si vedono stanno in mezzo.',riga:1,tab:'html'},
-     {t:'Cambia le parole del titolo e guarda la pagina a destra.'}],
+     {t:'Cambia le parole del titolo e guarda l’anteprima.'}],
     compito:'Scrivi un titolo tuo al posto di «Ciao, mondo».',
     controlli:[
      {cosa:'Il titolo ha un testo nuovo',ok:d=>{const t=testo(d,'h1');return !!t&&t!=='Ciao, mondo'},aiuto:'Cambia le parole che stanno tra <h1> e </h1>. I due tag devono restare.'}],
@@ -2095,7 +2098,9 @@ const Editor={
     if(alto<o.ta.scrollTop||alto+ALT>o.ta.scrollTop+o.ta.clientHeight-ALT)o.ta.scrollTop=Math.max(0,alto-ALT*3);
   },
   /* Durante le spiegazioni iniziali non si può scrivere. */
-  pausa(on){const o=this.t[this.attiva];if(o)o.ta.readOnly=o.bloccata||on},
+  /* Un tempo l'editor restava in sola lettura mentre parlava il prof; su telefono questo impediva alla tastiera di aprirsi.
+     Ora si può scrivere subito: la prima modifica chiude i fumetti (vedi Editor.onChange). Resta bloccata solo una scheda col lucchetto. */
+  pausa(on){const o=this.t[this.attiva];if(o)o.ta.readOnly=o.bloccata},
   pulisci(tipo){Object.keys(this.t).forEach(n=>{const o=this.t[n];if(tipo)delete o.marks[tipo];else o.marks={};this.aggiorna(n)})},
 
   /* Tasti speciali: Tab scrive due spazi, Invio mantiene il rientro, Ctrl+Invio prova il codice,
@@ -2456,6 +2461,7 @@ Anteprima.onErrore=e=>{if(!S.errore)erroreRuntime(e)};
 let rit=null;
 Editor.onChange=n=>{
   lastIn=Date.now();S.aiuto='';Editor.pulisci('help');
+  if(S.introStep>=0){S.introStep=-1;render()}
   if(n==='js')return;
   clearTimeout(rit);rit=setTimeout(()=>provaCodice(S.conJs),400);
 };
