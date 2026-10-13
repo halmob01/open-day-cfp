@@ -53,6 +53,55 @@ const eseg = await page.evaluate(async (casi) => {
 }, C.JS_ESEGUITI);
 C.JS_ESEGUITI.forEach(([c, riga, pezzo], i) => verifica(`JS eseguito n.${i + 1}`, eseg[i] && eseg[i].l === riga && eseg[i].it.includes(pezzo), JSON.stringify(eseg[i])));
 
+// ---- i passi dei capitoli ----
+sezione('Passi dei capitoli');
+const passi = await page.evaluate(() => window.__impara.CAPITOLI.map((c, ci) => ({
+  titolo: c.titolo, descr: c.descr, intro: c.intro.map((s) => s.t), imparato: c.imparato,
+  passi: c.passi.map((p, pi) => ({
+    ci, pi, id: p.id, file: p.file, titolo: p.titolo, compito: p.compito, bravo: p.bravo,
+    intro: (p.intro || []).map((s) => s.t), ini: p.codIni, sol: p.codSol,
+    controlli: p.controlli.map((k) => ({ cosa: k.cosa, aiuto: k.aiuto })),
+  })),
+})));
+const EMOJI = /\p{Extended_Pictographic}/u;
+const testi = (v) => (Array.isArray(v) ? v : [v]).filter(Boolean);
+const idVisti = new Set();
+let totalePassi = 0;
+for (const cap of passi) {
+  const sigla = `Capitolo ${cap.passi[0].ci + 1}`;
+  for (const t of [cap.titolo, cap.descr, ...cap.intro, ...cap.imparato]) {
+    verifica(`${sigla}: testo senza emoji, senza «coach» e senza doppi spazi`, !EMOJI.test(t) && !/coach/i.test(t) && !/ {2}/.test(t), t);
+  }
+  verifica(`${sigla}: tre frasi su cosa si è imparato`, cap.imparato.length === 3);
+  for (const p of cap.passi) {
+    totalePassi++;
+    verifica(`${p.id}: id unico e nel formato giusto`, !idVisti.has(p.id) && p.id === `c${p.ci + 1}p${p.pi + 1}`, p.id);
+    idVisti.add(p.id);
+    const tutti = [p.titolo, p.compito, p.bravo, ...p.intro, ...p.controlli.flatMap((k) => [k.cosa, k.aiuto])];
+    verifica(`${p.id}: compito, frase finale, spiegazioni e controlli presenti`, !!p.compito && !!p.bravo && p.intro.length > 0 && p.controlli.length > 0 && p.controlli.every((k) => k.cosa && k.aiuto));
+    verifica(`${p.id}: testi senza emoji, senza «coach» e senza doppi spazi`, tutti.every((t) => !EMOJI.test(t) && !/coach/i.test(t) && !/ {2}/.test(t)), tutti.find((t) => EMOJI.test(t) || /coach/i.test(t) || / {2}/.test(t)));
+    // il codice di tutte le schede, in partenza e in soluzione, non deve contenere errori di HTML o CSS
+    const nonDiPartenzaGiusta = await page.evaluate(({ ini, sol }) => {
+      const I = window.__impara, r = [];
+      for (const [nome, cod] of [['partenza', ini], ['soluzione', sol]]) {
+        const h = I.controllaHtml(cod.html), c = I.controllaCss(cod.css);
+        if (h.length) r.push(`${nome} HTML riga ${h[0].riga}: ${h[0].msg}`);
+        if (c.length) r.push(`${nome} CSS riga ${c[0].riga}: ${c[0].msg}`);
+      }
+      return r;
+    }, { ini: p.ini, sol: p.sol });
+    verifica(`${p.id}: codice di partenza e soluzione senza errori di HTML e CSS`, nonDiPartenzaGiusta.length === 0, nonDiPartenzaGiusta.join(' | '));
+    // con il codice di partenza almeno un controllo fallisce e non ci sono errori; con la soluzione passano tutti
+    const ini = await page.evaluate(({ ci, pi, cod }) => { window.__impara.store.mem.codice = {}; return window.__impara.valutaPasso(ci, pi, cod); }, { ci: p.ci, pi: p.pi, cod: p.ini });
+    verifica(`${p.id}: con il codice di partenza almeno un controllo fallisce`, ini.falliti && ini.falliti.length > 0 && !ini.won, JSON.stringify(ini));
+    verifica(`${p.id}: il codice di partenza non mostra errori`, !ini.errore, JSON.stringify(ini.errore));
+    const sol = await page.evaluate(({ ci, pi, cod }) => { window.__impara.store.mem.codice = {}; return window.__impara.valutaPasso(ci, pi, cod); }, { ci: p.ci, pi: p.pi, cod: p.sol });
+    verifica(`${p.id}: con la soluzione passano tutti i controlli`, sol.won && !sol.errore && sol.falliti.length === 0, JSON.stringify(sol));
+  }
+  console.log(`  ${sigla}: ${cap.passi.length} passi controllati`);
+}
+verifica('almeno un capitolo con passi', totalePassi > 0);
+
 // ---- riepilogo ----
 const erroriPagina = await page.evaluate(() => window.__erroriPagina);
 verifica('nessun errore nella console della pagina', erroriPagina.length === 0, erroriPagina.join(' | '));
