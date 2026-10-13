@@ -111,7 +111,7 @@ indipendenti: i due gruppi si possono svolgere in parallelo.
 - [x] **T11 · Contenuti: capitoli 3 e 4**
   Come T10.
 
-- [ ] **T12 · Contenuti: capitoli 5 e 6**
+- [x] **T12 · Contenuti: capitoli 5 e 6**
   Come T10.
 
 - [ ] **T13 · Contenuti: capitoli 7 e 8**

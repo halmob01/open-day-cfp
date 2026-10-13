@@ -447,6 +447,225 @@ luce.addEventListener('click', function () {
   document.documentElement.classList.toggle('lit');
 });
 </script>
+<script type="text/plain" data-k="c5-html-ini">
+<section>
+  <h1>Cosa ti interessa?</h1>
+  <p class="sub">Scegli un mestiere e provalo.</p>
+  <div class="paths">
+    <button class="path" data-path="el" type="button">
+      <b>Elettricità</b>
+      <span>Accendi la luce</span>
+    </button>
+    <button class="path" data-path="net" type="button">
+      <b>Informatica</b>
+      <span>Fai arrivare il messaggio</span>
+    </button>
+    <button class="path" data-path="est" type="button">
+      <b>Estetica</b>
+      <span>Prepara il trattamento</span>
+    </button>
+  </div>
+</section>
+</script>
+<script type="text/plain" data-k="c5p1-html">
+<section id="home">
+  <h1>Cosa ti interessa?</h1>
+  <p class="sub">Scegli un mestiere e provalo.</p>
+  <div class="paths">
+    <button class="path" data-path="el" type="button">
+      <b>Elettricità</b>
+      <span>Accendi la luce</span>
+    </button>
+    <button class="path" data-path="net" type="button">
+      <b>Informatica</b>
+      <span>Fai arrivare il messaggio</span>
+    </button>
+    <button class="path" data-path="est" type="button">
+      <b>Estetica</b>
+      <span>Prepara il trattamento</span>
+    </button>
+  </div>
+</section>
+
+<section id="play" hidden>
+  <button id="back" type="button">X</button>
+  <h2>Il trattamento viso</h2>
+</section>
+</script>
+<script type="text/plain" data-k="c5p2-ini">
+function show(id) {
+  // 1. nascondi la home
+  // 2. nascondi il gioco
+  // 3. mostra la schermata che si chiama id
+}
+</script>
+<script type="text/plain" data-k="c5p2-js">
+function show(id) {
+  document.querySelector('#home').hidden = true;
+  document.querySelector('#play').hidden = true;
+  document.querySelector('#' + id).hidden = false;
+}
+</script>
+<script type="text/plain" data-k="c5p3-ini">
+const carte = document.querySelectorAll('.path');
+
+carte.forEach(function (carta) {
+  carta.addEventListener('click', function () {
+    // se la carta è Estetica, mostra il gioco
+  });
+});
+</script>
+<script type="text/plain" data-k="c5p3-js">
+const carte = document.querySelectorAll('.path');
+
+carte.forEach(function (carta) {
+  carta.addEventListener('click', function () {
+    if (carta.dataset.path === 'est') {
+      show('play');
+    }
+  });
+});
+</script>
+<script type="text/plain" data-k="c5p4-ini">
+const indietro = document.querySelector('#back');
+
+indietro.addEventListener('click', function () {
+  // torna alla home
+});
+</script>
+<script type="text/plain" data-k="c5p4-js">
+const indietro = document.querySelector('#back');
+
+indietro.addEventListener('click', function () {
+  show('home');
+});
+</script>
+<script type="text/plain" data-k="c6-carte">
+.carte {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+</script>
+<script type="text/plain" data-k="c6-html">
+<section id="play">
+  <h2 id="titolo">Il trattamento viso</h2>
+  <p id="obiettivo" class="sub">Tocca i prodotti uno alla volta, nell’ordine giusto.</p>
+  <div class="carte" id="carte"></div>
+  <p id="messaggio"></p>
+</section>
+</script>
+<script type="text/plain" data-k="c6p4-html">
+<section id="play">
+  <h2 id="titolo"></h2>
+  <p id="obiettivo" class="sub"></p>
+  <div class="carte" id="carte"></div>
+  <p id="messaggio"></p>
+</section>
+</script>
+<script type="text/plain" data-k="c6p1-ini">
+// Un oggetto raccoglie le informazioni su una cosa sola.
+const prodotto = {
+  t: 'Struccante',
+};
+
+console.log(prodotto.t);
+</script>
+<script type="text/plain" data-k="c6p1-js">
+// Un oggetto raccoglie le informazioni su una cosa sola.
+const prodotto = {
+  t: 'Struccante',
+  done: 'Via il trucco!',
+};
+
+console.log(prodotto.done);
+</script>
+<script type="text/plain" data-k="c6p2-ini">
+const prodotti = [
+  { t: 'Struccante', done: 'Via il trucco!' },
+];
+
+console.log(prodotti.length);
+</script>
+<script type="text/plain" data-k="c6p2-js">
+const prodotti = [
+  { t: 'Struccante', done: 'Via il trucco!' },
+  { t: 'Detergente', done: 'Pelle pulita.' },
+  { t: 'Maschera', done: 'La maschera nutre la pelle.' },
+  { t: 'Crema', done: 'La crema protegge e chiude il trattamento.' },
+];
+
+console.log(prodotti.length);
+</script>
+<script type="text/plain" data-k="c6p3-ini">
+const prodotti = [
+  { t: 'Struccante', done: 'Via il trucco!' },
+  { t: 'Detergente', done: 'Pelle pulita.' },
+  { t: 'Maschera', done: 'La maschera nutre la pelle.' },
+  { t: 'Crema', done: 'La crema protegge e chiude il trattamento.' },
+];
+
+const contenitore = document.querySelector('#carte');
+
+contenitore.innerHTML = prodotti.map(function (p) {
+  return '';
+}).join('');
+</script>
+<script type="text/plain" data-k="c6p3-js">
+const prodotti = [
+  { t: 'Struccante', done: 'Via il trucco!' },
+  { t: 'Detergente', done: 'Pelle pulita.' },
+  { t: 'Maschera', done: 'La maschera nutre la pelle.' },
+  { t: 'Crema', done: 'La crema protegge e chiude il trattamento.' },
+];
+
+const contenitore = document.querySelector('#carte');
+
+contenitore.innerHTML = prodotti.map(function (p) {
+  return '<button class="path"><b>' + p.t + '</b></button>';
+}).join('');
+</script>
+<script type="text/plain" data-k="c6p4-ini">
+const livello = {
+  title: 'Il trattamento viso',
+  goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+  items: [
+    { t: 'Struccante', done: 'Via il trucco!' },
+    { t: 'Detergente', done: 'Pelle pulita.' },
+    { t: 'Maschera', done: 'La maschera nutre la pelle.' },
+    { t: 'Crema', done: 'La crema protegge e chiude il trattamento.' },
+  ],
+};
+
+const contenitore = document.querySelector('#carte');
+
+contenitore.innerHTML = livello.items.map(function (p) {
+  return '<button class="path"><b>' + p.t + '</b></button>';
+}).join('');
+
+// qui scrivi il titolo e l'obiettivo nella pagina
+</script>
+<script type="text/plain" data-k="c6p4-js">
+const livello = {
+  title: 'Il trattamento viso',
+  goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+  items: [
+    { t: 'Struccante', done: 'Via il trucco!' },
+    { t: 'Detergente', done: 'Pelle pulita.' },
+    { t: 'Maschera', done: 'La maschera nutre la pelle.' },
+    { t: 'Crema', done: 'La crema protegge e chiude il trattamento.' },
+  ],
+};
+
+const contenitore = document.querySelector('#carte');
+
+contenitore.innerHTML = livello.items.map(function (p) {
+  return '<button class="path"><b>' + p.t + '</b></button>';
+}).join('');
+
+document.querySelector('#titolo').textContent = livello.title;
+document.querySelector('#obiettivo').textContent = livello.goal;
+</script>
 
 <!-- SPIA: piccolo script che viene messo in cima a ogni anteprima. Ascolta gli errori e i console.log del codice
      dell'allievo e li passa alla pagina. È testo semplice (text/plain): il browser non lo esegue qui. -->
@@ -713,7 +932,112 @@ const CAPITOLI=[
      {cosa:'Premendo il pulsante la pagina si accende',ok:d=>{const b=sel(d,'#luce');if(!b)return false;b.click();return d.documentElement.classList.contains('lit')},aiuto:'Dentro le graffe scrivi document.documentElement.classList.toggle(\'lit\'); con gli apici attorno a lit.'},
      {cosa:'Premendolo ancora si spegne',ok:d=>{const b=sel(d,'#luce');if(!b)return false;b.click();b.click();return !d.documentElement.classList.contains('lit')},aiuto:'Usa toggle e non add: toggle accende e spegne, add solo accende.'}],
     bravo:'Un clic e la pagina si accende, un altro e si spegne. Funziona come nel sito vero.'}],
-  imparato:['Una classe può cambiare l’aspetto di tutta la pagina.','Con transition i cambi diventano sfumature.','classList.toggle aggiunge o toglie una classe a ogni clic.']}
+  imparato:['Una classe può cambiare l’aspetto di tutta la pagina.','Con transition i cambi diventano sfumature.','classList.toggle aggiunge o toglie una classe a ogni clic.']},
+{id:'c5',titolo:'Cambiare schermata',descr:'Funzioni ed eventi: dalla home al gioco e ritorno.',
+  intro:[
+   {t:'Il sito vero ha più schermate: la home, il gioco, i contatti. In realtà la pagina è una sola: le schermate sono blocchi section e se ne vede uno per volta.'},
+   {t:'Gli altri blocchi hanno l’attributo hidden, che vuol dire «nascosto». Il JavaScript lo toglie e lo rimette per cambiare schermata.'},
+   {t:'Ci serviranno una funzione, cioè un gruppo di istruzioni con un nome, e un evento, cioè qualcosa che succede, come un clic.'}],
+  passi:[
+   {id:'c5p1',titolo:'Due schermate',file:'html',
+    inizio:{html:'c5-html-ini',js:'c2-js'},soluzione:{html:'c5p1-html'},
+    intro:[
+     {t:'Ho tolto il pulsante della luce e ho raccolto la home dentro un blocco <section>. Dai un nome a quel blocco con id="home": un id è un nome unico, come una targhetta.',riga:1,tab:'html'},
+     {t:'Sotto scrivi una seconda section con id="play": la schermata di gioco. Aggiungi l’attributo hidden, senza valore, per nasconderla. Dentro metti un titolo h2 e un pulsante con id="back" e la lettera X.'}],
+    compito:'Dai id="home" alla prima section e aggiungi una section con id="play", nascosta, con un h2 e un pulsante #back.',
+    controlli:[
+     {cosa:'La home è una section con id home',ok:d=>!!sel(d,'section#home .paths'),aiuto:'Nel tag <section> scrivi id="home". La section deve contenere le carte.'},
+     {cosa:'C’è una seconda section con id play',ok:d=>!!sel(d,'section#play'),aiuto:'Dopo la home scrivi <section id="play"> e chiudila con </section>.'},
+     {cosa:'La schermata play è nascosta',ok:d=>{const p=sel(d,'section#play');return !!p&&p.hidden&&d.defaultView.getComputedStyle(p).display==='none'},aiuto:'Nel tag di apertura della section play aggiungi la parola hidden, dopo l’id.'},
+     {cosa:'In play ci sono un h2 con testo e il pulsante #back',ok:d=>!!testo(d,'section#play h2')&&!!sel(d,'section#play button#back'),aiuto:'Dentro la section play scrivi un <h2> con il titolo e un <button id="back" type="button">.'}],
+    bravo:'Due schermate, una sola visibile. Ora serve chi le cambia.'},
+   {id:'c5p2',titolo:'La funzione show',file:'js',
+    inizio:{js:'c5p2-ini'},soluzione:{js:'c5p2-js'},
+    intro:[
+     {t:'Una funzione si scrive una volta e si usa quando serve. Questa si chiama show e riceve un nome (id): la schermata da mostrare.',riga:1,tab:'js'},
+     {t:'Per nascondere un elemento: document.querySelector(\'#home\').hidden = true; Per mostrarlo, false. Scrivi le tre istruzioni dei commenti, una per riga.'},
+     {t:'Per la terza, «#» + id incolla il cancelletto al nome: se id è play, il computer cerca #play. Per provare scrivi show(\'play\'); in fondo, poi toglilo.'}],
+    compito:'Scrivi show(id): nasconde home e play e mostra la schermata chiamata id.',
+    controlli:[
+     {cosa:'Esiste la funzione show',ok:(d,w)=>typeof w.show==='function',aiuto:'Deve restare function show(id) { ... } con le graffe.'},
+     {cosa:'show(\'play\') mostra il gioco e nasconde la home',ok:(d,w)=>{if(typeof w.show!=='function')return false;w.show('play');return sel(d,'#play').hidden===false&&sel(d,'#home').hidden===true},aiuto:'Metti hidden = true a home e a play, poi hidden = false all’elemento che si chiama id.'},
+     {cosa:'show(\'home\') riporta la home',ok:(d,w)=>{if(typeof w.show!=='function')return false;w.show('play');w.show('home');return sel(d,'#home').hidden===false&&sel(d,'#play').hidden===true},aiuto:'La terza istruzione usa \'#\' + id: così funziona per qualunque schermata.'}],
+    bravo:'La funzione è pronta. Ancora nessuno la chiama, ma sa già cosa fare.'},
+   {id:'c5p3',titolo:'Un clic su Estetica',file:'js',
+    inizio:{js:['c5p2-js','c5p3-ini']},soluzione:{js:['c5p2-js','c5p3-js']},
+    intro:[
+     {t:'Questo codice prende tutte le carte e, per ognuna, resta in ascolto di un clic. Quando il clic arriva, esegue le istruzioni tra le graffe interne.',riga:7,tab:'js'},
+     {t:'Ogni carta sa chi è grazie all’attributo data-path che hai scritto nel capitolo 2: dentro il codice si legge con carta.dataset.path.'},
+     {t:'Scrivi una condizione: if (carta.dataset.path === \'est\') { ... }. Si legge «se il data-path è est». Dentro le graffe chiama show(\'play\'). Poi premi «Prova il codice» e clicca Estetica.'}],
+    compito:'Se la carta cliccata è Estetica, mostra il gioco. Le altre carte non fanno niente.',
+    controlli:[
+     {cosa:'Cliccando Estetica compare il gioco',ok:d=>{const c=sel(d,'.path[data-path="est"]');if(!c)return false;c.click();return sel(d,'#play').hidden===false&&sel(d,'#home').hidden===true},aiuto:'Dentro il clic scrivi if (carta.dataset.path === \'est\') { show(\'play\'); } con tre uguali.'},
+     {cosa:'Cliccando Elettricità non succede niente',ok:d=>{const c=sel(d,'.path[data-path="el"]');if(!c)return false;c.click();return sel(d,'#play').hidden===true},aiuto:'La condizione deve controllare che il data-path sia proprio est: le altre carte non devono aprire il gioco.'}],
+    bravo:'Il clic funziona. Hai usato una condizione per scegliere cosa fare.'},
+   {id:'c5p4',titolo:'Tornare alla home',file:'js',
+    inizio:{js:['c5p2-js','c5p3-js','c5p4-ini']},soluzione:{js:['c5p2-js','c5p3-js','c5p4-js']},
+    intro:[
+     {t:'Manca la strada del ritorno. Qui in fondo c’è un clic per il pulsante X (id back), ma dentro le graffe non c’è ancora niente.',riga:17,tab:'js'},
+     {t:'Basta una riga: la funzione show che hai già scritto. Quale schermata vuoi mostrare?'}],
+    compito:'Quando premi la X, torna alla home.',
+    controlli:[
+     {cosa:'Premendo la X ricompare la home',ok:(d,w)=>{if(typeof w.show!=='function')return false;w.show('play');const b=sel(d,'#back');if(!b)return false;b.click();return sel(d,'#home').hidden===false&&sel(d,'#play').hidden===true},aiuto:'Dentro le graffe del clic chiama la funzione: show(\'home\');'}],
+    bravo:'Andata e ritorno. Il sito ha due schermate che funzionano.'}],
+  imparato:['Una funzione è un gruppo di istruzioni con un nome, che si usa quando serve.','Un evento, come il clic, fa partire una funzione.','Con hidden si mostra o si nasconde una schermata.']},
+{id:'c6',titolo:'I dati del gioco',descr:'Oggetti ed elenchi: come si descrive un livello in modo che il programma lo capisca.',
+  intro:[
+   {t:'Un gioco ha bisogno di dati: quali prodotti ci sono, come si chiamano, cosa dice il prof quando li scegli. I dati si scrivono in JavaScript in modo ordinato, così il programma li può leggere.'},
+   {t:'Un oggetto raccoglie più informazioni su una cosa sola: si scrive tra graffe, con coppie nome: valore. Un elenco (in inglese array) mette più cose in fila: si scrive tra parentesi quadre.'},
+   {t:'Per vedere cosa contiene una variabile usiamo console.log: scrive un messaggio nella striscia sotto l’anteprima. È lo strumento preferito da chi programma per capire cosa sta succedendo.'}],
+  passi:[
+   {id:'c6p1',titolo:'Un prodotto',file:'js',
+    inizio:{html:'c6-html',css:['c3-vars','c3-body-2','c3-blocco','c3-path','c3-paths','c3-hover','c4-lit','c4-trans','c6-carte'],js:'c6p1-ini'},
+    soluzione:{js:'c6p1-js'},
+    intro:[
+     {t:'Da qui lavoriamo solo sulla schermata di gioco: la home sparisce dall’anteprima per non distrarci. Quello che hai scritto resta valido e lo ritroveremo alla fine.'},
+     {t:'Questo oggetto descrive un prodotto: t è il testo (il nome) e il valore sta tra apici. Le proprietà sono separate da una virgola.',riga:2,tab:'js'},
+     {t:'Aggiungi una proprietà done con la frase che il prof dice quando il prodotto è quello giusto, per esempio \'Via il trucco!\'. Poi cambia console.log per scrivere prodotto.done. Il punto serve a leggere una proprietà.'},
+     {t:'Premi «Prova il codice» e guarda la striscia sotto l’anteprima.'}],
+    compito:'Aggiungi la proprietà done all’oggetto prodotto e scrivila con console.log.',
+    controlli:[
+     {cosa:'L’oggetto prodotto ha la proprietà done con una frase',ok:(d,w)=>{let p=null;try{p=w.eval('typeof prodotto!=="undefined"?prodotto:null')}catch(e){}return !!p&&typeof p.done==='string'&&p.done.trim()!==''},aiuto:'Dopo t aggiungi una riga done: \'...\', con la frase tra apici. Ricorda la virgola alla fine di ogni proprietà.'},
+     {cosa:'console.log scrive la frase done',ok:(d,w)=>{let p=null;try{p=w.eval('typeof prodotto!=="undefined"?prodotto:null')}catch(e){}return !!p&&typeof p.done==='string'&&p.done.trim()!==''&&w.__log.includes(p.done)},aiuto:'Dentro console.log() scrivi prodotto.done, senza apici.'}],
+    bravo:'Il prodotto ora ha un nome e una frase. Hai letto una proprietà con il punto.'},
+   {id:'c6p2',titolo:'Un elenco di prodotti',file:'js',
+    inizio:{js:'c6p2-ini'},soluzione:{js:'c6p2-js'},
+    intro:[
+     {t:'Un trattamento ha più prodotti, quindi serve un elenco: parentesi quadre, un oggetto per riga, virgola dopo ognuno.',riga:1,tab:'js'},
+     {t:'Per ora c’è solo lo Struccante. Aggiungi Detergente, Maschera e Crema, ognuno con t e done. console.log(prodotti.length) scrive quanti elementi ci sono.'}],
+    compito:'Completa l’elenco prodotti con quattro prodotti, ognuno con t e done.',
+    controlli:[
+     {cosa:'L’elenco ha quattro prodotti',ok:(d,w)=>{let n=0;try{n=w.eval('Array.isArray(prodotti)?prodotti.length:0')}catch(e){}return n===4},aiuto:'Servono quattro oggetti tra le parentesi quadre, separati da virgole.'},
+     {cosa:'Ogni prodotto ha un nome t e una frase done diversi',ok:(d,w)=>{let a=[];try{a=w.eval('prodotti.map(function(p){return [p.t,p.done]})')}catch(e){}return a.length===4&&a.every(x=>typeof x[0]==='string'&&x[0].trim()!==''&&typeof x[1]==='string'&&x[1].trim()!=='')&&new Set(a.map(x=>x[0])).size===4},aiuto:'Ogni riga ha la forma { t: \'Nome\', done: \'Frase\' }. I quattro nomi devono essere diversi.'},
+     {cosa:'console.log scrive 4',ok:(d,w)=>w.__log.includes('4'),aiuto:'Lascia in fondo console.log(prodotti.length): quando i prodotti sono quattro scrive 4.'}],
+    bravo:'Quattro prodotti in fila, pronti per essere usati.'},
+   {id:'c6p3',titolo:'Le carte dall’elenco',file:'js',
+    inizio:{js:'c6p3-ini'},soluzione:{js:'c6p3-js'},
+    intro:[
+     {t:'Ora le carte le fa il programma. map prende i prodotti uno alla volta e per ognuno esegue la funzione; quello che la funzione restituisce (return) diventa un pezzo di HTML.',riga:11,tab:'js'},
+     {t:'join unisce i pezzi in un unico testo e innerHTML lo mette dentro la pagina. Per ora la funzione restituisce un testo vuoto, quindi non si vede niente.'},
+     {t:'Fai restituire il codice di una carta: un button con classe path e dentro un b con il nome. Con + si incollano i testi: \'<b>\' + p.t + \'</b>\'. Ricorda che p è il prodotto del momento.'}],
+    compito:'Fai restituire alla funzione il codice HTML di una carta con il nome del prodotto.',
+    controlli:[
+     {cosa:'Nella schermata di gioco compaiono quattro carte',ok:d=>tutti(d,'#carte button').length===4,aiuto:'Dopo return scrivi il testo di un button. map lo ripete una volta per prodotto, quindi le carte saranno quattro.'},
+     {cosa:'Ogni carta mostra il nome del suo prodotto',ok:(d,w)=>{let n=[];try{n=w.eval('prodotti.map(function(p){return p.t})')}catch(e){}const c=tutti(d,'#carte button');return n.length===4&&c.length===4&&c.every((x,i)=>norm(x.textContent)===n[i])},aiuto:'Dentro la carta aggiungi p.t con il segno +: i nomi devono corrispondere a quelli dell’elenco.'}],
+    bravo:'Le carte nascono dall’elenco. Se aggiungi un prodotto, appare da solo.'},
+   {id:'c6p4',titolo:'Il livello',file:'js',
+    inizio:{html:'c6p4-html',js:'c6p4-ini'},soluzione:{js:'c6p4-js'},
+    intro:[
+     {t:'Raccogliamo tutto in un solo oggetto, livello, con tre proprietà: title (il titolo), goal (cosa deve fare il giocatore) e items (l’elenco dei prodotti).',riga:1,tab:'js'},
+     {t:'Le carte vengono già dal livello. Ma il titolo e l’obiettivo nella pagina sono vuoti: devono arrivare dai dati.'},
+     {t:'textContent cambia il testo di un elemento. Scrivi: document.querySelector(\'#titolo\').textContent = livello.title; e la riga uguale per \'#obiettivo\' con livello.goal.'}],
+    compito:'Scrivi nella pagina il titolo e l’obiettivo, prendendoli da livello.',
+    controlli:[
+     {cosa:'Il titolo nella pagina viene da livello.title',ok:(d,w)=>{let t=null;try{t=w.eval('typeof livello!=="undefined"?livello.title:null')}catch(e){}return !!t&&testo(d,'#titolo')===norm(t)},aiuto:'Scrivi document.querySelector(\'#titolo\').textContent = livello.title;'},
+     {cosa:'L’obiettivo nella pagina viene da livello.goal',ok:(d,w)=>{let t=null;try{t=w.eval('typeof livello!=="undefined"?livello.goal:null')}catch(e){}return !!t&&testo(d,'#obiettivo')===norm(t)},aiuto:'Scrivi document.querySelector(\'#obiettivo\').textContent = livello.goal;'},
+     {cosa:'Le quattro carte ci sono ancora',ok:d=>tutti(d,'#carte button').length===4,aiuto:'Non toccare la parte che crea le carte: serve ancora.'}],
+    bravo:'Titolo, obiettivo e carte arrivano tutti dai dati. Cambia i dati e cambia il gioco.'}],
+  imparato:['Un oggetto raccoglie informazioni su una cosa, un elenco ne mette più in fila.','Il codice può creare l’HTML partendo dai dati.','console.log fa vedere cosa c’è dentro una variabile.']}
 ];
 
 /* Per ogni passo si calcolano il codice di partenza (codIni) e la soluzione (codSol). Ogni passo
