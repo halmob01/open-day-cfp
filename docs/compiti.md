@@ -114,7 +114,7 @@ indipendenti: i due gruppi si possono svolgere in parallelo.
 - [x] **T12 · Contenuti: capitoli 5 e 6**
   Come T10.
 
-- [ ] **T13 · Contenuti: capitoli 7 e 8**
+- [x] **T13 · Contenuti: capitoli 7 e 8**
   Come T10. L'ultimo passo del capitolo 8 chiude con il confronto con
   `GAMES` in `index.html`.
 

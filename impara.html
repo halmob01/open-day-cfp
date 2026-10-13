@@ -666,6 +666,818 @@ contenitore.innerHTML = livello.items.map(function (p) {
 document.querySelector('#titolo').textContent = livello.title;
 document.querySelector('#obiettivo').textContent = livello.goal;
 </script>
+<script type="text/plain" data-k="c7p1-ini">
+const livello = {
+  title: 'Il trattamento viso',
+  goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+  win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+  show: [3, 1, 0, 2],
+  items: [
+    { t: 'Struccante', done: 'Via il trucco!' },
+    { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+    { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+    { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+  ],
+};
+
+let picked = [];
+let trema = -1;
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  // qui riempi il vassoio con i prodotti scelti
+}
+
+function pick(i) {
+  // aggiungi la carta scelta a picked e scrivi picked con console.log
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#titolo').textContent = livello.title;
+document.querySelector('#obiettivo').textContent = livello.goal;
+render();
+</script>
+<script type="text/plain" data-k="c7p1-js">
+const livello = {
+  title: 'Il trattamento viso',
+  goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+  win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+  show: [3, 1, 0, 2],
+  items: [
+    { t: 'Struccante', done: 'Via il trucco!' },
+    { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+    { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+    { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+  ],
+};
+
+let picked = [];
+let trema = -1;
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  // qui riempi il vassoio con i prodotti scelti
+}
+
+function pick(i) {
+  picked.push(i);
+  console.log(picked);
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#titolo').textContent = livello.title;
+document.querySelector('#obiettivo').textContent = livello.goal;
+render();
+</script>
+<script type="text/plain" data-k="c7p2-js">
+const livello = {
+  title: 'Il trattamento viso',
+  goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+  win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+  show: [3, 1, 0, 2],
+  items: [
+    { t: 'Struccante', done: 'Via il trucco!' },
+    { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+    { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+    { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+  ],
+};
+
+let picked = [];
+let trema = -1;
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  // qui riempi il vassoio con i prodotti scelti
+}
+
+function pick(i) {
+  if (i === picked.length) {
+    picked.push(i);
+    console.log(picked);
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#titolo').textContent = livello.title;
+document.querySelector('#obiettivo').textContent = livello.goal;
+render();
+</script>
+<script type="text/plain" data-k="c7p3-js">
+const livello = {
+  title: 'Il trattamento viso',
+  goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+  win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+  show: [3, 1, 0, 2],
+  items: [
+    { t: 'Struccante', done: 'Via il trucco!' },
+    { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+    { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+    { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+  ],
+};
+
+let picked = [];
+let trema = -1;
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  // qui riempi il vassoio con i prodotti scelti
+}
+
+function pick(i) {
+  if (i === picked.length) {
+    picked.push(i);
+    console.log(picked);
+  } else {
+    trema = i;
+    document.querySelector('#messaggio').textContent = livello.items[i].early || 'Non è ancora il momento.';
+    render();
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#titolo').textContent = livello.title;
+document.querySelector('#obiettivo').textContent = livello.goal;
+render();
+</script>
+<script type="text/plain" data-k="c7p4-js">
+const livello = {
+  title: 'Il trattamento viso',
+  goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+  win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+  show: [3, 1, 0, 2],
+  items: [
+    { t: 'Struccante', done: 'Via il trucco!' },
+    { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+    { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+    { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+  ],
+};
+
+let picked = [];
+let trema = -1;
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  document.querySelector('#vassoio').innerHTML = picked.map(function (i) {
+    return '<b>' + livello.items[i].t + '</b> ';
+  }).join('');
+}
+
+function pick(i) {
+  if (i === picked.length) {
+    picked.push(i);
+    trema = -1;
+    document.querySelector('#messaggio').textContent = livello.items[i].done;
+    render();
+  } else {
+    trema = i;
+    document.querySelector('#messaggio').textContent = livello.items[i].early || 'Non è ancora il momento.';
+    render();
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#titolo').textContent = livello.title;
+document.querySelector('#obiettivo').textContent = livello.goal;
+render();
+</script>
+<script type="text/plain" data-k="c7p5-js">
+const livello = {
+  title: 'Il trattamento viso',
+  goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+  win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+  show: [3, 1, 0, 2],
+  items: [
+    { t: 'Struccante', done: 'Via il trucco!' },
+    { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+    { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+    { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+  ],
+};
+
+let picked = [];
+let trema = -1;
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  document.querySelector('#vassoio').innerHTML = picked.map(function (i) {
+    return '<b>' + livello.items[i].t + '</b> ';
+  }).join('');
+}
+
+function pick(i) {
+  if (i === picked.length) {
+    picked.push(i);
+    trema = -1;
+    document.querySelector('#messaggio').textContent = livello.items[i].done;
+    render();
+    if (picked.length === livello.items.length) {
+      document.documentElement.classList.add('lit');
+      document.querySelector('#messaggio').textContent = livello.win;
+    }
+  } else {
+    trema = i;
+    document.querySelector('#messaggio').textContent = livello.items[i].early || 'Non è ancora il momento.';
+    render();
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#titolo').textContent = livello.title;
+document.querySelector('#obiettivo').textContent = livello.goal;
+render();
+</script>
+<script type="text/plain" data-k="c7-html">
+<section id="play">
+  <h2 id="titolo"></h2>
+  <p id="obiettivo" class="sub"></p>
+  <div class="carte" id="carte"></div>
+  <p id="vassoio"></p>
+  <p id="messaggio"></p>
+</section>
+</script>
+<script type="text/plain" data-k="c7-shake">
+@keyframes trema {
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.shake {
+  animation: trema 0.3s;
+}
+</script>
+<script type="text/plain" data-k="c8p1-ini">
+const livello = {
+  title: 'Le unghie',
+  goal: '',
+  win: '',
+  ordered: true,
+  show: [2, 0, 3, 1],
+  items: [
+    { t: 'Taglia e lima', done: '' },
+    { t: 'Base trasparente', done: '', early: '' },
+    { t: 'Colore', done: '', early: '' },
+    { t: 'Lucidante', done: '', early: '' },
+  ],
+};
+
+let picked = [];
+let trema = -1;
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  document.querySelector('#vassoio').innerHTML = picked.map(function (i) {
+    return '<b>' + livello.items[i].t + '</b> ';
+  }).join('');
+}
+
+function pick(i) {
+  if (i === picked.length) {
+    picked.push(i);
+    trema = -1;
+    document.querySelector('#messaggio').textContent = livello.items[i].done;
+    render();
+    if (picked.length === livello.items.length) {
+      document.documentElement.classList.add('lit');
+      document.querySelector('#messaggio').textContent = livello.win;
+    }
+  } else {
+    trema = i;
+    document.querySelector('#messaggio').textContent = livello.items[i].early || 'Non è ancora il momento.';
+    render();
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#titolo').textContent = livello.title;
+document.querySelector('#obiettivo').textContent = livello.goal;
+render();
+</script>
+<script type="text/plain" data-k="c8p1-js">
+const livello = {
+  title: 'Le unghie',
+  goal: 'Prepara le unghie e metti lo smalto nell’ordine giusto.',
+  win: 'Che bel colore! Unghie perfette e lucide.',
+  ordered: true,
+  show: [2, 0, 3, 1],
+  items: [
+    { t: 'Taglia e lima', done: 'Unghie in forma.' },
+    { t: 'Base trasparente', done: 'La base protegge l’unghia.', early: 'Prima bisogna dare la forma alle unghie.' },
+    { t: 'Colore', done: 'Che colore!', early: 'Il colore va sopra la base, non prima.' },
+    { t: 'Lucidante', done: 'Il lucidante rende lo smalto brillante e lo fa durare di più.', early: 'Il lucidante si mette per ultimo, sopra il colore.' },
+  ],
+};
+
+let picked = [];
+let trema = -1;
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  document.querySelector('#vassoio').innerHTML = picked.map(function (i) {
+    return '<b>' + livello.items[i].t + '</b> ';
+  }).join('');
+}
+
+function pick(i) {
+  if (i === picked.length) {
+    picked.push(i);
+    trema = -1;
+    document.querySelector('#messaggio').textContent = livello.items[i].done;
+    render();
+    if (picked.length === livello.items.length) {
+      document.documentElement.classList.add('lit');
+      document.querySelector('#messaggio').textContent = livello.win;
+    }
+  } else {
+    trema = i;
+    document.querySelector('#messaggio').textContent = livello.items[i].early || 'Non è ancora il momento.';
+    render();
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#titolo').textContent = livello.title;
+document.querySelector('#obiettivo').textContent = livello.goal;
+render();
+</script>
+<script type="text/plain" data-k="c8-html">
+<section id="play">
+  <h2 id="titolo"></h2>
+  <p id="obiettivo" class="sub"></p>
+  <div class="carte" id="carte"></div>
+  <p id="vassoio"></p>
+  <p id="messaggio"></p>
+  <button class="path" id="avanti" type="button" hidden>Avanti</button>
+</section>
+</script>
+<script type="text/plain" data-k="c8p2-ini">
+const LIVELLI = [
+  {
+    title: 'Il trattamento viso',
+    goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+    win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+    ordered: true,
+    show: [3, 1, 0, 2],
+    items: [
+      { t: 'Struccante', done: 'Via il trucco!' },
+      { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+      { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+      { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+    ],
+  },
+  {
+    title: 'Le unghie',
+    goal: 'Prepara le unghie e metti lo smalto nell’ordine giusto.',
+    win: 'Che bel colore! Unghie perfette e lucide.',
+    ordered: true,
+    show: [2, 0, 3, 1],
+    items: [
+      { t: 'Taglia e lima', done: 'Unghie in forma.' },
+      { t: 'Base trasparente', done: 'La base protegge l’unghia.', early: 'Prima bisogna dare la forma alle unghie.' },
+      { t: 'Colore', done: 'Che colore!', early: 'Il colore va sopra la base, non prima.' },
+      { t: 'Lucidante', done: 'Il lucidante rende lo smalto brillante e lo fa durare di più.', early: 'Il lucidante si mette per ultimo, sopra il colore.' },
+    ],
+  },
+];
+
+let numero = 0;
+let livello = LIVELLI[numero];
+let picked = [];
+let trema = -1;
+
+function inizia() {
+  livello = LIVELLI[numero];
+  picked = [];
+  trema = -1;
+  document.documentElement.classList.remove('lit');
+  document.querySelector('#titolo').textContent = livello.title;
+  document.querySelector('#obiettivo').textContent = livello.goal;
+  document.querySelector('#messaggio').textContent = '';
+  document.querySelector('#avanti').hidden = true;
+  render();
+}
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  document.querySelector('#vassoio').innerHTML = picked.map(function (i) {
+    return '<b>' + livello.items[i].t + '</b> ';
+  }).join('');
+}
+
+function pick(i) {
+  if (i === picked.length) {
+    picked.push(i);
+    trema = -1;
+    document.querySelector('#messaggio').textContent = livello.items[i].done;
+    render();
+    if (picked.length === livello.items.length) {
+      document.documentElement.classList.add('lit');
+      document.querySelector('#messaggio').textContent = livello.win;
+      // qui mostra il pulsante Avanti, se dopo questo livello ce n'è un altro
+    }
+  } else {
+    trema = i;
+    document.querySelector('#messaggio').textContent = livello.items[i].early || 'Non è ancora il momento.';
+    render();
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#avanti').addEventListener('click', function () {
+  // passa al livello dopo e ricomincia
+});
+
+inizia();
+</script>
+<script type="text/plain" data-k="c8p2-js">
+const LIVELLI = [
+  {
+    title: 'Il trattamento viso',
+    goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+    win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+    ordered: true,
+    show: [3, 1, 0, 2],
+    items: [
+      { t: 'Struccante', done: 'Via il trucco!' },
+      { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+      { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+      { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+    ],
+  },
+  {
+    title: 'Le unghie',
+    goal: 'Prepara le unghie e metti lo smalto nell’ordine giusto.',
+    win: 'Che bel colore! Unghie perfette e lucide.',
+    ordered: true,
+    show: [2, 0, 3, 1],
+    items: [
+      { t: 'Taglia e lima', done: 'Unghie in forma.' },
+      { t: 'Base trasparente', done: 'La base protegge l’unghia.', early: 'Prima bisogna dare la forma alle unghie.' },
+      { t: 'Colore', done: 'Che colore!', early: 'Il colore va sopra la base, non prima.' },
+      { t: 'Lucidante', done: 'Il lucidante rende lo smalto brillante e lo fa durare di più.', early: 'Il lucidante si mette per ultimo, sopra il colore.' },
+    ],
+  },
+];
+
+let numero = 0;
+let livello = LIVELLI[numero];
+let picked = [];
+let trema = -1;
+
+function inizia() {
+  livello = LIVELLI[numero];
+  picked = [];
+  trema = -1;
+  document.documentElement.classList.remove('lit');
+  document.querySelector('#titolo').textContent = livello.title;
+  document.querySelector('#obiettivo').textContent = livello.goal;
+  document.querySelector('#messaggio').textContent = '';
+  document.querySelector('#avanti').hidden = true;
+  render();
+}
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  document.querySelector('#vassoio').innerHTML = picked.map(function (i) {
+    return '<b>' + livello.items[i].t + '</b> ';
+  }).join('');
+}
+
+function pick(i) {
+  if (i === picked.length) {
+    picked.push(i);
+    trema = -1;
+    document.querySelector('#messaggio').textContent = livello.items[i].done;
+    render();
+    if (picked.length === livello.items.length) {
+      document.documentElement.classList.add('lit');
+      document.querySelector('#messaggio').textContent = livello.win;
+      if (numero < LIVELLI.length - 1) {
+        document.querySelector('#avanti').hidden = false;
+      }
+    }
+  } else {
+    trema = i;
+    document.querySelector('#messaggio').textContent = livello.items[i].early || 'Non è ancora il momento.';
+    render();
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#avanti').addEventListener('click', function () {
+  numero = numero + 1;
+  inizia();
+});
+
+inizia();
+</script>
+<script type="text/plain" data-k="c8p3-ini">
+const LIVELLI = [
+  {
+    title: 'Il trattamento viso',
+    goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+    win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+    ordered: true,
+    show: [3, 1, 0, 2],
+    items: [
+      { t: 'Struccante', done: 'Via il trucco!' },
+      { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+      { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+      { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+    ],
+  },
+  {
+    title: 'Le unghie',
+    goal: 'Prepara le unghie e metti lo smalto nell’ordine giusto.',
+    win: 'Che bel colore! Unghie perfette e lucide.',
+    ordered: true,
+    show: [2, 0, 3, 1],
+    items: [
+      { t: 'Taglia e lima', done: 'Unghie in forma.' },
+      { t: 'Base trasparente', done: 'La base protegge l’unghia.', early: 'Prima bisogna dare la forma alle unghie.' },
+      { t: 'Colore', done: 'Che colore!', early: 'Il colore va sopra la base, non prima.' },
+      { t: 'Lucidante', done: 'Il lucidante rende lo smalto brillante e lo fa durare di più.', early: 'Il lucidante si mette per ultimo, sopra il colore.' },
+    ],
+  },
+  {
+    title: 'Igiene prima di tutto',
+    goal: 'Scegli le 3 cose giuste da fare prima di cominciare. Le altre sono sbagliate!',
+    win: 'Ottimo! Con mani e strumenti puliti si lavora in sicurezza.',
+    ordered: false,
+    show: [3, 0, 5, 1, 4, 2],
+    items: [
+      { t: 'Mani lavate', ok: true, done: 'Si parte sempre con le mani pulite.' },
+      { t: 'Guanti nuovi', ok: true, done: 'Guanti nuovi per ogni persona.' },
+      { t: 'Strumenti puliti', ok: true, done: 'Gli strumenti si puliscono e si disinfettano.' },
+      { t: 'Spugna già usata', why: 'Una spugna usata su un’altra persona porta germi. Si usa materiale nuovo o pulito.' },
+      { t: 'Merenda sul tavolo', why: 'Il cibo non sta dove si lavora: il tavolo deve restare pulito.' },
+      { t: 'Pennello sporco', why: 'Un pennello sporco può portare germi alla pelle. Va pulito prima.' },
+    ],
+  },
+];
+
+let numero = 0;
+let livello = LIVELLI[numero];
+let picked = [];
+let trema = -1;
+
+function inizia() {
+  livello = LIVELLI[numero];
+  picked = [];
+  trema = -1;
+  document.documentElement.classList.remove('lit');
+  document.querySelector('#titolo').textContent = livello.title;
+  document.querySelector('#obiettivo').textContent = livello.goal;
+  document.querySelector('#messaggio').textContent = '';
+  document.querySelector('#avanti').hidden = true;
+  render();
+}
+
+function quanteGiuste() {
+  return livello.items.filter(function (p) {
+    return livello.ordered || p.ok;
+  }).length;
+}
+
+function eGiusta(i) {
+  // in un livello con ordine: la carta giusta ha il numero uguale a quante ne hai già scelte
+  // in un livello senza ordine: la carta giusta ha ok: true e non è già stata scelta
+  return i === picked.length;
+}
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  document.querySelector('#vassoio').innerHTML = picked.map(function (i) {
+    return '<b>' + livello.items[i].t + '</b> ';
+  }).join('');
+}
+
+function pick(i) {
+  if (eGiusta(i)) {
+    picked.push(i);
+    trema = -1;
+    document.querySelector('#messaggio').textContent = livello.items[i].done;
+    render();
+    if (picked.length === quanteGiuste()) {
+      document.documentElement.classList.add('lit');
+      document.querySelector('#messaggio').textContent = livello.win;
+      if (numero < LIVELLI.length - 1) {
+        document.querySelector('#avanti').hidden = false;
+      }
+    }
+  } else {
+    const p = livello.items[i];
+    trema = i;
+    document.querySelector('#messaggio').textContent = p.early || p.why || 'Non è ancora il momento.';
+    render();
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#avanti').addEventListener('click', function () {
+  numero = numero + 1;
+  inizia();
+});
+
+inizia();
+</script>
+<script type="text/plain" data-k="c8p3-js">
+const LIVELLI = [
+  {
+    title: 'Il trattamento viso',
+    goal: 'Tocca i prodotti uno alla volta, nell’ordine giusto.',
+    win: 'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
+    ordered: true,
+    show: [3, 1, 0, 2],
+    items: [
+      { t: 'Struccante', done: 'Via il trucco!' },
+      { t: 'Detergente', done: 'Pelle pulita.', early: 'Prima di pulire bene la pelle, bisogna togliere il trucco.' },
+      { t: 'Maschera', done: 'La maschera nutre la pelle.', early: 'La maschera si mette su una pelle già pulita.' },
+      { t: 'Crema', done: 'La crema protegge e chiude il trattamento.', early: 'La crema va per ultima, quando la pelle è pulita e curata.' },
+    ],
+  },
+  {
+    title: 'Le unghie',
+    goal: 'Prepara le unghie e metti lo smalto nell’ordine giusto.',
+    win: 'Che bel colore! Unghie perfette e lucide.',
+    ordered: true,
+    show: [2, 0, 3, 1],
+    items: [
+      { t: 'Taglia e lima', done: 'Unghie in forma.' },
+      { t: 'Base trasparente', done: 'La base protegge l’unghia.', early: 'Prima bisogna dare la forma alle unghie.' },
+      { t: 'Colore', done: 'Che colore!', early: 'Il colore va sopra la base, non prima.' },
+      { t: 'Lucidante', done: 'Il lucidante rende lo smalto brillante e lo fa durare di più.', early: 'Il lucidante si mette per ultimo, sopra il colore.' },
+    ],
+  },
+  {
+    title: 'Igiene prima di tutto',
+    goal: 'Scegli le 3 cose giuste da fare prima di cominciare. Le altre sono sbagliate!',
+    win: 'Ottimo! Con mani e strumenti puliti si lavora in sicurezza.',
+    ordered: false,
+    show: [3, 0, 5, 1, 4, 2],
+    items: [
+      { t: 'Mani lavate', ok: true, done: 'Si parte sempre con le mani pulite.' },
+      { t: 'Guanti nuovi', ok: true, done: 'Guanti nuovi per ogni persona.' },
+      { t: 'Strumenti puliti', ok: true, done: 'Gli strumenti si puliscono e si disinfettano.' },
+      { t: 'Spugna già usata', why: 'Una spugna usata su un’altra persona porta germi. Si usa materiale nuovo o pulito.' },
+      { t: 'Merenda sul tavolo', why: 'Il cibo non sta dove si lavora: il tavolo deve restare pulito.' },
+      { t: 'Pennello sporco', why: 'Un pennello sporco può portare germi alla pelle. Va pulito prima.' },
+    ],
+  },
+];
+
+let numero = 0;
+let livello = LIVELLI[numero];
+let picked = [];
+let trema = -1;
+
+function inizia() {
+  livello = LIVELLI[numero];
+  picked = [];
+  trema = -1;
+  document.documentElement.classList.remove('lit');
+  document.querySelector('#titolo').textContent = livello.title;
+  document.querySelector('#obiettivo').textContent = livello.goal;
+  document.querySelector('#messaggio').textContent = '';
+  document.querySelector('#avanti').hidden = true;
+  render();
+}
+
+function quanteGiuste() {
+  return livello.items.filter(function (p) {
+    return livello.ordered || p.ok;
+  }).length;
+}
+
+function eGiusta(i) {
+  if (livello.ordered) {
+    return i === picked.length;
+  }
+  return livello.items[i].ok === true && !picked.includes(i);
+}
+
+function render() {
+  document.querySelector('#carte').innerHTML = livello.show.map(function (i) {
+    const classe = i === trema ? 'path shake' : 'path';
+    return '<button class="' + classe + '" data-i="' + i + '"><b>' + livello.items[i].t + '</b></button>';
+  }).join('');
+  document.querySelector('#vassoio').innerHTML = picked.map(function (i) {
+    return '<b>' + livello.items[i].t + '</b> ';
+  }).join('');
+}
+
+function pick(i) {
+  if (eGiusta(i)) {
+    picked.push(i);
+    trema = -1;
+    document.querySelector('#messaggio').textContent = livello.items[i].done;
+    render();
+    if (picked.length === quanteGiuste()) {
+      document.documentElement.classList.add('lit');
+      document.querySelector('#messaggio').textContent = livello.win;
+      if (numero < LIVELLI.length - 1) {
+        document.querySelector('#avanti').hidden = false;
+      }
+    }
+  } else {
+    const p = livello.items[i];
+    trema = i;
+    document.querySelector('#messaggio').textContent = p.early || p.why || 'Non è ancora il momento.';
+    render();
+  }
+}
+
+document.querySelector('#carte').addEventListener('click', function (e) {
+  const carta = e.target.closest('button');
+  if (carta) pick(Number(carta.dataset.i));
+});
+
+document.querySelector('#avanti').addEventListener('click', function () {
+  numero = numero + 1;
+  inizia();
+});
+
+inizia();
+</script>
 
 <!-- SPIA: piccolo script che viene messo in cima a ogni anteprima. Ascolta gli errori e i console.log del codice
      dell'allievo e li passa alla pagina. È testo semplice (text/plain): il browser non lo esegue qui. -->
@@ -733,6 +1545,11 @@ const senzaTransizioni=d=>{const s=d.createElement('style');s.textContent='*,*::
 /* chiarezza di un colore "rgb(r, g, b)" da 0 (nero) a 255 (bianco) */
 const chiarezza=c=>{const m=/(\d+)\D+(\d+)\D+(\d+)/.exec(c||'');return m?(+m[1]+ +m[2]+ +m[3])/3:-1};
 const norm=t=>(t||'').replace(/\s+/g,' ').trim();
+/* aiuti per i capitoli del gioco: la carta numero n, una sequenza di clic, la luce accesa, i dati del livello */
+const carta=(d,n)=>d.querySelector('[data-i="'+n+'"]');
+const gioca=(d,ordine)=>ordine.forEach(n=>{const c=carta(d,n);if(c)c.click()});
+const acceso=d=>d.documentElement.classList.contains('lit');
+const dati=(w,espr)=>{try{return w.eval(espr)}catch(e){return null}};
 
 const CAPITOLI=[
 {id:'c1',titolo:'Come è fatto un sito',descr:'I tre linguaggi di una pagina: struttura, aspetto e comportamento.',
@@ -1037,7 +1854,118 @@ const CAPITOLI=[
      {cosa:'L’obiettivo nella pagina viene da livello.goal',ok:(d,w)=>{let t=null;try{t=w.eval('typeof livello!=="undefined"?livello.goal:null')}catch(e){}return !!t&&testo(d,'#obiettivo')===norm(t)},aiuto:'Scrivi document.querySelector(\'#obiettivo\').textContent = livello.goal;'},
      {cosa:'Le quattro carte ci sono ancora',ok:d=>tutti(d,'#carte button').length===4,aiuto:'Non toccare la parte che crea le carte: serve ancora.'}],
     bravo:'Titolo, obiettivo e carte arrivano tutti dai dati. Cambia i dati e cambia il gioco.'}],
-  imparato:['Un oggetto raccoglie informazioni su una cosa, un elenco ne mette più in fila.','Il codice può creare l’HTML partendo dai dati.','console.log fa vedere cosa c’è dentro una variabile.']}
+  imparato:['Un oggetto raccoglie informazioni su una cosa, un elenco ne mette più in fila.','Il codice può creare l’HTML partendo dai dati.','console.log fa vedere cosa c’è dentro una variabile.']},
+{id:'c7',titolo:'La regola del gioco',descr:'Condizioni e stato: il prof spiega perché una mossa è sbagliata.',
+  intro:[
+   {t:'Ora la regola del gioco: i prodotti vanno scelti nell’ordine giusto. Se sbagli, il prof ti spiega perché.'},
+   {t:'Per ricordare cosa è già successo il programma tiene uno stato: variabili che cambiano durante la partita. Dopo ogni mossa si cambia lo stato e si ridisegna la schermata.'},
+   {t:'La regola si scrive con una condizione: if vuol dire «se». Se una cosa è vera si fa una cosa, altrimenti (else) se ne fa un’altra.'}],
+  passi:[
+   {id:'c7p1',titolo:'Le carte scelte',file:'js',
+    inizio:{html:'c7-html',css:['c3-vars','c3-body-2','c3-blocco','c3-path','c3-paths','c3-hover','c4-lit','c4-trans','c6-carte','c7-shake'],js:'c7p1-ini'},
+    soluzione:{js:'c7p1-js'},
+    intro:[
+     {t:'Ho scritto io il livello. C’è una novità: show è l’ordine in cui le carte compaiono sullo schermo (mescolato), items è l’ordine giusto. Il numero i di una carta è la sua posizione in items.',riga:5,tab:'js'},
+     {t:'picked è l’elenco dei numeri scelti finora: parte vuoto. Ogni carta, quando la tocchi, chiama pick con il suo numero: questo pezzo l’ho già scritto io.',riga:14,tab:'js'},
+     {t:'Tocca a te la funzione pick. Aggiungi i a picked con picked.push(i), che mette un elemento in fondo all’elenco, poi scrivi picked con console.log.',riga:25,tab:'js'}],
+    compito:'In pick aggiungi il numero della carta a picked e scrivi picked con console.log.',
+    controlli:[
+     {cosa:'Dopo due clic, picked contiene i due numeri scelti',ok:(d,w)=>{gioca(d,[0,3]);const p=dati(w,'picked.slice()');return !!p&&p.join(',')==='0,3'},aiuto:'Dentro pick scrivi picked.push(i); i è il numero della carta toccata.'},
+     {cosa:'console.log scrive picked',ok:(d,w)=>{gioca(d,[0,3]);return w.__log.length>=2},aiuto:'Dopo il push scrivi console.log(picked); e guarda la striscia sotto l’anteprima.'}],
+    bravo:'Ogni clic aggiunge un numero all’elenco. È lo stato del gioco.'},
+   {id:'c7p2',titolo:'L’ordine giusto',file:'js',
+    soluzione:{js:'c7p2-js'},
+    intro:[
+     {t:'Gli oggetti di items sono nell’ordine giusto: prima la 0, poi la 1, la 2 e la 3. Quindi una carta è giusta quando il suo numero è uguale a quante carte hai già scelto, cioè picked.length.'},
+     {t:'Per scrivere «se» si usa if (condizione) { ... }. Per confrontare due valori si usano tre uguali: i === picked.length.'},
+     {t:'Metti picked.push(i) e console.log dentro un if con quella condizione. Una carta fuori ordine non deve entrare in picked.',riga:26,tab:'js'}],
+    compito:'Aggiungi la carta a picked solo se il suo numero è uguale a picked.length.',
+    controlli:[
+     {cosa:'Una carta fuori ordine non entra in picked',ok:(d,w)=>{gioca(d,[3]);const p=dati(w,'picked.slice()');return !!p&&p.length===0},aiuto:'Il push deve stare dentro if (i === picked.length) { ... }. La prima carta giusta è la 0, non la 3.'},
+     {cosa:'La carta giusta entra in picked',ok:(d,w)=>{gioca(d,[0]);const p=dati(w,'picked.slice()');return !!p&&p.join(',')==='0'},aiuto:'Se la condizione è vera, dentro le graffe fai push come prima.'},
+     {cosa:'Scegliendo nell’ordine giusto entrano tutte e quattro',ok:(d,w)=>{gioca(d,[0,1,2,3]);const p=dati(w,'picked.slice()');return !!p&&p.join(',')==='0,1,2,3'},aiuto:'Controlla di aver scritto tre uguali e picked.length, senza altre parole.'}],
+    bravo:'La regola funziona: solo la carta giusta entra.'},
+   {id:'c7p3',titolo:'L’ordine sbagliato',file:'js',
+    soluzione:{js:'c7p3-js'},
+    intro:[
+     {t:'Ora lo sbaglio. Dopo la graffa che chiude l’if si scrive else { ... }: quello che c’è dentro succede quando la condizione non è vera.',riga:29,tab:'js'},
+     {t:'Nell’else scrivi tre cose: trema = i; (così la carta tremerà, l’animazione è già nel CSS), il testo di spiegazione nel paragrafo #messaggio, e render(); per ridisegnare le carte.'},
+     {t:'La spiegazione sta in livello.items[i].early. Scrivi: livello.items[i].early || \'Non è ancora il momento.\' Il segno || vuol dire «oppure»: se la carta non ha early si usa la frase dopo.'}],
+    compito:'Se la carta è fuori ordine, falla tremare e fai spiegare al prof perché in #messaggio.',
+    controlli:[
+     {cosa:'Una carta troppo presto fa spiegare il prof',ok:(d,w)=>{gioca(d,[2]);const e=dati(w,'livello.items[2].early');return !!e&&testo(d,'#messaggio')===norm(e)},aiuto:'Nell’else scrivi document.querySelector(\'#messaggio\').textContent = livello.items[i].early;'},
+     {cosa:'La carta sbagliata trema',ok:d=>{gioca(d,[2]);const t=sel(d,'.shake');return !!t&&t.dataset.i==='2'},aiuto:'Nell’else scrivi trema = i; e poi render();. La funzione render mette la classe shake alla carta con quel numero.'},
+     {cosa:'La carta sbagliata non entra in picked',ok:(d,w)=>{gioca(d,[2]);const p=dati(w,'picked.slice()');return !!p&&p.length===0},aiuto:'Il push deve restare dentro l’if, non nell’else.'}],
+    bravo:'Se sbagli il prof ti spiega perché, e la carta trema.'},
+   {id:'c7p4',titolo:'Il vassoio',file:'js',
+    soluzione:{js:'c7p4-js'},
+    intro:[
+     {t:'Manca il risultato delle mosse giuste: il vassoio (#vassoio) deve mostrare i prodotti scelti e il prof deve dire la frase done. Tutto quello che si vede nasce in render.',riga:22,tab:'js'},
+     {t:'Per il vassoio copia l’idea delle carte: picked.map(function (i) { return ... }).join(\'\') dà un testo con un pezzo per ogni numero scelto. Mettilo in #vassoio con innerHTML e prendi il nome da livello.items[i].t.'},
+     {t:'Nella parte giusta di pick sostituisci console.log con: trema = -1; (nessuna carta trema), la frase livello.items[i].done in #messaggio e render().'}],
+    compito:'Quando scegli la carta giusta il prof dice la frase done e il vassoio mostra i prodotti scelti.',
+    controlli:[
+     {cosa:'Il vassoio all’inizio è vuoto',ok:d=>testo(d,'#vassoio')==='',aiuto:'Prima di scegliere niente, picked è vuoto e il vassoio deve restare vuoto.'},
+     {cosa:'Con la carta giusta il prof dice la frase done',ok:(d,w)=>{gioca(d,[0]);const e=dati(w,'livello.items[0].done');return !!e&&testo(d,'#messaggio')===norm(e)},aiuto:'Nella parte giusta di pick scrivi document.querySelector(\'#messaggio\').textContent = livello.items[i].done; e poi render();'},
+     {cosa:'Il vassoio mostra i prodotti scelti',ok:d=>{gioca(d,[0,1]);const t=testo(d,'#vassoio')||'';return t.includes('Struccante')&&t.includes('Detergente')},aiuto:'In render riempi #vassoio con picked.map(...).join(\'\'), usando livello.items[i].t per il nome.'}],
+    bravo:'Il vassoio si riempie a ogni mossa giusta.'},
+   {id:'c7p5',titolo:'La vittoria',file:'js',
+    soluzione:{js:'c7p5-js'},
+    intro:[
+     {t:'Quando hai scelto tutti i prodotti hai vinto: la pagina si accende, come nel sito vero. Come si capisce? Quando picked ha tanti elementi quanti ne ha items.'},
+     {t:'Dopo render() in pick, scrivi if (picked.length === livello.items.length) { ... }. Dentro: document.documentElement.classList.add(\'lit\'); accende la pagina, e in #messaggio metti livello.win.'}],
+    compito:'Quando tutti i prodotti sono stati scelti accendi la pagina e scrivi livello.win.',
+    controlli:[
+     {cosa:'Prima della fine la pagina resta spenta',ok:d=>{gioca(d,[0,1,2]);return !acceso(d)},aiuto:'La condizione deve confrontare picked.length con livello.items.length, e vale solo alla fine.'},
+     {cosa:'Alla fine la pagina si accende',ok:d=>{gioca(d,[0,1,2,3]);return acceso(d)},aiuto:'Dentro l’if scrivi document.documentElement.classList.add(\'lit\');'},
+     {cosa:'Compare la frase della vittoria',ok:(d,w)=>{gioca(d,[0,1,2,3]);const e=dati(w,'livello.win');return !!e&&testo(d,'#messaggio')===norm(e)},aiuto:'Dentro l’if scrivi anche document.querySelector(\'#messaggio\').textContent = livello.win;'}],
+    bravo:'Hai vinto: la pagina si accende. Hai appena scritto il cuore del gioco.'}],
+  imparato:['Lo stato è l’insieme delle variabili che cambiano durante il gioco.','Con if e else il programma sceglie cosa fare.','Dopo ogni mossa si cambia lo stato e si ridisegna con render.']},
+{id:'c8',titolo:'Più livelli, stessa regola',descr:'Separare i dati dalle regole: un gioco nuovo si scrive solo come dati.',
+  intro:[
+   {t:'Il sito vero ha tre mestieri e molti livelli. Non c’è un codice diverso per ognuno: c’è sempre la stessa regola, che legge dati diversi.'},
+   {t:'Questa idea si chiama separare i dati dalle regole. Aggiungere un livello vuol dire scrivere un nuovo oggetto, senza toccare le funzioni.'},
+   {t:'Lo vedrai subito: scriverai un livello, poi il passaggio da uno all’altro, poi un livello con una regola diversa.'}],
+  passi:[
+   {id:'c8p1',titolo:'Le unghie, solo dati',file:'js',
+    inizio:{js:'c8p1-ini'},soluzione:{js:'c8p1-js'},
+    intro:[
+     {t:'Il codice è quello che hai finito. Ho cambiato solo i dati: ora il livello è quello delle unghie. Prima si dà forma, poi base, colore e lucidante.',riga:1,tab:'js'},
+     {t:'Mancano le frasi: l’obiettivo (goal), la frase di vittoria (win), la frase done di ogni prodotto e la frase early dal secondo in poi. Scrivile con parole tue, tra gli apici.'},
+     {t:'ordered: true vuol dire «con ordine»: lo useremo più avanti. Quando hai finito, gioca nell’anteprima.'}],
+    compito:'Completa le frasi mancanti del livello Le unghie: goal, win, done ed early.',
+    controlli:[
+     {cosa:'Il livello ha l’obiettivo e la frase di vittoria',ok:(d,w)=>{const g=dati(w,'livello.goal'),v=dati(w,'livello.win');return typeof g==='string'&&g.trim()!==''&&typeof v==='string'&&v.trim()!==''},aiuto:'Scrivi qualcosa tra gli apici di goal e di win.'},
+     {cosa:'Ogni prodotto ha la frase done',ok:(d,w)=>{const a=dati(w,'livello.items.map(function(p){return p.done})');return !!a&&a.length===4&&a.every(x=>typeof x==='string'&&x.trim()!=='')},aiuto:'Controlla che done non sia più vuoto in nessuno dei quattro prodotti.'},
+     {cosa:'Dal secondo in poi ogni prodotto ha la frase early',ok:(d,w)=>{const a=dati(w,'livello.items.slice(1).map(function(p){return p.early})');return !!a&&a.length===3&&a.every(x=>typeof x==='string'&&x.trim()!=='')},aiuto:'Early spiega perché è troppo presto. Serve per Base, Colore e Lucidante.'},
+     {cosa:'Giocando nell’ordine giusto la pagina si accende',ok:(d,w)=>{gioca(d,[0,1,2,3]);return acceso(d)},aiuto:'La regola è la stessa di prima: se non si accende, cerca un apice o una virgola che manca nei dati.'}],
+    bravo:'Un livello nuovo senza toccare le regole. Questo è separare i dati dal codice.'},
+   {id:'c8p2',titolo:'Il pulsante Avanti',file:'js',
+    inizio:{html:'c8-html',js:'c8p2-ini'},soluzione:{js:'c8p2-js'},
+    intro:[
+     {t:'Ora i livelli stanno in un elenco, LIVELLI. La variabile numero dice a che punto sei, e la funzione inizia prepara il livello giusto. Nella pagina c’è un pulsante Avanti, nascosto.',riga:1,tab:'js'},
+     {t:'Servono due cose. Quando vinci, se esiste un livello dopo questo, mostra il pulsante: numero < LIVELLI.length - 1 vuol dire «non sono all’ultimo».',riga:66,tab:'js'},
+     {t:'E quando premi Avanti: aumenta numero di uno (numero = numero + 1;) e chiama inizia();'}],
+    compito:'Alla vittoria mostra il pulsante Avanti, se c’è un altro livello. Premendolo passa al livello dopo.',
+    controlli:[
+     {cosa:'Vincendo il primo livello compare Avanti',ok:(d,w)=>{gioca(d,[0,1,2,3]);const b=sel(d,'#avanti');return !!b&&b.hidden===false},aiuto:'Nella vittoria scrivi document.querySelector(\'#avanti\').hidden = false; dentro un if con numero < LIVELLI.length - 1.'},
+     {cosa:'Avanti porta al livello delle unghie',ok:(d,w)=>{gioca(d,[0,1,2,3]);const b=sel(d,'#avanti');if(!b)return false;b.click();return testo(d,'#titolo')==='Le unghie'&&!acceso(d)&&b.hidden===true},aiuto:'Nel clic di Avanti scrivi numero = numero + 1; e poi inizia();'},
+     {cosa:'Nel secondo livello Avanti non compare, perché è l’ultimo',ok:(d,w)=>{gioca(d,[0,1,2,3]);const b=sel(d,'#avanti');if(!b)return false;b.click();const l=dati(w,'livello.show.length');if(l!==4)return false;gioca(d,[0,1,2,3]);return acceso(d)&&b.hidden===true},aiuto:'Mostra Avanti solo se numero < LIVELLI.length - 1: nell’ultimo livello la condizione è falsa.'}],
+    bravo:'I livelli si susseguono. Il gioco ora ha un inizio e una fine.'},
+   {id:'c8p3',titolo:'Un livello senza ordine',file:'js',
+    inizio:{js:'c8p3-ini'},soluzione:{js:'c8p3-js'},
+    intro:[
+     {t:'Terzo livello: Igiene. Qui non c’è un ordine: ci sono sei carte, tre giuste (ok: true) e tre sbagliate, ognuna con una spiegazione why. Le giuste vanno bene in qualunque ordine.',riga:35,tab:'js'},
+     {t:'La regola cambia, ma i dati dicono già quale usare: ordered: false. Ho scritto la funzione quanteGiuste, che conta le carte da scegliere. Resta eGiusta: dice se la carta i è una mossa giusta, e oggi controlla solo l’ordine.',riga:68,tab:'js'},
+     {t:'Scrivi: se il livello è ordinato (if (livello.ordered)) restituisci i === picked.length, come prima. Altrimenti restituisci livello.items[i].ok === true && !picked.includes(i): la carta ha ok ed è una che non hai ancora scelto. Il segno ! vuol dire «non».'}],
+    compito:'Completa eGiusta: con ordine conta il numero, senza ordine conta ok: true e che la carta non sia già scelta.',
+    controlli:[
+     {cosa:'Nei livelli con ordine la regola resta quella di prima',ok:(d,w)=>{gioca(d,[3]);const p=dati(w,'picked.length');return p===0},aiuto:'Se livello.ordered è vero, restituisci i === picked.length.'},
+     {cosa:'Nel livello Igiene le carte giuste valgono in qualunque ordine',ok:async(d,w)=>{gioca(d,[0,1,2,3]);const b=sel(d,'#avanti');b.click();gioca(d,[0,1,2,3]);const a=sel(d,'#avanti');a.click();const g=dati(w,'livello.items.map(function(p,i){return p.ok?i:-1}).filter(function(x){return x>=0}).reverse()');if(!g)return false;gioca(d,g);return dati(w,'picked.length')===3},aiuto:'Senza ordine una carta è giusta quando livello.items[i].ok === true.'},
+     {cosa:'Le carte sbagliate non entrano e il prof spiega perché',ok:(d,w)=>{gioca(d,[0,1,2,3]);sel(d,'#avanti').click();gioca(d,[0,1,2,3]);sel(d,'#avanti').click();const s=dati(w,'livello.items.map(function(p,i){return p.ok?-1:i}).filter(function(x){return x>=0})');if(!s)return false;gioca(d,[s[0]]);const why=dati(w,'livello.items['+s[0]+'].why');return dati(w,'picked.length')===0&&!!why&&testo(d,'#messaggio')===norm(why)},aiuto:'Una carta senza ok: true deve dare false, così pick usa la sua spiegazione why.'},
+     {cosa:'Scegliendo le tre giuste la pagina si accende',ok:(d,w)=>{gioca(d,[0,1,2,3]);sel(d,'#avanti').click();gioca(d,[0,1,2,3]);sel(d,'#avanti').click();const g=dati(w,'livello.items.map(function(p,i){return p.ok?i:-1}).filter(function(x){return x>=0})');if(!g)return false;gioca(d,g);return acceso(d)},aiuto:'Per non contare due volte la stessa carta aggiungi && !picked.includes(i) alla regola senza ordine.'}],
+    bravo:'Tre livelli, due regole, un solo codice. Ora apri index.html e cerca GAMES: contiene i livelli di tutti e tre i mestieri e funziona con la stessa idea.'}],
+  imparato:['I dati si scrivono come oggetti, le regole come funzioni.','Un livello nuovo si aggiunge scrivendo solo dati.','Il sito vero funziona così: GAMES raccoglie i livelli e le funzioni li leggono.']}
 ];
 
 /* Per ogni passo si calcolano il codice di partenza (codIni) e la soluzione (codSol). Ogni passo
