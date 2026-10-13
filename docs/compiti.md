@@ -74,7 +74,7 @@ indipendenti: i due gruppi si possono svolgere in parallelo.
 - [ ] **T07 · Controllo degli errori**
   Piano: sezione 5.3.
   I tre controllori e la tabella di traduzione degli errori JavaScript.
-  Il primo errore evidenzia la riga e fa parlare il coach con l'espressione
+  Il primo errore evidenzia la riga e fa parlare il prof con l'espressione
   `oops`.
   Accettazione: una funzione di prova (da riusare in T09) con almeno 8 casi
   di HTML sbagliato, 8 di CSS e 5 di JavaScript, ciascuno con la riga attesa;
@@ -101,24 +101,24 @@ indipendenti: i due gruppi si possono svolgere in parallelo.
   riepilogo leggibile; rompendo apposta una soluzione il test fallisce e dice
   quale passo.
 
-- [ ] **T10 · Contenuti: capitoli 1 e 2**
+- [x] **T10 · Contenuti: capitoli 1 e 2**
   Piano: sezione 6.
   Fumetti, compiti, codice di partenza, soluzioni, controlli e messaggi.
   Accettazione: test di T09 verde; ogni passo provato a mano facendo un errore
   tipico (un tag non chiuso, una parola sbagliata) e verificando che il
   messaggio aiuti davvero.
 
-- [ ] **T11 · Contenuti: capitoli 3 e 4**
+- [x] **T11 · Contenuti: capitoli 3 e 4**
   Come T10.
 
-- [ ] **T12 · Contenuti: capitoli 5 e 6**
+- [x] **T12 · Contenuti: capitoli 5 e 6**
   Come T10.
 
-- [ ] **T13 · Contenuti: capitoli 7 e 8**
+- [x] **T13 · Contenuti: capitoli 7 e 8**
   Come T10. L'ultimo passo del capitolo 8 chiude con il confronto con
   `GAMES` in `index.html`.
 
-- [ ] **T14 · Revisione finale**
+- [x] **T14 · Revisione finale**
   Rilettura di tutti i testi (refusi, frasi ripetute, registro uguale a quello
   del gioco), accessibilità di base (etichette dei pulsanti, focus visibile,
   editor usabile da tastiera), `prefers-reduced-motion`, aggiornamento del

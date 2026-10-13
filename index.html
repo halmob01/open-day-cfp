@@ -1,18 +1,86 @@
 <!doctype html>
 <html lang="it">
+<!--
+   MAPPA DEL FILE
+   Questo sito è un file solo. Dentro ci sono tre linguaggi, ognuno con il suo compito:
+     HTML        dice QUALI elementi ci sono nella pagina (titoli, pulsanti, riquadri).
+     CSS         dice COME appaiono (colori, dimensioni, spazi). Sta tra i tag style.
+     JavaScript  dice COSA SUCCEDE quando si tocca qualcosa: è il gioco vero e proprio.
+                 Sta tra i tag script, in fondo al file.
+
+   Le parti, nell'ordine in cui compaiono:
+     1. Intestazione (head): titolo della scheda, font, regole di base.
+     2. Stile (CSS): prima i colori, poi i componenti comuni, poi ogni schermata, poi la
+        versione per telefono.
+     3. Struttura (HTML): le tre schermate del sito. Home, gioco e contatti.
+     4. Programma (JavaScript), diviso in sezioni con un titolo tra =======:
+          DATI DELLA SCUOLA   indirizzo, email e date (la parte più facile da modificare)
+          LIVELLI             le missioni dei tre giochi, scritte come dati
+          STATO               le variabili che ricordano a che punto è il gioco
+          CARICAMENTO         prepara una missione
+          SIMULAZIONE         le regole di elettricità e di rete
+          DISEGNO e RENDER    disegna banco, componenti e fili
+          ESTETISTA           il gioco di Estetica
+          SCENE, STANZA       i disegni nella colonna di destra
+          MASCOTTE, SUONI     personaggio e suoni
+          SALVAVITA E FILI    cortocircuito e collegamenti
+          INTERAZIONE         cosa succede quando si tocca lo schermo
+          SCHERMATE, CONTATTI passaggio da una schermata all'altra, pagina finale
+          INATTIVITÀ          ritorno automatico alla home
+
+   Per trovare una parte: Cerca (Ctrl+F) e scrivi il titolo, per esempio DATI DELLA SCUOLA.
+
+   Cosa si può cambiare senza rischi (prima di tutto: salva una copia del file):
+     - indirizzo, email, date e laboratori: blocco SCUOLA;
+     - titoli e frasi del prof: dentro i livelli, solo il testo tra gli apici;
+     - colori: variabili in cima allo stile (--accent e le altre).
+   Regola d'oro: cambia solo il testo dentro gli apici ' ' oppure i valori dei colori. Non
+   togliere virgole, apici, parentesi o graffe: sono la punteggiatura del codice.
+-->
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Prova il mestiere: tre mestieri, tre giochi guidati per ragazzi.">
 <title>Prova il mestiere</title>
+<!--
+   Regola minima che vale subito: gli elementi con l'attributo hidden spariscono. È così
+   che il sito nasconde le schermate che non servono in quel momento.
+-->
 <style>[hidden]{display:none!important}body{margin:0}</style>
 </head>
 <body>
 
+<!--
+   FONT: il carattere Fira Sans viene scaricato da Google Fonts. Se manca internet il browser
+   usa un carattere di riserva (vedi --font nel CSS) e il sito funziona lo stesso.
+-->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/*
+   STILE (CSS)
+   Il CSS è l'elenco delle regole di aspetto. Ogni regola ha questa forma:
+       selettore { proprietà: valore; proprietà: valore; }
+   - Il selettore dice a quali elementi si applica. Un punto indica una classe, cioè un'etichetta
+     che si dà agli elementi: .btn vale per tutti gli elementi con class="btn". Il cancelletto
+     indica un id, cioè un nome unico: #home vale per l'elemento con id="home". Una parola sola,
+     come button, vale per tutti i pulsanti.
+   - Dentro le graffe, ogni proprietà (color, background, font-size...) riceve un valore.
+   Se due regole dicono cose diverse sullo stesso elemento, di solito vince quella scritta più in
+   basso nel file.
+*/
 /* Luce spenta = scuro con accenti rossi. Quando il gioco riesce, il sito "si accende": bianco, scritte nere, accenti rossi. */
+/*
+   COLORI: le variabili CSS.
+   Una variabile è un nome che custodisce un valore: lo si scrive una volta sola e poi lo si
+   riusa ovunque con var(--nome). Se cambi il valore qui, cambia in tutto il sito.
+   :root significa tutta la pagina. Qui si definiscono i colori di base:
+     --bg      sfondo della pagina        --card    sfondo di carte e riquadri
+     --ink     colore del testo           --muted   testo meno importante
+     --accent  il rosso dei pulsanti      --good e --bad  verde e rosso per giusto e sbagliato
+   I colori sono scritti in esadecimale: #rrggbb sono le quantità di rosso, verde e blu, ciascuna
+   da 00 a ff. #000000 è nero, #ffffff è bianco. Questo è il tema luce spenta, quello scuro.
+*/
 :root{ /* luce spenta: verde scuro con accenti rossi */
   --bg:#0f1a17; --card:#17251f; --ink:#f1fff9; --muted:#a9c4b9; --line:#2d4a3f;
   --accent:#d6404a; --accent-ink:#ffffff; --good:#4fd89a; --bad:#ff8a8f;
@@ -20,27 +88,65 @@
   --brown:#d08142; --blue:#63a7ff; --wire-g:#c9d6d0; --cable:#4fd1b8;
   --font:'Fira Sans','Segoe UI',system-ui,-apple-system,sans-serif; color-scheme:dark;
 }
+/*
+   TEMA LUCE ACCESA.
+   :root.lit vale solo quando la pagina ha anche la classe lit. Il programma aggiunge o toglie
+   questa classe quando una missione riesce: tutti i colori cambiano insieme, perché ogni regola
+   usa le variabili e non i colori scritti a mano.
+*/
 :root.lit{ /* luce accesa: bianco, scritte nere, accenti rossi */
   --bg:#ffffff; --card:#ffffff; --ink:#0b0b0b; --muted:#4d4d4d; --line:#e4e4e4;
   --accent:#c8323a; --accent-ink:#ffffff; --good:#1b9a5a; --bad:#9c1520;
   --bench:#f6f6f6; --bench-line:#e0e0e0; --plate:#ffffff; --plate-line:#c4c4c4; --metal:#d6d9dc; --metal-dark:#7d868c;
   --brown:#8b4a1f; --blue:#2f7be0; --wire-g:#3a3f4b; --cable:#12806f; color-scheme:light;
 }
+/*
+   TRANSIZIONE: quando i colori cambiano (da spento ad acceso) non scattano di colpo ma sfumano
+   in 0,6 secondi.
+*/
 body,.btn,.coach,.benchcard,.dot,.qr,.path,.card,.slot,.panel{transition:background-color .6s,color .6s,box-shadow .6s,border-color .6s}
+/*
+   REGOLE DI BASE. L'asterisco significa ogni elemento. box-sizing:border-box fa sì che la
+   larghezza di una scatola comprenda anche bordi e spazi interni: rende i calcoli più semplici.
+*/
 *{box-sizing:border-box}
 html,body{height:100%}
+/*
+   IL CORPO DELLA PAGINA. Sfondo e colore del testo vengono dalle variabili. font-size è la
+   grandezza del testo; padding-inline e padding-block sono gli spazi interni ai lati e sopra e
+   sotto; margin:0 toglie lo spazio esterno che il browser mette di suo.
+*/
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.3;padding-inline:16px;padding-block:12px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
+/*
+   ACCESSIBILITÀ. Chi usa la tastiera vede l'elemento selezionato circondato da un contorno
+   rosso ben visibile.
+*/
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/*
+   PULSANTI. .btn è lo stile di base di ogni pulsante: forma a pillola (border-radius molto
+   alto), altezza minima 48px per essere facile da toccare col dito. .primary è il pulsante
+   principale, rosso; .big è più grande. :active è il momento in cui lo si preme.
+*/
 .btn{border:0;border-radius:999px;padding:12px 22px;font-weight:600;font-size:1.05rem;background:var(--card);color:var(--ink);box-shadow:0 0 0 2px var(--line) inset;display:inline-flex;align-items:center;gap:8px;min-height:48px;text-decoration:none}
 .btn.primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 rgba(120,0,15,.35)}
 .btn.big{font-size:1.4rem;padding:16px 34px;min-height:64px}
 .btn:active{transform:translateY(2px)}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
+/*
+   CONTENITORE. .wrap racchiude tutto il contenuto: centrato (margin-inline:auto) e largo al
+   massimo 1240px. display:flex dispone i figli in colonna, con uno spazio (gap) di 12px.
+*/
 .wrap{max-width:1240px;margin-inline:auto;min-height:100%;display:flex;flex-direction:column;gap:12px}
 h1,h2,h3{text-wrap:balance}
 
+/*
+   SCHERMATA HOME (la prima che si vede).
+   display:grid dispone gli elementi in una griglia. .paths contiene le tre carte dei mestieri
+   affiancate: repeat(3, minmax(0,1fr)) vuol dire tre colonne uguali. .path è una carta;
+   .qr è il riquadro con il codice QR.
+*/
 /* home */
 #home{flex:1;display:grid;grid-template-columns:1fr;gap:22px;align-content:center;justify-items:center;text-align:center;padding-block:10px}
 #home h1{font-size:clamp(2.3rem,5.5vw,4rem);line-height:1.02;margin:0}
@@ -52,17 +158,34 @@ h1,h2,h3{text-wrap:balance}
 .path div b,.path div span{display:block}
 .path b{font-size:1.9rem}
 .path span{color:var(--muted);font-size:1.05rem}
+/*
+   SALVA COME IMMAGINE. Il riquadro .shot è nascosto (display:none): compare solo sul telefono,
+   grazie alla regola @media più sotto. #imgov è la finestra scura che copre tutto lo schermo
+   (position:fixed e inset:0) e mostra l'immagine da salvare.
+*/
 .shot{display:none;margin:4px 0 14px}
 #imgov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
 #imgov[hidden]{display:none}
 #imgov .box{background:#fff;color:#0b0b0b;border-radius:20px;padding:16px;max-width:420px;width:100%;text-align:center}
 #imgov img{width:100%;border-radius:12px;box-shadow:0 0 0 2px #ddd;margin:8px 0 14px}
 #imgov p{margin:0 0 6px}
+/*
+   @media è una regola condizionale: vale solo se lo schermo ha certe caratteristiche. Qui: se
+   la larghezza è al massimo 919px (telefono) oppure se si usa il dito (pointer:coarse), mostra
+   il pulsante per salvare l'immagine.
+*/
 @media (max-width:919px),(pointer:coarse){.shot{display:block}}
 .qr{display:flex;gap:14px;align-items:center;background:var(--card);padding:12px 16px;border-radius:18px;box-shadow:0 0 0 2px var(--line) inset;text-align:left}
 .qr svg{width:84px;height:84px;flex:none;background:#fff;border-radius:8px;padding:4px}
 .qr b{display:block}.qr span{color:var(--muted);font-size:.95rem}
 
+/*
+   SCHERMATA DI GIOCO (#play).
+   Griglia a due colonne: a sinistra il banco di lavoro (minmax(0,1fr) è tutto lo spazio che
+   resta), a destra una colonna fissa di 360px con stanza, mascotte e pulsanti. .top è la barra
+   in alto, con il titolo, i pallini delle missioni (.dot: .now in corso, .done fatta) e i
+   pulsanti per il suono e per uscire.
+*/
 /* play */
 #play{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto 1fr;gap:12px 16px;min-height:0}
 .top{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -72,10 +195,20 @@ h1,h2,h3{text-wrap:balance}
 .dot.now{background:var(--accent);color:var(--accent-ink);box-shadow:none}
 .dot.done{background:var(--good);color:#fff;box-shadow:none}
 .ib{width:48px;height:48px;padding:0;justify-content:center}
+/*
+   IL BANCO. .benchcard è il riquadro scuro dove si fanno i collegamenti; dentro c'è il
+   disegno #bench (un SVG, vedi più avanti). touch-action:none impedisce al telefono di far
+   scorrere la pagina mentre si trascina un filo; user-select:none impedisce di selezionare il
+   testo per sbaglio.
+*/
 .benchwrap{position:relative;min-height:0;display:flex}
 .benchcard{flex:1;background:var(--bench);border-radius:24px;box-shadow:0 0 0 3px var(--bench-line) inset;display:flex;flex-direction:column;min-height:0;padding:8px}
 #bench{width:100%;height:100%;min-height:0;touch-action:none;user-select:none;-webkit-user-select:none;flex:1}
 .cap{text-align:center;color:var(--muted);font-size:.9rem;padding:2px 0 4px}
+/*
+   COLONNA LATERALE: la stanza (.roomcard), la mascotte con il fumetto (.coach) e i pulsanti
+   (.btns).
+*/
 .side{display:flex;flex-direction:column;gap:12px;min-height:0}
 .roomcard{border-radius:22px;overflow:hidden;box-shadow:0 0 0 3px var(--line);background:#13204a;line-height:0}
 .room{width:100%;height:auto;display:block}
@@ -86,6 +219,12 @@ h1,h2,h3{text-wrap:balance}
 .coach .bubble{font-size:1.25rem;font-weight:500;min-width:0}
 .btns{display:flex;gap:8px;flex-wrap:wrap}
 .btns .btn{flex:1;justify-content:center}
+/*
+   ELEMENTI DISEGNATI DENTRO L'SVG. .plate è la piastra di un componente, .lbl le etichette,
+   .ring e .screw i morsetti (i pallini a cui si attaccano i fili), .halo l'alone che appare sul
+   morsetto selezionato. Per le forme disegnate si usano fill (riempimento) e stroke (contorno)
+   al posto di background e border, che valgono solo per le scatole.
+*/
 .plate{fill:var(--plate);stroke:var(--plate-line);stroke-width:3}
 .lbl{fill:var(--muted);font-size:15px;font-weight:600;text-anchor:middle}
 .ring{fill:var(--metal);stroke:var(--metal-dark);stroke-width:3}
@@ -96,6 +235,12 @@ h1,h2,h3{text-wrap:balance}
 .term.sel .halo{opacity:1}
 .wireline{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .hit{fill:transparent;stroke:transparent}
+/*
+   ANIMAZIONI. @keyframes descrive i passaggi di un'animazione, animation la applica.
+   .flow sono i puntini che scorrono lungo il filo quando passa la corrente; .pulse è l'anello
+   che pulsa per indicare dove toccare; .ghost è il filo tratteggiato suggerito dall'aiuto;
+   .nudge è un leggero ingrandimento per attirare l'attenzione.
+*/
 .flow{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-dasharray:1 22;animation:flow .8s linear infinite;opacity:.9}
 .flow.rev{animation-direction:reverse}
 @keyframes flow{to{stroke-dashoffset:-23}}
@@ -106,17 +251,36 @@ h1,h2,h3{text-wrap:balance}
 .nudge{animation:nd .9s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes nd{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 .tog{cursor:pointer}
+/*
+   AVVISO OPS. Appare al centro quando salta il salvavita (cortocircuito). Resta nascosto
+   (display:none) finché il programma non gli aggiunge la classe .on. La classe .tripped rende
+   il banco grigio e scuro.
+*/
 #ops{position:absolute;inset:0;display:none;place-items:center;pointer-events:none;z-index:5}
 #ops.on{display:grid}
 #ops div{background:var(--bad);color:#fff;border-radius:28px;padding:18px 32px;text-align:center;font-size:2.4rem;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:shake .4s}
 #ops small{display:block;font-size:1.1rem;font-weight:500}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 .tripped #bench{filter:grayscale(.8) brightness(.7)}
+/*
+   LA TELA DEI CORIANDOLI (#cf). È trasparente, sta sopra a tutto e non intercetta i tocchi
+   (pointer-events:none): ci si disegna la pioggia di coriandoli quando una missione riesce.
+*/
 #cf{position:fixed;inset:0;pointer-events:none;z-index:20}
+/*
+   SCENE ANIMATE. I disegni nella colonna di destra hanno due parti: .pre (prima) e .post
+   (dopo). Quando la scena riceve la classe .ok, una svanisce e l'altra compare con dissolvenza.
+*/
 .scene{width:100%;height:auto;display:block}
 .scene .pre{transition:opacity .5s}.scene .post{opacity:0;transition:opacity .6s}
 .scene.ok .pre{opacity:0}.scene.ok .post{opacity:1}
 
+/*
+   GIOCO DI ESTETICA. Qui non ci sono fili ma carte da toccare. .tray è il vassoio con le
+   caselle (.slot) che si riempiono; .cgrid è la griglia di carte (.card).
+   repeat(auto-fit, minmax(150px,1fr)) vuol dire tante colonne quante ne entrano, larghe almeno
+   150px. Stati di una carta: .done già scelta, .shake sbagliata (trema), .hint suggerita.
+*/
 /* estetista */
 #cards{flex:1;display:flex;flex-direction:column;gap:14px;padding:10px;min-height:0;overflow:auto}
 .tray{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
@@ -130,6 +294,11 @@ h1,h2,h3{text-wrap:balance}
 .card.shake{animation:shake .4s;box-shadow:0 0 0 4px var(--bad) inset}
 .card.hint{animation:nd .9s ease-in-out infinite;box-shadow:0 0 0 4px var(--accent) inset}
 
+/*
+   SCHERMATA CONTATTI. Titolo, frase di apertura e quattro riquadri (.panel) disposti su due
+   colonne (.cols). Le regole .field, .chips, .chip e #fallback non sono usate da nessun
+   elemento: sono avanzate da un modulo di prenotazione che non c'è più.
+*/
 /* contatti */
 #contacts{flex:1;display:flex;flex-direction:column;gap:18px;max-width:1000px;width:100%;margin-inline:auto;padding-block:8px 24px}
 #contacts h1{font-size:clamp(2rem,5vw,3.2rem);margin:0;line-height:1.05}
@@ -151,6 +320,11 @@ h1,h2,h3{text-wrap:balance}
 #fallback textarea{min-height:140px}
 .cta{display:flex;gap:10px;flex-wrap:wrap}
 
+/*
+   RITOCCHI DI IDENTITÀ. Regole aggiunte dopo, per dare al sito il suo carattere: titoli molto
+   pesanti, pallini collegati da una linea, accenti rossi. Essendo scritte più in basso,
+   prevalgono sulle regole precedenti con lo stesso selettore (per esempio #home, .path, .dot).
+*/
 /* identità: titoli minuscoli e pesanti, anello rosso, linea con nodo */
 h1,h2,h3{font-weight:800;letter-spacing:-.01em}
 .eyebrow{color:var(--accent);font-weight:700;font-size:1.2rem;margin:0}
@@ -175,6 +349,11 @@ h1,h2,h3{font-weight:800;letter-spacing:-.01em}
 ul.dl{list-style:none;padding:0}
 ul.dl li{display:flex;gap:10px;align-items:flex-start}
 ul.dl li .ico{margin-top:2px}
+/*
+   VERSIONE PER TELEFONO. Tutto quello che sta in questo blocco vale solo se lo schermo è
+   largo al massimo 919px. La griglia a due colonne diventa una pila unica, le carte dei mestieri
+   si dispongono in riga, il codice QR sparisce (sul telefono non serve) e i testi si riducono.
+*/
 @media (max-width:919px){
   body{padding-block:8px;font-size:16px}
   .paths{grid-template-columns:1fr;gap:12px}
@@ -201,6 +380,7 @@ ul.dl li .ico{margin-top:2px}
   .card{min-height:104px;font-size:1.05rem}.card i{font-size:2.4rem}
   .cols{grid-template-columns:1fr}
 }
+/* TELEFONO IN ORIZZONTALE (poco alto): si torna a due colonne, in versione ridotta. */
 @media (max-width:919px) and (orientation:landscape) and (max-height:520px){
   #play{display:grid;grid-template-columns:minmax(0,1fr) 250px;grid-template-rows:auto 1fr}
   .side{display:flex}
@@ -213,15 +393,41 @@ ul.dl li .ico{margin-top:2px}
   .btns{order:0;padding:0}.btn{min-height:42px;padding:8px 14px;font-size:.95rem}
   .paths{grid-template-columns:repeat(3,1fr)}.path{flex-direction:column;text-align:center}
 }
+/* Ultimi ritocchi per telefono. */
 @media (max-width:919px){
         #home h1{font-size:2.7rem}
   .path{align-items:center}.path svg{width:76px;height:76px}.path b{font-size:1.6rem}
   .dot{width:30px;height:30px;margin-left:12px;border-width:5px}.dot::before{width:12px;height:5px;margin-top:-2.5px}
 }
+/*
+   ACCESSIBILITÀ. Chi ha chiesto al sistema di ridurre i movimenti (prefers-reduced-motion) vede
+   animazioni e transizioni quasi istantanee.
+*/
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+/*
+   COLLEGAMENTO A impara.html. position:fixed lo stacca dal resto della pagina e lo ancora alla
+   finestra: top e right lo mettono in alto a destra. Sta dentro la home, quindi sparisce
+   quando si passa al gioco o ai contatti.
+*/
+#impara{position:fixed;top:14px;right:16px;z-index:5;min-height:40px;padding:8px 16px;font-size:.95rem}
+@media (max-width:919px){#impara{top:10px;right:10px;padding:6px 12px;font-size:.85rem;min-height:36px}}
 </style>
 
+<!--
+   STRUTTURA DELLA PAGINA (HTML)
+   Un elemento HTML si scrive con un tag di apertura e uno di chiusura: <section> ... </section>.
+   Gli elementi stanno uno dentro l'altro, come scatole. Gli attributi (id, class, data-...)
+   danno agli elementi un nome o un'etichetta: il CSS e il JavaScript li usano per trovarli.
+   Le schermate sono tre (le section): home, play e contacts. Ne è visibile una sola: le altre
+   hanno l'attributo hidden. Il JavaScript le scambia con la funzione show().
+-->
 <div class="wrap" id="app">
+  <!--
+     SCHERMATA 1: HOME
+     Il titolo, tre pulsanti-carta (uno per mestiere), il pulsante per saltare il gioco e il
+     codice QR. L'attributo data-path ('el', 'net', 'est') dice al programma quale gioco aprire.
+     Gli elementi svg dentro i pulsanti sono le icone, disegnate con il codice.
+  -->
   <section id="home">
     <h1>Cosa ti interessa?</h1>
     <p class="sub">Scegli un mestiere e provalo: ci vogliono pochi minuti.</p>
@@ -240,9 +446,21 @@ ul.dl li .ico{margin-top:2px}
       </button>
     </div>
     <div class="cta" style="justify-content:center;margin-top:6px"><button class="btn" id="skipGame" type="button">Non vuoi giocare? Vai ai contatti</button></div>
+    <!-- Collegamento a impara.html: la pagina dove gli allievi ricostruiscono questo sito scrivendo il codice. -->
+    <a class="btn" id="impara" href="impara.html">Scopri come è fatto questo sito</a>
+    <!--
+       CODICE QR. È un disegno SVG, uguale al file qr-sito.svg. Inquadrato con il telefono porta
+       all'indirizzo del sito. Per cambiarlo, sostituisci tutto l'elemento svg con quello nuovo.
+    -->
     <div class="qr"><svg role="img" aria-label="Codice QR del gioco" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h29v29H0z"/><path fill="none" stroke="#000000" d="M0 0.5h7m2 0h1m4 0h2m2 0h2m2 0h7m-29 1h1m5 0h1m1 0h4m3 0h2m2 0h2m1 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m1 0h2m5 0h1m3 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m3 0h1m3 0h1m4 0h2m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h2m2 0h6m2 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m2 0h4m1 0h3m1 0h2m2 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-19 1h2m1 0h1m1 0h1m1 0h1m1 0h1m-20 1h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m3 0h1m2 0h1m-28 1h3m2 0h1m2 0h3m1 0h3m1 0h1m3 0h3m2 0h1m2 0h1m-29 1h1m1 0h1m1 0h3m4 0h1m2 0h1m3 0h1m1 0h2m1 0h2m1 0h3m-25 1h2m2 0h1m1 0h2m1 0h1m1 0h1m1 0h4m1 0h1m1 0h1m2 0h1m-26 1h6m2 0h1m2 0h2m1 0h2m3 0h2m2 0h1m1 0h2m-29 1h3m1 0h2m2 0h1m7 0h1m3 0h3m2 0h1m2 0h1m-28 1h1m1 0h1m1 0h2m2 0h1m2 0h2m2 0h2m4 0h1m1 0h2m1 0h2m-29 1h2m1 0h2m4 0h3m1 0h7m1 0h2m1 0h2m1 0h1m-28 1h2m1 0h1m1 0h3m4 0h1m1 0h1m1 0h5m1 0h1m2 0h1m1 0h2m-27 1h1m5 0h1m2 0h1m1 0h1m2 0h1m3 0h1m1 0h1m2 0h2m1 0h1m-29 1h1m1 0h2m2 0h1m5 0h1m1 0h1m2 0h1m4 0h3m2 0h2m-28 1h3m1 0h1m4 0h2m1 0h1m1 0h4m1 0h2m1 0h1m1 0h1m1 0h1m-28 1h1m2 0h7m2 0h1m1 0h4m2 0h5m-17 1h4m7 0h2m3 0h1m1 0h3m-29 1h7m4 0h3m2 0h2m1 0h2m1 0h1m1 0h2m1 0h2m-29 1h1m5 0h1m9 0h3m1 0h1m3 0h2m1 0h1m-28 1h1m1 0h3m1 0h1m1 0h3m1 0h1m2 0h3m2 0h5m-25 1h1m1 0h3m1 0h1m2 0h1m1 0h1m1 0h1m2 0h6m1 0h2m1 0h3m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h4m4 0h2m1 0h1m1 0h3m2 0h1m-29 1h1m5 0h1m2 0h2m4 0h3m1 0h3m1 0h1m3 0h1m-28 1h7m1 0h1m1 0h1m1 0h1m3 0h2m2 0h3m4 0h2"/></svg><div><b>Gioca dal telefono</b><span>Inquadra il codice</span></div></div>
   </section>
 
+  <!--
+     SCHERMATA 2: GIOCO
+     La barra in alto (.top), il banco di lavoro (#bench è un disegno SVG, #cards contiene le
+     carte di Estetica) e la colonna laterale con la stanza (#playRoom), la mascotte con la sua
+     frase (#mascot e #say) e i pulsanti. Molti elementi sono vuoti: li riempie il JavaScript.
+  -->
   <section id="play" hidden>
     <div class="top">
       <h2 id="mtitle"></h2>
@@ -270,6 +488,11 @@ ul.dl li .ico{margin-top:2px}
     </div>
   </section>
 
+  <!--
+     SCHERMATA 3: CONTATTI
+     I quattro riquadri (#pWhere, #pDates, #pLabs, #pBook) sono vuoti: li compila il JavaScript
+     con i dati del blocco SCUOLA, nella funzione toContacts().
+  -->
   <section id="contacts" hidden>
     <h1 id="cTitle">Ti è piaciuto? Vieni a trovarci!</h1>
     <p class="lead" id="cLead"></p>
@@ -284,29 +507,89 @@ ul.dl li .ico{margin-top:2px}
     <div class="cta"><button class="btn primary big" id="other" type="button">Prova un altro mestiere</button></div>
   </section>
 </div>
+<!-- La tela trasparente su cui si disegnano i coriandoli. -->
 <canvas id="cf"></canvas>
 
+<!--
+   Da qui comincia il programma (JavaScript): il codice che reagisce ai tocchi e fa funzionare
+   il gioco.
+-->
 <script>
+// Tutto il programma sta dentro una funzione che si esegue subito: (()=>{ ... })();
+// Serve a tenere i nomi delle variabili dentro il programma, senza mescolarli con quelli
+// del resto della pagina.
 (()=>{
+// Una scorciatoia: $('#home') trova nella pagina l'elemento con id="home".
+// querySelector è la funzione del browser che cerca un elemento a partire da un selettore CSS.
 const $=s=>document.querySelector(s);
+// DESKTOP è vero se si sta usando un computer (schermo largo e mouse), falso su telefono.
+// Serve per tornare da soli alla home dopo 90 secondi di inattività, ma solo sul PC allo stand.
 const DESKTOP=!matchMedia('(max-width:919px)').matches && !matchMedia('(pointer:coarse)').matches;
 
 /* ======= DATI DELLA SCUOLA: da compilare ======= */
+/*
+   DATI DELLA SCUOLA: la parte che si può modificare
+   Qui sono scritte le informazioni che compaiono nella pagina finale. Per cambiarle basta
+   cambiare il testo tra gli apici ' '. NON togliere apici, virgole, graffe o parentesi quadre.
+   Un po' di vocabolario:
+     const   dà un nome a un valore che non cambia. Qui il nome è SCUOLA.
+     { ... } un oggetto: un insieme di coppie nome:valore, separate da virgole.
+     [ ... ] un elenco: più valori in fila, separati da virgole.
+     nome, indirizzo, telefono, email, sito   testi semplici. Se il testo è vuoto ('') la
+                                              riga corrispondente non compare nella pagina.
+     email   se è vuota, il riquadro Scrivici avvisa che l'indirizzo non c'è ancora.
+*/
 const SCUOLA={
   nome:'Afol Metropolitana Rozzano',
   indirizzo:'Via degli Oleandri, 48',
   telefono:'',
   email:'segreteria.cfprozzano@afolmet.it',
   sito:'',
+  // Le date degli open day. Ogni riga è {quando:'...'}. Per aggiungerne una, copia una riga,
+  // mettila dopo una virgola e cambia il testo. Si può aggiungere anche una nota:
+  // {quando:'...', note:'...'}.
   date:[{quando:'Sabato 28 novembre, 9:00–12:00'},{quando:'Sabato 16 gennaio, 9:00–12:00'}],
+  // La frase che compare sotto i laboratori.
   labNote:'Dalle 15 alle 16, su prenotazione, per tutti e tre i corsi: 1/12/26, 15/12/26, 12/01/27, 19/01/27.',
+  // Una descrizione per ogni mestiere: el è Elettricità, net è Informatica, est è Estetica.
+  // Se è vuota, nel riquadro compare solo il nome del mestiere.
   laboratori:{el:'',net:'',est:''}
 };
+// I nomi dei mestieri come compaiono nei testi. Le sigle el, net ed est sono usate in tutto il
+// programma per riconoscere i tre giochi.
 const PNAME={el:'Elettricità',net:'Informatica',est:'Estetica'};
 
 /* ======= LIVELLI ======= */
+/*
+   I LIVELLI
+   Ogni missione è descritta da dati, non da codice: il programma legge i dati e costruisce da
+   solo la missione. Per cambiare un titolo o una frase del prof basta cambiare il testo tra
+   gli apici. Per aggiungere una missione si copia un blocco e si modificano i dati.
+
+   SRC sono le due uscite della presa di corrente del gioco Elettricità: F è la fase (filo
+   marrone, la corrente va), N è il neutro (filo blu, la corrente torna). x e y sono la
+   posizione nel disegno; dir è il lato da cui esce il filo (1 destra, -1 sinistra).
+*/
 const SRC=[{id:'S.F',x:190,y:160,dir:1,kind:'F'},{id:'S.N',x:190,y:260,dir:1,kind:'N'}];
+/*
+   MISSIONI DI ELETTRICITÀ. Ogni missione è un blocco {...} con:
+     title  il titolo mostrato in alto
+     goal   la frase del prof all'inizio
+     win    la frase del prof quando la missione riesce
+     press  la frase che invita a premere l'interruttore
+     intro  le spiegazioni iniziali, una alla volta. t è il testo; box dice quali componenti
+            far pulsare; hl dice quali morsetti far pulsare
+     comps  i componenti presenti. t è il tipo (lamp lampadina, sw interruttore), id il nome,
+            x e y la posizione sul banco
+     room   la posizione delle lampade nella stanza di destra
+     sol    una soluzione possibile: l'elenco dei fili, ognuno è una coppia di morsetti, per
+            esempio ['S.F','L.a'] = dalla fase al morsetto a della lampada L.
+   sol serve solo all'aiuto, per suggerire il prossimo filo. La vittoria invece si decide
+   guardando se le lampade si accendono davvero (funzione works): per questo sono valide anche
+   soluzioni diverse da quella scritta.
+*/
 const EL=[
+ // Missione 1: due fili, dalla fase alla lampadina e dalla lampadina al neutro.
  {title:'Accendi la lampadina',
   goal:'La corrente fa un giro: va alla lampadina e poi torna indietro. Servono due fili!',
   win:'Evviva! La corrente esce dal marrone, passa nella lampadina e torna dal blu. Un giro completo!',
@@ -316,6 +599,7 @@ const EL=[
          {t:'Tocca il pallino marrone, poi un pallino della lampadina. Poi fai lo stesso con il blu.'}],
   comps:[{t:'lamp',id:'L',x:610,y:130}], room:[180],
   sol:[['S.F','L.a'],['S.N','L.b']]},
+ // Missione 2: l'interruttore va messo sulla strada del filo marrone (la fase).
  {title:'Aggiungi l’interruttore',
   goal:'L’interruttore apre e chiude la strada. Metti il filo marrone dentro l’interruttore.',
   win:'Ottimo lavoro! Ora comandi tu la luce: premi l’interruttore.',
@@ -324,6 +608,7 @@ const EL=[
          {t:'Si mette sulla strada del filo marrone: prima l’interruttore, poi la lampadina. Il blu va dritto alla lampadina.',hl:['S.F','SW.in','SW.out','L.a']}],
   comps:[{t:'sw',id:'SW',x:330,y:100},{t:'lamp',id:'L',x:610,y:130}], room:[180],
   sol:[['S.F','SW.in'],['SW.out','L.a'],['S.N','L.b']]},
+ // Missione 3: due lampade comandate dallo stesso interruttore.
  {title:'Due lampade, un interruttore',
   goal:'Una sola mano sull’interruttore e si accendono tutte e due le lampade!',
   win:'Fantastico! Un interruttore comanda due lampade insieme.',
@@ -332,7 +617,16 @@ const EL=[
   comps:[{t:'sw',id:'SW',x:300,y:100},{t:'lamp',id:'L1',x:610,y:40},{t:'lamp',id:'L2',x:610,y:230}], room:[115,245],
   sol:[['S.F','SW.in'],['SW.out','L1.a'],['SW.out','L2.a'],['S.N','L1.b'],['S.N','L2.b']]}
 ];
+/*
+   MISSIONI DI INFORMATICA. Stessa idea, con qualche campo in più:
+     mode   lan = i computer devono parlarsi tra loro; web = i computer devono arrivare a internet
+     scene  la scena animata a destra (chat1, chat3 o web)
+     comps  i componenti. pc = computer (flip:true lo rovescia, con la presa a sinistra),
+            nsw = switch, router, web = internet. label è il nome scritto sotto
+     sol    una soluzione possibile, usata solo dall'aiuto. La vittoria si decide con evalNet.
+*/
 const NET=[
+ // Missione 1: un cavo tra due computer.
  {title:'Due computer', mode:'lan', scene:'chat1',
   goal:'Collega i due computer con un cavo: il messaggio deve arrivare.',
   win:'Il messaggio è arrivato! Un cavo basta per far parlare due computer.',
@@ -340,6 +634,7 @@ const NET=[
          {t:'Tocca la presa di un computer e poi quella dell’altro: il cavo li unisce.',hl:['A.p','B.p']}],
   comps:[{t:'pc',id:'A',x:60,y:150,label:'Tu'},{t:'pc',id:'B',x:620,y:150,flip:true,label:'Il tuo amico'}],
   sol:[['A.p','B.p']]},
+ // Missione 2: tre computer, ognuno con una sola presa: serve lo switch.
  {title:'Tre computer', mode:'lan', scene:'chat3',
   goal:'Tre computer devono parlarsi. Ognuno ha una sola presa: serve un aiuto in mezzo.',
   win:'Perfetto! Lo switch fa parlare tutti insieme.',
@@ -348,6 +643,7 @@ const NET=[
          {t:'Collega ogni computer a una presa dello switch.',hl:['A.p','B.p','C.p']}],
   comps:[{t:'pc',id:'A',x:60,y:50,label:'Tu'},{t:'pc',id:'B',x:60,y:270,label:'Anna'},{t:'nsw',id:'SW',x:325,y:150},{t:'pc',id:'C',x:620,y:150,flip:true,label:'Marco'}],
   sol:[['A.p','SW.p1'],['B.p','SW.p2'],['C.p','SW.p3']]},
+ // Missione 3: computer, switch, router e internet. Il router ha due prese diverse.
  {title:'Vai su internet', mode:'web', scene:'web',
   goal:'Porta i due computer su internet. Serve il router.',
   win:'Sei online! Il router collega la tua rete a internet.',
@@ -357,7 +653,23 @@ const NET=[
   comps:[{t:'pc',id:'A',x:40,y:30,label:'Computer 1'},{t:'pc',id:'B',x:40,y:290,label:'Computer 2'},{t:'nsw',id:'SW',x:230,y:160},{t:'router',id:'R',x:450,y:160},{t:'web',id:'W',x:650,y:140}],
   sol:[['A.p','SW.p1'],['B.p','SW.p2'],['SW.p3','R.lan'],['R.wan','W.p']]}
 ];
+/*
+   MISSIONI DI ESTETICA. Qui non ci sono fili ma carte (items). Ogni carta ha:
+     e      il disegnino (emoji) mostrato sulla carta
+     t      il nome
+     done   la frase del prof quando la scelta è giusta
+     early  (solo se ordered:true) la frase se la carta viene scelta troppo presto
+     ok     (solo nei livelli senza ordine) true per le tre scelte giuste
+     why    (solo per le scelte sbagliate) la spiegazione dell'errore
+   Il livello ha poi:
+     ordered:true  le carte vanno toccate nell'ordine in cui sono scritte in items
+     face          quale scena mostrare a destra (m1 e m2 il viso, hand la mano)
+     show          l'ordine in cui le carte compaiono sullo schermo: sono posizioni dell'elenco
+                   items, contate da zero. [3,1,0,2] mostra per prime la quarta carta, poi la
+                   seconda, poi la prima, poi la terza: così l'ordine giusto non si vede.
+*/
 const EST=[
+ // Missione 1: prodotti da usare in un ordine preciso.
  {title:'Il trattamento viso', ordered:true, face:'m1', show:[3,1,0,2],
   goal:'Tocca i prodotti uno alla volta, nell’ordine giusto.',
   win:'Ottimo lavoro! La pelle è pulita, morbida e luminosa.',
@@ -367,6 +679,7 @@ const EST=[
          {e:'🫧',t:'Detergente',done:'Pelle pulita.',early:'Prima di pulire bene la pelle, bisogna togliere il trucco.'},
          {e:'🧖',t:'Maschera',done:'La maschera nutre la pelle.',early:'La maschera si mette su una pelle già pulita.'},
          {e:'🧴',t:'Crema',done:'La crema protegge e chiude il trattamento.',early:'La crema va per ultima, quando la pelle è pulita e curata.'}]},
+ // Missione 2: sei carte, solo tre giuste, in qualunque ordine.
  {title:'Igiene prima di tutto', ordered:false, face:'m2', show:[3,0,5,1,4,2],
   goal:'Scegli le 3 cose giuste da fare prima di cominciare. Le altre sono sbagliate!',
   win:'Ottimo! Con mani e strumenti puliti si lavora in sicurezza.',
@@ -378,6 +691,7 @@ const EST=[
          {e:'🧽',t:'Spugna già usata',why:'Una spugna usata su un’altra persona porta germi. Si usa materiale nuovo o pulito.'},
          {e:'🍔',t:'Merenda sul tavolo',why:'Il cibo non sta dove si lavora: il tavolo deve restare pulito.'},
          {e:'🖌️',t:'Pennello sporco',why:'Un pennello sporco può portare germi alla pelle. Va pulito prima.'}]},
+ // Missione 3: ancora un ordine da rispettare, questa volta per la manicure.
  {title:'Le unghie', ordered:true, face:'hand', show:[2,0,3,1],
   goal:'Prepara le unghie e metti lo smalto nell’ordine giusto.',
   win:'Che bel colore! Unghie perfette e lucide.',
@@ -387,14 +701,44 @@ const EST=[
          {e:'💅',t:'Colore',done:'Che colore!',early:'Il colore va sopra la base, non prima.'},
          {e:'🌟',t:'Lucidante',done:'Il lucidante rende lo smalto brillante e lo fa durare di più.',early:'Il lucidante si mette per ultimo, sopra il colore.'}]}
 ];
+// GAMES collega la sigla del mestiere al suo elenco di missioni. È la tabella che il programma
+// consulta per sapere quali missioni far giocare.
 const GAMES={el:EL,net:NET,est:EST};
 
 /* ======= STATO ======= */
+/*
+   STATO DEL GIOCO
+   Sono variabili: scatole con un nome, il cui contenuto cambia mentre si gioca. Servono a
+   ricordare a che punto si è:
+     game      il mestiere in corso: 'el', 'net' o 'est'
+     li        il numero della missione in corso (0 è la prima)
+     level     i dati della missione in corso (uno dei blocchi di EL, NET o EST)
+     TM        la mappa dei morsetti: da ogni nome (per esempio 'L.a') alla sua posizione
+     IDS       l'elenco dei nomi di tutti i morsetti
+     wires     i fili posati finora. Ognuno è {id, a, b}: i due morsetti che collega
+     st        lo stato degli interruttori (acceso o spento)
+     SEL       il morsetto toccato per primo, in attesa del secondo
+     hintOn    vero se l'aiuto è acceso
+     won       vero se la missione è riuscita
+     tripped   vero se è appena saltato il salvavita
+     introStep a quale spiegazione iniziale siamo (-1 vuol dire finite)
+     lastIn    l'ora dell'ultimo tocco (serve per l'inattività)
+     wid       il contatore che dà un numero a ogni filo
+*/
 let game='el',L,li=0,level,TM={},IDS=[],wires=[],st={},SEL=null,hintOn=false,won=false,tripped=false,introStep=-1,lastIn=Date.now(),wid=0;
+// Variabili del gioco di Estetica: picked sono le carte scelte finora, shakeI la carta che sta
+// tremando, flashMsg la frase temporanea del prof, lastDone l'ultima frase di scelta giusta.
 let picked=[],shakeI=-1,flashMsg='',flashT=null,lastDone='';
+// Tre domande a risposta vera o falsa: si sta giocando a Elettricità, a Informatica o a Estetica?
 const isEl=()=>game==='el',isNet=()=>game==='net',isEst=()=>game==='est';
+// Dice se il componente con quel nome è un interruttore.
 const isSw=id=>level.comps.find(c=>c.id===id).t==='sw';
 
+/*
+   I MORSETTI di ogni componente. I morsetti sono i pallini a cui si attaccano i fili. Il nome è
+   composto dal componente e dalla lettera del morsetto: 'L.a' è il morsetto a della lampada L.
+   x e y dicono dove si trova, dir da quale lato esce il filo (-1 sinistra, 1 destra).
+*/
 function termsOf(c){
   switch(c.t){
   case'lamp':return[{id:c.id+'.a',x:c.x,y:c.y+30,dir:-1},{id:c.id+'.b',x:c.x,y:c.y+80,dir:-1}];
@@ -407,6 +751,8 @@ function termsOf(c){
   case'web':return[{id:c.id+'.p',x:c.x,y:c.y+55,dir:-1}];
   }
 }
+// Il riquadro (x, y, larghezza, altezza) occupato da un componente. Serve a far pulsare un
+// anello attorno ad esso quando il prof lo presenta.
 function bbox(id){
   if(id==='S')return[40,110,150,200];
   const c=level.comps.find(c=>c.id===id);
@@ -414,39 +760,82 @@ function bbox(id){
 }
 
 /* ======= CARICAMENTO ======= */
+/*
+   CARICAMENTO DI UNA MISSIONE
+   Prepara tutto per la missione numero i: azzera fili e stato, scrive il titolo, mostra il
+   banco (o le carte di Estetica), costruisce la mappa dei morsetti, disegna la stanza o la
+   scena a destra e infine chiama render(), che disegna tutto.
+*/
 function loadLevel(i){
   li=i;level=GAMES[game][i];wires=[];st={};SEL=null;won=false;tripped=false;hintOn=false;introStep=level.intro?0:-1;
   picked=[];shakeI=-1;flashMsg='';lastDone='';
+  // Nasconde i pulsanti Avanti e il messaggio OPS, e toglie l'effetto grigio del salvavita.
   $('#ok').hidden=true;$('#next').hidden=true;$('#ops').classList.remove('on');$('#app').classList.remove('tripped');
   $('#mtitle').textContent='Missione '+(i+1)+': '+level.title;
+  // Spegne la luce: la pagina torna ai colori scuri (si toglie la classe lit dall'elemento html).
   document.documentElement.classList.remove('lit');
+  // Elettricità e Informatica usano il banco; Estetica usa le carte. Si nasconde quello che non serve.
   $('#bench').toggleAttribute('hidden',isEst());$('#cards').hidden=!isEst();
   $('#cap').textContent=isEst()?'':'Tocca un pallino e poi un altro per unirli con un filo. Tocca un filo per toglierlo.';
   $('#cap').hidden=isEst();
   if(!isEst()){
+    // Costruisce la mappa dei morsetti: per ogni componente chiede i suoi morsetti e li annota.
     TM={};if(isEl())SRC.forEach(t=>TM[t.id]=t);
     level.comps.forEach(c=>termsOf(c).forEach(t=>TM[t.id]=t));
     IDS=Object.keys(TM);
+    // Gli interruttori partono spenti.
     level.comps.forEach(c=>{if(c.t==='sw')st[c.id]=false;if(c.t==='dev')st[c.id]=c.flip?2:1});
+    // Elettricità mostra la stanza con le lampade; Informatica mostra la scena della chat.
     if(isEl())buildRoom('#playRoom','p',level.room);else $('#playRoom').innerHTML=netScene(level.scene);
   }
   render();
 }
 
 /* ======= SIMULAZIONE ELETTRICA ======= */
+/*
+   SIMULAZIONE ELETTRICA
+   Il programma non conosce la soluzione: simula. L'idea è questa. Due morsetti uniti da un
+   filo diventano lo stesso punto, come se fossero un unico pezzo di rame. UF (unisci e trova)
+   tiene i gruppi di punti collegati tra loro: u(a,b) unisce due gruppi, f(x) dice a quale
+   gruppo appartiene x.
+   Se la fase (F) e il neutro (N) finiscono nello stesso gruppo c'è un cortocircuito: la
+   corrente passa senza attraversare niente e il salvavita stacca tutto.
+   Una lampada si accende se un suo morsetto sta nel gruppo della fase e l'altro in quello del
+   neutro: la corrente entra da una parte ed esce dall'altra.
+*/
 function UF(){const p={};IDS.forEach(i=>p[i]=i);const f=x=>p[x]===x?x:(p[x]=f(p[x]));return{f,u:(a,b)=>{a=f(a);b=f(b);if(a!==b)p[a]=b}}}
+/*
+   sim(s, ws) fa la simulazione. s è lo stato degli interruttori, ws sono i fili. Restituisce
+   i gruppi (U), il gruppo della fase (F) e del neutro (N), se c'è cortocircuito (short) e
+   quali lampade sono accese (lit).
+*/
 function sim(s,ws){
+  // Primo passo: ogni filo unisce i suoi due morsetti.
   const U=UF();ws.forEach(w=>U.u(w.a,w.b));
+  // Un interruttore acceso è come un filo: unisce il suo ingresso (in) con la sua uscita (out).
   level.comps.forEach(c=>{if(c.t==='sw'&&s[c.id])U.u(c.id+'.in',c.id+'.out');if(c.t==='dev')U.u(c.id+'.C',c.id+'.'+s[c.id])});
+  // Cerca i gruppi della fase e del neutro. Se sono lo stesso gruppo, c'è cortocircuito.
   const F=U.f('S.F'),N=U.f('S.N'),short=F===N,lit={};
+  // Per ogni lampada: accesa se un morsetto è sulla fase e l'altro sul neutro, in qualunque
+  // verso, e se non c'è cortocircuito.
   level.comps.filter(c=>c.t==='lamp').forEach(c=>{const a=U.f(c.id+'.a'),b=U.f(c.id+'.b');lit[c.id]=!short&&((a===F&&b===N)||(a===N&&b===F))});
   return{U,F,N,short,lit};
 }
+// Elenca tutte le combinazioni acceso/spento degli interruttori (con due interruttori sono
+// quattro). Serve a works() per provarle una per una.
 function combos(){
   const ids=level.comps.filter(c=>c.t!=='lamp').map(c=>c.id),out=[];
   for(let m=0;m<(1<<ids.length);m++){const s={};ids.forEach((id,i)=>{const b=(m>>i)&1;s[id]=isSw(id)?!!b:(b?2:1)});out.push({m,s})}
   return{ids,out};
 }
+/*
+   works(ws) controlla che il circuito sia fatto bene, provando tutte le combinazioni:
+     1. non deve mai esserci un cortocircuito;
+     2. ogni lampada deve accendersi in almeno una combinazione;
+     3. ogni interruttore, quando lo giri, deve cambiare lo stato di tutte le lampade.
+   La terza regola serve a non accettare una lampada che resta sempre accesa, o un interruttore
+   che non comanda niente.
+*/
 function works(ws){
   const lamps=level.comps.filter(c=>c.t==='lamp').map(c=>c.id),{ids,out}=combos();
   const R=out.map(o=>sim(o.s,ws));
@@ -457,6 +846,15 @@ function works(ws){
   return true;
 }
 /* ======= SIMULAZIONE RETE ======= */
+/*
+   SIMULAZIONE DI RETE
+   evalNet() controlla chi riesce a parlare con chi. Anche qui i fili uniscono i punti in
+   gruppi. Lo switch è come una ciabatta: le sue quattro prese diventano un unico gruppo.
+   Nel modo lan tutti i computer devono stare nello stesso gruppo. Nel modo web i computer
+   devono stare con la presa casa (lan) del router, la presa internet (wan) deve stare con
+   internet, e le due prese del router NON devono finire insieme (why='merged').
+   got dice quali computer hanno ricevuto il messaggio e ok se vanno bene tutti.
+*/
 function evalNet(){
   const U=UF();wires.forEach(w=>U.u(w.a,w.b));
   level.comps.filter(c=>c.t==='nsw').forEach(c=>{U.u(c.id+'.p1',c.id+'.p2');U.u(c.id+'.p1',c.id+'.p3');U.u(c.id+'.p1',c.id+'.p4')});
@@ -472,20 +870,40 @@ function evalNet(){
   ok=Object.values(got).every(Boolean);
   return{U,got,ok,why};
 }
+// Dice se c'è già un filo tra due morsetti.
 const hasW=(a,b)=>wires.some(w=>(w.a===a&&w.b===b)||(w.a===b&&w.b===a));
+/*
+   Trova il primo filo della soluzione ancora mancante: è quello che l'aiuto suggerisce.
+   In Informatica conta il risultato (i due punti sono già collegati?), in Elettricità il filo preciso.
+*/
 function nextMissing(){
   if(isNet()){const U=evalNet().U;return level.sol.find(([a,b])=>U.f(a)!==U.f(b))}
   return level.sol.find(([a,b])=>!hasW(a,b));
 }
 
 /* ======= DISEGNO BANCO ======= */
+/*
+   DISEGNO DEL BANCO
+   Gli oggetti sul banco sono disegni SVG: un formato in cui il disegno è scritto come testo,
+   con elementi come rect (rettangolo), circle (cerchio), path (linea o curva) e text (scritta).
+   Il programma costruisce questo testo a seconda dello stato (per esempio una lampada accesa
+   ha altri colori) e lo inserisce nella pagina a ogni cambiamento.
+   Le misure sono coordinate: x cresce verso destra, y verso il basso, l'origine è in alto a
+   sinistra. Il banco misura 800 per 440 unità (viewBox) e si adatta alla grandezza dello schermo.
+   I testi tra apici inversi (`...`) sono modelli: ${...} inserisce un valore calcolato.
+
+   wpath disegna la forma di un filo: una curva (C) che parte dal morsetto a, esce nella sua
+   direzione e arriva al morsetto b. M vuol dire sposta la penna, C traccia la curva.
+*/
 function wpath(a,b){
   const k=Math.max(30,Math.min(110,Math.abs(b.x-a.x)/2));
   return `M${a.x} ${a.y}C${a.x+a.dir*k} ${a.y} ${b.x+b.dir*k} ${b.y} ${b.x} ${b.y}`;
 }
+// La piastra della corrente, con il fulmine.
 function drawSource(){return `<g><rect class="plate" x="40" y="110" width="150" height="200" rx="22"/>
  <path d="M104 150l-26 50h22l-8 42 38-56H106l14-36z" fill="#ffc400" stroke="#b58300" stroke-width="3" stroke-linejoin="round" transform="translate(-6,0)"/>
  <text class="lbl" x="115" y="292">Corrente</text><text class="lbl" x="170" y="165" style="text-anchor:end;fill:var(--brown)">va</text><text class="lbl" x="170" y="265" style="text-anchor:end;fill:var(--blue)">torna</text></g>`;}
+// Una lampadina. Se è accesa (lit) ha i colori caldi e un alone luminoso.
 function drawLamp(c,lit){const cx=c.x+75,cy=c.y+48;
  return `<g><rect class="plate" x="${c.x}" y="${c.y}" width="130" height="110" rx="18"/>
  ${lit?`<circle cx="${cx}" cy="${cy}" r="62" fill="#ffd84d" opacity=".35"/><circle cx="${cx}" cy="${cy}" r="44" fill="#ffd84d" opacity=".4"/>`:''}
@@ -493,11 +911,14 @@ function drawLamp(c,lit){const cx=c.x+75,cy=c.y+48;
  <path d="M${cx-9} ${cy+10}l4-14 5 8 5-8 4 14" fill="none" stroke="${lit?'#ff8a00':'#7b869c'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
  <rect x="${cx-12}" y="${cy+25}" width="24" height="12" rx="3" fill="#8b96ad"/>
  <text class="lbl" x="${c.x+65}" y="${c.y+104}" style="font-size:14px">Lampadina</text></g>`;}
+// Un interruttore. Toccarlo lo accende o lo spegne (data-toggle dice quale).
 function drawSw(c,on,nudge){return `<g class="tog" data-toggle="${c.id}">
  <rect class="plate" x="${c.x}" y="${c.y}" width="110" height="90" rx="16"/>
  <g class="${nudge?'nudge':''}"><rect x="${c.x+33}" y="${c.y+14}" width="44" height="62" rx="10" fill="${on?'#2fbf71':'#c5ccda'}" stroke="${on?'#167a43':'#8b96ad'}" stroke-width="3"/>
  <rect x="${c.x+39}" y="${on?c.y+19:c.y+43}" width="32" height="28" rx="7" fill="#fff" stroke="#8b96ad" stroke-width="2"/></g>
  <text class="lbl" x="${c.x+55}" y="${c.y+112}">Interruttore</text></g>`;}
+// Un deviatore (un interruttore con due posizioni). Nessuna missione lo usa: è rimasto nel
+// programma ma non viene mai disegnato.
 function drawDev(c,s,nudge){
   const T=Object.fromEntries(termsOf(c).map(t=>[t.id.split('.')[1],t]));
   const cp={x:c.flip?c.x+78:c.x+22,y:c.y+80},tp=T[s];const tx=c.flip?c.x+22:c.x+78,ty=tp.y;
@@ -506,39 +927,65 @@ function drawDev(c,s,nudge){
   <circle cx="${tx}" cy="${oy}" r="6" fill="#8b96ad"/><circle cx="${tx}" cy="${ty}" r="6" fill="#8b96ad"/>
   <g class="${nudge?'nudge':''}"><line x1="${cp.x}" y1="${cp.y}" x2="${tx}" y2="${ty}" stroke="#2fbf71" stroke-width="12" stroke-linecap="round"/>
   <circle cx="${cp.x}" cy="${cp.y}" r="10" fill="#fff" stroke="#8b96ad" stroke-width="3"/></g><text class="lbl" x="${c.x+50}" y="${c.y+180}">Deviatore</text></g>`;}
+// Un computer. Se riceve il messaggio (on) lo schermo mostra una spunta.
 function drawPc(c,on){
   return `<g><rect class="plate" x="${c.x+8}" y="${c.y}" width="104" height="64" rx="10"/>
   <rect x="${c.x+16}" y="${c.y+8}" width="88" height="46" rx="5" fill="${on?'#d9f6ee':'#13204a'}"/>
   ${on?`<path d="M${c.x+46} ${c.y+32}l10 10 20-20" fill="none" stroke="#12806f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`:`<path d="M${c.x+34} ${c.y+31}h52" stroke="#4fd1b8" stroke-width="3" stroke-dasharray="2 8" opacity=".6"/>`}
   <rect class="plate" x="${c.x}" y="${c.y+62}" width="120" height="30" rx="10"/>
   <text class="lbl" x="${c.x+60}" y="${c.y+112}">${c.label||''}</text></g>`;}
+// Lo switch di rete, con quattro lucette verdi.
 function drawNsw(c){return `<g><rect class="plate" x="${c.x}" y="${c.y}" width="150" height="90" rx="16"/>
   <text class="lbl" x="${c.x+75}" y="${c.y+52}" style="font-size:18px">Switch</text>
   ${[0,1,2,3].map(i=>`<circle cx="${c.x+45+i*20}" cy="${c.y+72}" r="4" fill="#2fbf71"/>`).join('')}</g>`;}
+// Il router, con le scritte casa e internet vicino alle due prese.
 function drawRouter(c){return `<g><rect class="plate" x="${c.x}" y="${c.y}" width="130" height="90" rx="16"/>
   <path d="M${c.x+30} ${c.y}v-26M${c.x+100} ${c.y}v-26" stroke="var(--plate-line)" stroke-width="6" stroke-linecap="round"/>
   <text class="lbl" x="${c.x+65}" y="${c.y+28}" style="font-size:18px">Router</text>
   <text class="lbl" x="${c.x+40}" y="${c.y+68}" style="font-size:12px">casa</text><text class="lbl" x="${c.x+92}" y="${c.y+68}" style="font-size:12px">internet</text></g>`;}
+// Il simbolo di internet, un mappamondo. Più azzurro quando è collegato.
 function drawWeb(c,on){const cx=c.x+70,cy=c.y+50;return `<g><rect class="plate" x="${c.x}" y="${c.y}" width="120" height="110" rx="18"/>
   <circle cx="${cx}" cy="${cy}" r="34" fill="${on?'#4fb3ff':'#9ab0c8'}" stroke="#2f6fb0" stroke-width="3"/>
   <ellipse cx="${cx}" cy="${cy}" rx="14" ry="34" fill="none" stroke="#2f6fb0" stroke-width="2.5"/><path d="M${cx-34} ${cy}h68M${cx-28} ${cy-16}h56M${cx-28} ${cy+16}h56" stroke="#2f6fb0" stroke-width="2.5" fill="none"/>
   <text class="lbl" x="${c.x+65}" y="${c.y+104}" style="font-size:14px">Internet</text></g>`;}
+/*
+   Un morsetto: un cerchio trasparente grande (la zona che si può toccare, comoda col dito),
+   un alone che compare quando è selezionato, l'anello colorato e la vite. data-term è il suo
+   nome: il programma lo legge per sapere quale morsetto è stato toccato.
+*/
 function drawTerm(t){const kind=t.kind||'';
   return `<g class="term${SEL===t.id?' sel':''}" data-term="${t.id}"><circle class="hit" cx="${t.x}" cy="${t.y}" r="34"/><circle class="halo" cx="${t.x}" cy="${t.y}" r="26"/><circle class="ring ${kind}" cx="${t.x}" cy="${t.y}" r="16"/><circle class="screw" cx="${t.x}" cy="${t.y}" r="7"/><line x1="${t.x-5}" y1="${t.y-5}" x2="${t.x+5}" y2="${t.y+5}" stroke="var(--plate)" stroke-width="2.5"/></g>`;}
 
 /* ======= RENDER ======= */
+/*
+   RENDER: IL DISEGNO DI TUTTO
+   render() ridisegna tutto in base allo stato del gioco. Si chiama dopo ogni azione: un filo
+   posato, un interruttore girato, un pulsante premuto. I passi sono:
+     1. calcola la situazione (simulazione elettrica o di rete);
+     2. disegna i componenti e poi i fili;
+     3. aggiunge gli anelli che pulsano, se il prof sta spiegando o se l'aiuto è acceso;
+     4. accende o spegne la luce della pagina e della stanza;
+     5. sceglie la frase del prof (in ordine di importanza);
+     6. chiama finishRender per mascotte, pulsanti e pallini.
+*/
 function render(){
   if(isEst())return renderEst();
   const svg=$('#bench');let g='',h='',wg='',fg='',msg,mood='hi',ok=false,needPress=false,allLit=false,lampsLit={},net=null,s=null,W=false;
+  // Elettricità: simula il circuito. ok vuol dire missione riuscita: nessun cortocircuito,
+  // circuito fatto bene e tutte le lampade accese. needPress vuol dire che è fatto bene ma resta
+  // da premere l'interruttore.
   if(isEl()){
     s=sim(st,wires);
     const lamps=level.comps.filter(c=>c.t==='lamp');
     lampsLit=tripped?{}:s.lit;allLit=lamps.every(l=>lampsLit[l.id]);
     W=works(wires);ok=!s.short&&W&&allLit;needPress=W&&!allLit&&!tripped;
   }else{net=evalNet();ok=net.ok;}
+  // Per colorare i fili si ricalcolano i gruppi usando solo i fili (senza interruttori): un filo
+  // del gruppo della fase diventa marrone, uno del gruppo del neutro blu.
   // colori: unione con soli fili
   const U0=UF();wires.forEach(w=>U0.u(w.a,w.b));const rF=isEl()?U0.f('S.F'):null,rN=isEl()?U0.f('S.N'):null;
   if(isEl())g+=drawSource();
+  // Disegna i componenti della missione, uno per uno, ciascuno con la sua funzione.
   level.comps.forEach(c=>{
     if(c.t==='lamp')g+=drawLamp(c,!!lampsLit[c.id]);
     if(c.t==='sw')g+=drawSw(c,st[c.id],needPress);
@@ -548,6 +995,9 @@ function render(){
     if(c.t==='router')g+=drawRouter(c);
     if(c.t==='web')g+=drawWeb(c,!!net.got.W);
   });
+  // Disegna i fili. Ogni filo è una linea scura più larga (l'ombra), la linea colorata sopra e
+  // una linea trasparente molto larga: serve solo per essere toccata e togliere il filo. Se la
+  // missione è riuscita aggiunge i puntini che scorrono.
   wires.forEach(w=>{
     let a=TM[w.a],b=TM[w.b];
     let col='var(--cable)';
@@ -558,20 +1008,29 @@ function render(){
     if(isEl()&&!s.short&&!tripped&&allLit){const f=s.U.f(w.a);if(f===s.F)fg+=`<path class="flow" d="${d}"/>`;else if(f===s.N)fg+=`<path class="flow rev" d="${d}"/>`}
     if(isNet()&&ok)fg+=`<path class="flow" d="${d}"/>`;
   });
+  // I fili si aggiungono dopo i componenti, così stanno sopra.
   g+=wg+fg;
+  // Se il prof sta spiegando, fa pulsare i componenti o i morsetti di cui parla.
   if(introStep>=0){const sl=level.intro[introStep];
     (sl.box||[]).forEach(id=>{const b=bbox(id);h+=`<rect class="pulse" x="${b[0]-10}" y="${b[1]-10}" width="${b[2]+20}" height="${b[3]+20}" rx="26"/>`});
     (sl.hl||[]).forEach(id=>{const t=TM[id];h+=`<circle class="pulse" cx="${t.x}" cy="${t.y}" r="26"/>`});
+  // Altrimenti, se l'aiuto è acceso, mostra il prossimo filo da posare: una linea tratteggiata
+  // e due anelli che pulsano.
   }else if(hintOn&&!won&&!tripped){
     const n=nextMissing();
     if(n){const a=TM[n[0]],b=TM[n[1]];
       h+=`<path class="ghost" d="${wpath(a.x<=b.x?a:b,a.x<=b.x?b:a)}"/><circle class="pulse" cx="${a.x}" cy="${a.y}" r="26"/><circle class="pulse" cx="${b.x}" cy="${b.y}" r="26"/>`}
   }
   g+=h;
+  // I morsetti si disegnano per ultimi, sopra a tutto, così si possono toccare.
   const termList=isEl()?SRC.concat(Object.values(TM).filter(t=>!SRC.includes(t))):Object.values(TM);
   termList.forEach(t=>g+=drawTerm(t));
   g+=`<path id="prev" class="wireline" d="" stroke="var(--accent)" stroke-width="8" stroke-dasharray="2 14" style="pointer-events:none"/>`;
+  // Mette il disegno nella pagina: innerHTML sostituisce il contenuto dell'elemento con il testo
+  // SVG appena costruito.
   svg.innerHTML=g;
+  // La luce: se almeno una lampada è accesa (o la rete funziona) si aggiunge la classe lit alla
+  // pagina e tutti i colori cambiano.
   let lightOn=false;
   if(isEl()){
     const lamps=level.comps.filter(c=>c.t==='lamp');
@@ -582,6 +1041,10 @@ function render(){
   }
   $('#app').classList.toggle('tripped',tripped);
   document.documentElement.classList.toggle('lit',lightOn);
+  // LA FRASE DEL PROF. Si sceglie la prima situazione che è vera, in questo ordine:
+  // spiegazione iniziale, messaggio temporaneo, salvavita scattato, missione riuscita, invito a
+  // premere, lampada sempre accesa, router sbagliato, aiuto acceso, morsetto selezionato, nessun
+  // filo ancora, e infine l'incoraggiamento.
   // guida
   if(introStep>=0)msg=level.intro[introStep].t;
   else if(flashMsg)msg=flashMsg;
@@ -596,6 +1059,11 @@ function render(){
   else{const done=isNet()?level.sol.filter(([a,b])=>net.U.f(a)===net.U.f(b)).length:level.sol.filter(([a,b])=>hasW(a,b)).length;msg=done>=level.sol.length-1?'Ci sei quasi!':'Continua così. Se serve, tocca «Aiutami».'}
   finishRender(msg,mood,ok);
 }
+/*
+   Ultimi ritocchi dopo ogni disegno: scrive la frase, sceglie la faccia della mascotte, controlla
+   se la missione è appena riuscita (e in quel caso fa partire la festa), mostra o nasconde i
+   pulsanti e disegna i pallini delle missioni in alto.
+*/
 function finishRender(msg,mood,ok){
   $('#say').textContent=msg;$('#mascot').innerHTML=mascot(mood);
   if(ok&&!won){won=true;celebrate()}
@@ -609,6 +1077,13 @@ function finishRender(msg,mood,ok){
 }
 
 /* ======= ESTETISTA ======= */
+/*
+   ESTETISTA: IL GIOCO DI ESTETICA
+   renderEst() fa lo stesso lavoro di render() per il gioco di Estetica. need è quante scelte
+   servono: tutte se l'ordine conta, altrimenti solo quelle giuste. Poi costruisce il vassoio con
+   le caselle, le carte (con le classi done, shake e hint a seconda dei casi) e la scena a
+   destra: il viso o la mano.
+*/
 function renderEst(){
   const it=level.items,total=it.length,need=level.ordered?total:it.filter(x=>x.ok).length;
   const ok=picked.length>=need;
@@ -631,7 +1106,16 @@ function renderEst(){
   else msg=level.goal;
   finishRender(msg,mood,ok);
 }
+// Mostra una frase del prof per qualche secondo, poi la toglie e ridisegna.
 function flash(msg,ms=3200){flashMsg=msg;clearTimeout(flashT);flashT=setTimeout(()=>{flashMsg='';shakeI=-1;render()},ms)}
+/*
+   Cosa succede quando si tocca una carta di Estetica.
+   Se l'ordine conta (ordered): la carta è giusta solo se è la prossima in elenco, cioè se il
+   suo numero è uguale a quante carte sono già state scelte. Altrimenti trema e il prof
+   spiega perché è troppo presto (early).
+   Se l'ordine non conta: la carta è giusta se ha ok:true, altrimenti trema e il prof spiega
+   l'errore (why).
+*/
 function pickCard(i){
   if(introStep>=0||won)return;lastIn=Date.now();ac();
   const it=level.items[i];if(picked.includes(i))return;
@@ -644,6 +1128,11 @@ function pickCard(i){
   }
   render();
 }
+/*
+   Il disegno del viso di Giulia. p dice a che punto è il trattamento e cambia i dettagli:
+   trucco e pelle spenta all'inizio, poi pelle pulita, maschera verde sul viso e infine occhi
+   chiusi e sorriso. Le coordinate sono nello stesso sistema dell'SVG del banco.
+*/
 function faceSVG(kind,p,ok){
   const makeup=kind==='m1'&&p<1,dull=kind==='m1'&&p<2,mask=kind==='m1'&&p===3;
   const skin='#f7d5bf',skinD='#ecb99c',hair='#f0c463',hairD='#d6a03e',hairL='#ffe49a',iris='#3d8fe0';
@@ -680,6 +1169,10 @@ function faceSVG(kind,p,ok){
   ${ok?`<path d="M134 100l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#fff"/><path d="M300 56l5 12 12 5-12 5-5 12-5-12-12-5 12-5z" fill="#ffc400"/><path d="M52 92l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#ffc400"/>`:''}
   </svg>`;
 }
+/*
+   Il disegno della mano con le unghie. p è il numero di passaggi fatti: da unghie al naturale
+   a forma, base, colore e lucido. Il colore dello smalto è calcolato da p.
+*/
 function handSVG(p){
   const nailC=p>=3?'#c8323a':p>=2?'#fbe9ea':p>=1?'#f7e0d6':'#efdcc9',edge=p>=3?'#a11f2a':'#dcbca6';
   const OUT='#d79f82';
@@ -716,6 +1209,11 @@ function handSVG(p){
 }
 
 /* ======= SCENE RETE ======= */
+/*
+   SCENE DI RETE
+   netScene disegna lo schermo a destra in Informatica: una chat o la pagina web. Gli elementi
+   .pre sono visibili prima, quelli .post compaiono quando la rete funziona.
+*/
 function netScene(k){
   const frame=(inner,title)=>`<svg class="scene" viewBox="0 0 360 240" role="img" aria-label="Schermo"><rect width="360" height="240" fill="#13204a"/><rect x="14" y="14" width="332" height="212" rx="12" fill="#f4f7ff"/><rect x="14" y="14" width="332" height="30" rx="12" fill="#d7dff0"/><rect x="14" y="30" width="332" height="14" fill="#d7dff0"/><text x="28" y="35" font-size="14" font-weight="600" fill="#33405c">${title}</text>${inner}</svg>`;
   const bub=(x,y,w,t,me,cls)=>`<g class="${cls}"><rect x="${x}" y="${y}" width="${w}" height="30" rx="15" fill="${me?'#d7263d':'#dfe5f3'}"/><text x="${x+w/2}" y="${y+20}" text-anchor="middle" font-size="15" font-weight="600" fill="${me?'#fff':'#233'}">${t}</text></g>`;
@@ -726,6 +1224,12 @@ function netScene(k){
 }
 
 /* ======= STANZA ======= */
+/*
+   LA STANZA
+   Il disegno della stanza con le lampade al soffitto. Di notte è coperta da un velo scuro; per
+   ogni lampada accesa si fa un buco circolare nel velo (mask) e si aggiunge un alone giallo.
+   p è un prefisso che rende unici i nomi interni quando ci sono due stanze nella pagina.
+*/
 function roomSVG(p,xs){
   return `<svg class="room" viewBox="0 0 360 240" preserveAspectRatio="xMidYMin slice" role="img" aria-label="Una stanza">
   <defs>
@@ -751,7 +1255,9 @@ function roomSVG(p,xs){
   ${xs.map(x=>`<line x1="${x}" y1="0" x2="${x}" y2="47" stroke="#555" stroke-width="3"/><circle class="bulb" data-x="${x}" cx="${x}" cy="60" r="14" fill="#9aa3b5" stroke="#555" stroke-width="3"/>`).join('')}
   </svg>`;
 }
+// Inserisce il disegno della stanza nell'elemento indicato.
 function buildRoom(sel,p,xs){$(sel).innerHTML=roomSVG(p,xs)}
+// Accende o spegne le lampade della stanza, una per una, in base all'elenco arr (vero o falso).
 function setRoom(sel,arr){
   const el=$(sel);if(!el)return;
   el.querySelectorAll('.hole').forEach((c,i)=>c.style.opacity=arr[i]?1:0);
@@ -760,6 +1266,8 @@ function setRoom(sel,arr){
 }
 
 /* ======= MASCOTTE ======= */
+// LA MASCOTTE. Disegna la faccina del prof in tre espressioni: hi (normale), oops (errore)
+// e happy (successo).
 function mascot(m){
   const eyes=m==='oops'?'<circle cx="25" cy="27" r="4.5" fill="#2b2140"/><circle cx="39" cy="27" r="4.5" fill="#2b2140"/><circle cx="26" cy="26" r="1.5" fill="#fff"/><circle cx="40" cy="26" r="1.5" fill="#fff"/>':
    m==='happy'?'<path d="M20 28q5-8 10 0M34 28q5-8 10 0" fill="none" stroke="#2b2140" stroke-width="3" stroke-linecap="round"/>':
@@ -770,13 +1278,31 @@ function mascot(m){
 }
 
 /* ======= SUONI ======= */
+/*
+   I SUONI
+   Non ci sono file audio: i suoni sono generati dal codice con l'API Web Audio del browser.
+   tone(frequenza, ritardo, durata, forma, volume) produce una nota. I browser permettono
+   l'audio solo dopo che l'utente ha toccato qualcosa, per questo ac() viene chiamata al
+   primo tocco. sfx è l'elenco dei suoni del gioco (click, filo, vittoria, cortocircuito).
+*/
 let AC=null,muted=false;
 function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+// Suona una nota: un oscillatore (la sorgente del suono) e un volume che sale e scende.
 function tone(f,t,d,type='sine',v=.18){if(muted)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(a.destination);const T=a.currentTime+t;g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(v,T+.02);g.gain.exponentialRampToValueAtTime(.001,T+d);o.start(T);o.stop(T+d+.05)}
 const sfx={click:()=>tone(660,0,.1),wire:()=>{tone(520,0,.08);tone(780,.07,.1)},tog:()=>tone(300,0,.08,'square',.1),
  win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.35,'triangle',.2)),trip:()=>{tone(110,0,.5,'sawtooth',.2);tone(90,.1,.5,'sawtooth',.15)},rm:()=>tone(330,0,.1)};
+// Fa vibrare il telefono, se può.
 const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+// Disegna l'icona dell'altoparlante: barrato se il suono è spento.
 function setMute(){$('#mute').innerHTML=muted?'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>':'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>'}
+/*
+   LA FESTA
+   Quando una missione riesce suona la melodia, fa vibrare il telefono e lancia 150 coriandoli.
+   Ogni coriandolo è una particella con posizione (x,y), velocità (vx,vy), colore e rotazione.
+   A ogni fotogramma (requestAnimationFrame, circa 60 volte al secondo) le particelle si spostano,
+   la gravità le tira verso il basso e si ridisegnano sulla tela #cf. Dopo circa 110 fotogrammi
+   la tela si pulisce. Chi ha chiesto di ridurre i movimenti non vede i coriandoli.
+*/
 function celebrate(){
   sfx.win();vib([60,40,120]);
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
@@ -786,11 +1312,23 @@ function celebrate(){
 }
 
 /* ======= SALVAVITA E FILI ======= */
+/*
+   SALVAVITA E FILI
+   trip() è il salvavita: quando c'è un cortocircuito mostra OPS, fa vibrare il telefono e,
+   dopo 2,6 secondi, annulla l'ultima azione (undo), cioè toglie il filo o rimette
+   l'interruttore com'era.
+*/
 function trip(undo){
   tripped=true;SEL=null;sfx.trip();vib([90,60,90]);$('#ops').classList.add('on');render();
   setTimeout(()=>{undo();tripped=false;$('#ops').classList.remove('on');render()},2600);
 }
+// Mostra una frase del prof per un po'.
 function say(msg,ms){flash(msg,ms||2600)}
+/*
+   Posa un filo tra due morsetti. Ignora le richieste senza senso (stesso morsetto, filo già
+   presente, salvavita attivo). In Informatica ogni presa accetta un solo cavo. Se in
+   Elettricità il nuovo filo provoca un cortocircuito, scatta il salvavita.
+*/
 function addWire(a,b){
   if(!a||!b||a===b||tripped||hasW(a,b))return;
   if(isNet()){
@@ -802,13 +1340,24 @@ function addWire(a,b){
 }
 
 /* ======= INTERAZIONE ======= */
+/*
+   INTERAZIONE: COSA SUCCEDE QUANDO SI TOCCA LO SCHERMO
+   Un evento è qualcosa che accade (un tocco, un clic, un tasto). addEventListener dice al
+   browser: quando succede questo evento, esegui questa funzione.
+   Per collegare due morsetti ci sono due modi: toccarne uno e poi l'altro, oppure trascinare
+   da uno all'altro. In entrambi i casi il primo morsetto toccato viene ricordato in SEL.
+*/
 const bench=$('#bench');
+// Trasforma la posizione del dito sullo schermo nella posizione corrispondente nel disegno SVG.
 function svgPt(e){const p=bench.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(bench.getScreenCTM().inverse())}
 let dragging=false,reselect=false;
+// Mentre il dito si muove disegna un filo di prova tratteggiato dal morsetto scelto al dito.
 function showPrev(e){const t=TM[SEL];if(!t)return;const p=svgPt(e),pv=$('#prev');if(!pv)return;
   pv.setAttribute('d',`M${t.x} ${t.y}C${t.x+t.dir*50} ${t.y} ${p.x} ${p.y} ${p.x} ${p.y}`)}
 function hidePrev(){const pv=$('#prev');if(pv)pv.setAttribute('d','')}
 function clearSel(){SEL=null;hidePrev();bench.querySelectorAll('.term.sel').forEach(x=>x.classList.remove('sel'))}
+// Dito (o mouse) giù: se tocca un morsetto lo seleziona; se un morsetto era già selezionato
+// posa il filo tra i due.
 bench.addEventListener('pointerdown',e=>{
   lastIn=Date.now();ac();dragging=false;if(tripped||introStep>=0)return;
   const t=e.target.closest('[data-term]');if(!t)return;const id=t.dataset.term;
@@ -816,6 +1365,7 @@ bench.addEventListener('pointerdown',e=>{
   reselect=(SEL===id);clearSel();SEL=id;dragging=true;t.classList.add('sel');sfx.click();$('#say').textContent='Bene! Ora tocca dove vuoi arrivare.';
 });
 bench.addEventListener('pointermove',e=>{if(SEL)showPrev(e)});
+// Dito su: se è stato trascinato fino a un altro morsetto, posa il filo.
 window.addEventListener('pointerup',e=>{
   if(!dragging)return;dragging=false;
   const el=document.elementFromPoint(e.clientX,e.clientY),t=el&&el.closest?el.closest('[data-term]'):null;
@@ -824,6 +1374,7 @@ window.addEventListener('pointerup',e=>{
   else hidePrev();
 });
 window.addEventListener('pointercancel',()=>{dragging=false;hidePrev()});
+// Clic: su un interruttore lo gira (e controlla il cortocircuito); su un filo lo toglie.
 bench.addEventListener('click',e=>{
   lastIn=Date.now();if(tripped||introStep>=0)return;
   const tg=e.target.closest('[data-toggle]');
@@ -834,6 +1385,16 @@ bench.addEventListener('click',e=>{
 });
 $('#cards').addEventListener('click',e=>{const c=e.target.closest('[data-i]');if(c)pickCard(+c.dataset.i)});
 
+/*
+   I PULSANTI. Ognuno ha una funzione che parte al clic (onclick):
+     ok       va avanti nelle spiegazioni iniziali
+     hint     accende l'aiuto
+     reset    toglie tutti i fili e ricomincia la missione
+     next     passa alla missione successiva, o ai contatti dopo l'ultima
+     mute     spegne e accende il suono
+     homeb    torna alla home
+     .path    le tre carte della home: scelgono il mestiere e aprono il gioco
+*/
 $('#ok').onclick=()=>{lastIn=Date.now();sfx.click();introStep++;if(introStep>=level.intro.length){introStep=-1;hintOn=(li===0&&!isEst())}render()};
 $('#hint').onclick=()=>{lastIn=Date.now();hintOn=true;SEL=null;sfx.click();render()};
 $('#reset').onclick=()=>{lastIn=Date.now();if(tripped)return;wires=[];SEL=null;picked=[];lastDone='';flashMsg='';shakeI=-1;hintOn=(li===0&&!isEst());won=false;sfx.rm();render()};
@@ -842,6 +1403,13 @@ $('#mute').onclick=()=>{muted=!muted;setMute();ac()};
 $('#homeb').onclick=()=>toHome();
 document.querySelectorAll('.path').forEach(b=>b.onclick=()=>{ac();sfx.click();game=b.dataset.path;toPlay()});
 
+/*
+   IMMAGINE DA SALVARE
+   Disegna le informazioni della scuola su una tela (canvas) di 1080 pixel di larghezza:
+   prima prepara l'elenco delle righe (titolo, indirizzo, date, laboratori), poi le va a capo
+   quando sono troppo lunghe misurando la loro larghezza, calcola l'altezza totale e infine
+   le scrive una sotto l'altra. Il risultato è un'immagine PNG.
+*/
 function makeImage(){
   const S=SCUOLA,W=1080,P=64,c=document.createElement('canvas'),x=c.getContext('2d');
   const F='Fira Sans, Arial, sans-serif',INK='#0b0b0b',RED='#c8323a',MUT='#555';
@@ -865,6 +1433,8 @@ function makeImage(){
   x.fillStyle=RED;x.fillRect(0,0,W,14);
   return c;
 }
+// Salva l'immagine: sul telefono usa il menu di condivisione; altrimenti la mostra in una
+// finestra, da salvare tenendo premuto.
 $('#saveImg').onclick=async()=>{
   sfx.click();const c=makeImage();
   const blob=await new Promise(r=>c.toBlob(r,'image/png'));
@@ -873,20 +1443,36 @@ $('#saveImg').onclick=async()=>{
   $('#imgout').src=c.toDataURL('image/png');$('#imgov').hidden=false;
 };
 $('#imgclose').onclick=()=>{$('#imgov').hidden=true};
+// Salta il gioco e va direttamente ai contatti.
 $('#skipGame').onclick=()=>{sfx.click();game=null;toContacts()};
 $('#other').onclick=()=>{sfx.click();toHome()};
 
 /* ======= SCHERMATE ======= */
+/*
+   LE SCHERMATE
+   show(id) mostra la schermata con quel nome e nasconde le altre, e torna in cima alla pagina.
+   toHome() e toPlay() sono scorciatoie: toHome accende la luce (colori chiari) e mostra la
+   home; toPlay mostra il gioco e carica la prima missione.
+*/
 function show(id){['home','play','contacts'].forEach(s=>$('#'+s).hidden=s!==id);window.scrollTo(0,0)}
 function toHome(){show('home');document.documentElement.classList.add('lit')}
 function toPlay(){show('play');lastIn=Date.now();loadLevel(0)}
 
 /* ======= CONTATTI E PRENOTAZIONE ======= */
+// Le piccole icone dei riquadri nella pagina contatti, in formato SVG.
 const ICO={cal:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>',
  pin:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
  lab:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/></svg>',
  mail:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'};
+// Rende sicuro un testo prima di metterlo nella pagina: sostituisce i simboli < > & e " con
+// i loro codici, così non possono essere scambiati per codice HTML.
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+/*
+   CONTATTI
+   toContacts() compila i quattro riquadri della pagina finale con i dati del blocco SCUOLA.
+   La frase iniziale cambia secondo il mestiere appena provato. I dati vuoti non compaiono. Il
+   pulsante Scrivi una email apre il programma di posta con l'oggetto già scritto.
+*/
 function toContacts(){
   show('contacts');lastIn=Date.now();document.documentElement.classList.add('lit');
   $('#cLead').textContent=!game?'Vieni a vedere i laboratori dal vivo e prova i mestieri con le tue mani.':{el:'Hai provato a lavorare con l’elettricità.',net:'Hai provato a lavorare con computer e reti.',est:'Hai provato a prenderti cura della pelle e delle mani.'}[game]+' Se ti è piaciuto, vieni a vedere i laboratori dal vivo.';
@@ -898,6 +1484,12 @@ function toContacts(){
 }
 
 /* ======= INATTIVITA' (solo PC allo stand) ======= */
+/*
+   INATTIVITÀ
+   Ogni 2 secondi (2000 millisecondi) il programma controlla da quanto nessuno tocca niente:
+     - sul PC dello stand, dopo 90 secondi torna alla home, pronta per il visitatore dopo;
+     - durante il gioco, dopo 15 secondi senza tocchi accende da solo l'aiuto.
+*/
 setInterval(()=>{
   const idle=Date.now()-lastIn;
   if(!$('#play').hidden&&!tripped){
@@ -906,7 +1498,10 @@ setInterval(()=>{
   }
   if(!$('#contacts').hidden&&DESKTOP&&idle>90000)toHome();
 },2000);
+// Ogni tasto o tocco azzera il conteggio dell'inattività.
 ['keydown','pointerdown'].forEach(ev=>addEventListener(ev,()=>lastIn=Date.now()));
+// AVVIO. Disegna l'icona del suono e mostra la home. Da qui in poi il programma resta in attesa
+// dei tocchi.
 setMute();toHome();
 })();
 </script>
