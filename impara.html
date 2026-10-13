@@ -339,6 +339,114 @@ pulsante.addEventListener('click', function () {
   </button>
 </div>
 </script>
+<script type="text/plain" data-k="c3-vars">
+:root {
+  --bg: #0f1a17;
+  --card: #17251f;
+  --ink: #f1fff9;
+  --muted: #a9c4b9;
+  --line: #2d4a3f;
+  --accent: #d6404a;
+}
+</script>
+<script type="text/plain" data-k="c3-body-0">
+body {
+}
+</script>
+<script type="text/plain" data-k="c3-body-1">
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+</script>
+<script type="text/plain" data-k="c3-body-2">
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 18px;
+}
+</script>
+<script type="text/plain" data-k="c3-blocco">
+.path b,
+.path span {
+  display: block;
+}
+</script>
+<script type="text/plain" data-k="c3-path">
+.path {
+  background: var(--card);
+  border: 0;
+  border-radius: 28px;
+  padding: 22px 16px;
+  color: var(--ink);
+}
+</script>
+<script type="text/plain" data-k="c3-paths">
+.paths {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+</script>
+<script type="text/plain" data-k="c3-hover">
+.path:hover {
+  box-shadow: 0 0 0 4px var(--accent) inset;
+}
+</script>
+<script type="text/plain" data-k="c4-lit-ini">
+:root.lit {
+  --bg: #ffffff;
+}
+</script>
+<script type="text/plain" data-k="c4-lit">
+:root.lit {
+  --bg: #ffffff;
+  --card: #ffffff;
+  --ink: #0b0b0b;
+  --muted: #4d4d4d;
+  --line: #e4e4e4;
+}
+</script>
+<script type="text/plain" data-k="c4-trans">
+body,
+.path {
+  transition: background-color 0.6s, color 0.6s;
+}
+</script>
+<script type="text/plain" data-k="c4p3-html">
+<h1>Cosa ti interessa?</h1>
+<p class="sub">Scegli un mestiere e provalo.</p>
+<div class="paths">
+  <button class="path" data-path="el" type="button">
+    <b>Elettricità</b>
+    <span>Accendi la luce</span>
+  </button>
+  <button class="path" data-path="net" type="button">
+    <b>Informatica</b>
+    <span>Fai arrivare il messaggio</span>
+  </button>
+  <button class="path" data-path="est" type="button">
+    <b>Estetica</b>
+    <span>Prepara il trattamento</span>
+  </button>
+</div>
+<button id="luce" type="button">Accendi o spegni</button>
+</script>
+<script type="text/plain" data-k="c4p3-js-ini">
+const luce = document.querySelector('#luce');
+
+luce.addEventListener('click', function () {
+  // qui accendi o spegni la luce
+});
+</script>
+<script type="text/plain" data-k="c4p3-js">
+const luce = document.querySelector('#luce');
+
+luce.addEventListener('click', function () {
+  document.documentElement.classList.toggle('lit');
+});
+</script>
 
 <!-- SPIA: piccolo script che viene messo in cima a ogni anteprima. Ascolta gli errori e i console.log del codice
      dell'allievo e li passa alla pagina. È testo semplice (text/plain): il browser non lo esegue qui. -->
@@ -497,7 +605,115 @@ const CAPITOLI=[
      {cosa:'Ogni carta ha class="path"',ok:d=>tutti(d,'div.paths > button.path').length===3,aiuto:'Nel tag <button> aggiungi anche class="path". Un tag può avere più attributi, separati da uno spazio.'},
      {cosa:'I data-path sono el, net ed est',ok:d=>tutti(d,'div.paths > button').map(x=>x.getAttribute('data-path')).join(',')==='el,net,est',aiuto:'Prima carta data-path="el", seconda data-path="net", terza data-path="est".'}],
     bravo:'Lo scheletro della home è completo. Ora gli manca solo il vestito.'}],
-  imparato:['Ogni elemento HTML ha un tag che lo apre e uno che lo chiude.','Gli elementi si annidano uno dentro l’altro.','Gli attributi, come class e data-path, aggiungono informazioni a un tag.']}
+  imparato:['Ogni elemento HTML ha un tag che lo apre e uno che lo chiude.','Gli elementi si annidano uno dentro l’altro.','Gli attributi, come class e data-path, aggiungono informazioni a un tag.']},
+{id:'c3',titolo:'Colori e forme',descr:'Selettori, proprietà e valori: il vestito della home.',
+  intro:[
+   {t:'Ora vestiamo lo scheletro. Una regola CSS ha tre parti: il selettore dice a chi si applica, la proprietà dice cosa cambiare, il valore dice come.'},
+   {t:'Per esempio h1 { color: red; } vuol dire: ai titoli h1 cambia il colore (color) e mettilo rosso (red). Le regole stanno sempre tra graffe.'},
+   {t:'Per non ripetere gli stessi colori ovunque li mettiamo in variabili: nomi che iniziano con due trattini, come --bg, che si richiamano con var(--bg). Se cambi il valore in un posto, cambia in tutta la pagina.'}],
+  passi:[
+   {id:'c3p1',titolo:'Le variabili e lo sfondo',file:'css',
+    inizio:{css:['c3-vars','c3-body-0']},soluzione:{css:['c3-vars','c3-body-1']},
+    intro:[
+     {t:'Le variabili sono già pronte dentro :root, che è la radice della pagina. Ogni nome ha il suo colore.',riga:1,tab:'css'},
+     {t:'Sotto c’è la regola per il body, il corpo della pagina, ancora vuota. Dentro scrivi due proprietà: background (lo sfondo) con var(--bg) e color (il colore del testo) con var(--ink).',riga:10,tab:'css'}],
+    compito:'Nel body usa le variabili: lo sfondo è var(--bg) e il colore del testo è var(--ink).',
+    controlli:[
+     {cosa:'Lo sfondo della pagina è scuro',ok:d=>{const s=stile(d,'body');return !!s&&chiarezza(s.backgroundColor)>=0&&chiarezza(s.backgroundColor)<60},aiuto:'Dentro il body scrivi background: var(--bg); senza dimenticare il punto e virgola.'},
+     {cosa:'Il testo è chiaro',ok:d=>{const s=stile(d,'body');return !!s&&chiarezza(s.color)>200},aiuto:'Aggiungi color: var(--ink); dentro il body.'},
+     {cosa:'Usi var(--bg) e var(--ink)',ok:(d,w,c)=>/var\(\s*--bg\s*\)/.test(c.css)&&/var\(\s*--ink\s*\)/.test(c.css),aiuto:'Non scrivere i colori a mano: richiama le variabili con var(--bg) e var(--ink).'}],
+    bravo:'Sfondo scuro e testo chiaro, e se cambi una variabile cambia tutta la pagina.'},
+   {id:'c3p2',titolo:'Il carattere Fira Sans',file:'css',
+    soluzione:{css:['c3-vars','c3-body-2']},
+    intro:[
+     {t:'Il carattere (in inglese font) si sceglie con font-family. Si scrive una lista: vince il primo che il computer ha, l’ultimo (sans-serif) è quello di riserva.'},
+     {t:'Il sito vero usa Fira Sans, che scarica da internet. Se qui non lo vedi cambiare non è un errore: il browser usa quello di riserva.'},
+     {t:'Un nome con lo spazio dentro va tra apici, come \'Fira Sans\'. Aggiungi al body font-family e anche font-size, la grandezza del testo.',riga:12,tab:'css'}],
+    compito:'Nel body scrivi font-family con Fira Sans e font-size di 18px.',
+    controlli:[
+     {cosa:'Il carattere è Fira Sans',ok:d=>{const s=stile(d,'body');return !!s&&/fira sans/i.test(s.fontFamily)},aiuto:'Scrivi font-family: \'Fira Sans\', sans-serif; con gli apici attorno a Fira Sans.'},
+     {cosa:'Il testo è grande 18px',ok:d=>{const s=stile(d,'body');return !!s&&s.fontSize==='18px'},aiuto:'Scrivi font-size: 18px; sono pixel, un punto dello schermo.'}],
+    bravo:'Il carattere è quello del sito.'},
+   {id:'c3p3',titolo:'La carta',file:'css',
+    inizio:{css:['c3-vars','c3-body-2','c3-blocco']},soluzione:{css:['c3-vars','c3-body-2','c3-blocco','c3-path']},
+    intro:[
+     {t:'Per scrivere una regola solo per le carte il selettore è .path: il punto vuol dire «gli elementi con questa classe». Ecco perché prima hai scritto class="path".'},
+     {t:'Ti ho già scritto una regola che mette il nome e la spiegazione uno sopra l’altro (display: block). Ora tocca alla carta.',riga:17,tab:'css'},
+     {t:'Scrivi una regola .path con cinque proprietà: background con var(--card), border: 0 per togliere il bordo grigio, border-radius per gli angoli (prova 28px), padding per lo spazio dentro la carta (prova 22px 16px) e color con var(--ink): i pulsanti non prendono da soli il colore del testo.'}],
+    compito:'Scrivi la regola .path: fondo var(--card), niente bordo, angoli arrotondati, spazio interno e testo chiaro.',
+    controlli:[
+     {cosa:'La carta ha un fondo scuro',ok:d=>{const s=stile(d,'.path');return !!s&&chiarezza(s.backgroundColor)>=0&&chiarezza(s.backgroundColor)<80},aiuto:'Scrivi background: var(--card); dentro la regola .path.'},
+     {cosa:'Il bordo grigio è tolto',ok:d=>{const s=stile(d,'.path');return !!s&&(parseFloat(s.borderTopWidth)===0||s.borderTopStyle==='none')},aiuto:'Scrivi border: 0; per togliere il bordo che il browser mette ai pulsanti.'},
+     {cosa:'Gli angoli sono arrotondati',ok:d=>{const s=stile(d,'.path');return !!s&&parseFloat(s.borderTopLeftRadius)>=16},aiuto:'Scrivi border-radius: 28px; più il numero è alto, più la carta è rotonda.'},
+     {cosa:'C’è spazio dentro la carta',ok:d=>{const s=stile(d,'.path');return !!s&&parseFloat(s.paddingTop)>=12&&parseFloat(s.paddingLeft)>=12},aiuto:'Scrivi padding: 22px 16px; il primo numero è sopra e sotto, il secondo ai lati.'},
+     {cosa:'Il testo della carta è chiaro',ok:d=>{const s=stile(d,'.path');return !!s&&chiarezza(s.color)>150},aiuto:'Scrivi color: var(--ink); i pulsanti hanno il testo nero se non lo cambi.'}],
+    bravo:'Ecco una vera carta. Ora ce ne vuole una accanto all’altra.'},
+   {id:'c3p4',titolo:'Tre colonne',file:'css',
+    inizio:{css:['c3-vars','c3-body-2','c3-blocco','c3-path']},soluzione:{css:['c3-vars','c3-body-2','c3-blocco','c3-path','c3-paths']},
+    intro:[
+     {t:'Le tre carte sono dentro il div con classe paths. Se a quel div dici display: grid, i suoi figli si dispongono in una griglia.'},
+     {t:'Poi dici quante colonne vuoi con grid-template-columns: repeat(3, 1fr) vuol dire tre colonne uguali (1fr è una parte). Con gap lasci lo spazio tra una carta e l’altra.'}],
+    compito:'Scrivi la regola .paths: una griglia di tre colonne uguali con 18px di spazio.',
+    controlli:[
+     {cosa:'Le carte sono in una griglia',ok:d=>{const s=stile(d,'.paths');return !!s&&s.display==='grid'},aiuto:'Nella regola .paths scrivi display: grid;'},
+     {cosa:'La griglia ha tre colonne',ok:d=>{const s=stile(d,'.paths');return !!s&&s.gridTemplateColumns.split(' ').length===3},aiuto:'Scrivi grid-template-columns: repeat(3, 1fr);'},
+     {cosa:'Le tre carte stanno sulla stessa riga',ok:d=>{const c=tutti(d,'.path');return c.length===3&&new Set(c.map(x=>Math.round(x.getBoundingClientRect().top))).size===1},aiuto:'Servono display: grid e tre colonne insieme: controlla di averli scritti tutti e due.'},
+     {cosa:'Tra le carte c’è uno spazio',ok:d=>{const s=stile(d,'.paths');return !!s&&parseFloat(s.columnGap)>0},aiuto:'Scrivi gap: 18px; per lasciare spazio tra le carte.'}],
+    bravo:'Tre colonne in ordine. Ora la home somiglia a quella vera.'},
+   {id:'c3p5',titolo:'Il mouse sopra la carta',file:'css',
+    inizio:{css:['c3-vars','c3-body-2','c3-blocco','c3-path','c3-paths']},soluzione:{css:['c3-vars','c3-body-2','c3-blocco','c3-path','c3-paths','c3-hover']},
+    intro:[
+     {t:'Un selettore può anche descrivere uno stato. .path:hover vuol dire «una carta, ma solo mentre il mouse ci passa sopra». Hover in inglese è «stare sospeso sopra».'},
+     {t:'Nel sito vero la carta si circonda di rosso. Lo fa box-shadow: 0 0 0 4px var(--accent) inset; che disegna un contorno di 4px dentro la carta. Prova a scriverlo, poi passa con il mouse sopra una carta.'}],
+    compito:'Scrivi una regola .path:hover che cambia l’aspetto della carta quando il mouse ci passa sopra.',
+    controlli:[
+     {cosa:'Esiste una regola .path:hover',ok:d=>[...d.styleSheets].some(f=>[...f.cssRules].some(r=>r.selectorText&&/\.path:hover/.test(r.selectorText))),aiuto:'Scrivi un nuovo selettore .path:hover, senza spazi, con le sue graffe.'},
+     {cosa:'La regola cambia qualcosa',ok:d=>[...d.styleSheets].some(f=>[...f.cssRules].some(r=>r.selectorText&&/\.path:hover/.test(r.selectorText)&&r.style.length>0)),aiuto:'Dentro le graffe scrivi per esempio box-shadow: 0 0 0 4px var(--accent) inset;'}],
+    bravo:'La carta risponde al mouse. Il vestito è finito.'}],
+  imparato:['Una regola CSS ha selettore, proprietà e valore.','Le variabili con var() evitano di ripetere i colori.','Con display: grid si dispongono gli elementi in colonne.']},
+{id:'c4',titolo:'Luce spenta, luce accesa',descr:'Come una classe cambia l’aspetto di tutta la pagina. Il tuo primo JavaScript.',
+  intro:[
+   {t:'Nel sito vero la pagina è scura finché non riesci in un gioco: quando riesci, si accende. Il trucco è una classe.'},
+   {t:'Nel CSS scrivi i colori chiari dentro una regola che vale solo se la pagina ha la classe lit. Il JavaScript aggiunge o toglie quella classe e tutti i colori cambiano insieme, perché usano le variabili.'},
+   {t:'Faremo tre cose: scrivere i colori chiari, farli sfumare e collegare un pulsante.'}],
+  passi:[
+   {id:'c4p1',titolo:'I colori della luce accesa',file:'css',
+    inizio:{css:['c3-vars','c3-body-2','c3-blocco','c3-path','c3-paths','c3-hover','c4-lit-ini']},
+    soluzione:{css:['c3-vars','c3-body-2','c3-blocco','c3-path','c3-paths','c3-hover','c4-lit']},
+    intro:[
+     {t:':root.lit significa «la radice della pagina, ma solo quando ha la classe lit». Dentro cambiamo le variabili e tutta la pagina le segue.',riga:40,tab:'css'},
+     {t:'La prima è già pronta: --bg diventa bianco. Aggiungi le altre: --card bianco (#ffffff), --ink quasi nero (#0b0b0b), --muted grigio scuro (#4d4d4d) e --line grigio chiaro (#e4e4e4).'}],
+    compito:'Completa :root.lit con i colori chiari: --card, --ink, --muted e --line.',
+    controlli:[
+     {cosa:'Con la classe lit lo sfondo è chiaro',ok:d=>{senzaTransizioni(d);d.documentElement.classList.add('lit');const s=stile(d,'body');return !!s&&chiarezza(s.backgroundColor)>240},aiuto:'Dentro :root.lit scrivi --bg: #ffffff; per lo sfondo bianco.'},
+     {cosa:'Con la classe lit il testo è scuro',ok:d=>{senzaTransizioni(d);d.documentElement.classList.add('lit');const s=stile(d,'body');return !!s&&chiarezza(s.color)>=0&&chiarezza(s.color)<60},aiuto:'Aggiungi --ink: #0b0b0b; altrimenti il testo resta chiaro su sfondo bianco.'},
+     {cosa:'Con la classe lit anche le carte sono chiare',ok:d=>{senzaTransizioni(d);d.documentElement.classList.add('lit');const s=stile(d,'.path');return !!s&&chiarezza(s.backgroundColor)>240},aiuto:'Aggiungi --card: #ffffff; per le carte.'},
+     {cosa:'Senza la classe lit la pagina resta scura',ok:d=>{const s=stile(d,'body');return !!s&&chiarezza(s.backgroundColor)>=0&&chiarezza(s.backgroundColor)<60},aiuto:'I colori chiari vanno solo dentro :root.lit, non nella regola :root.'}],
+    bravo:'I colori della luce accesa sono pronti. Ora serve qualcuno che accenda.'},
+   {id:'c4p2',titolo:'Un passaggio morbido',file:'css',
+    soluzione:{css:['c3-vars','c3-body-2','c3-blocco','c3-path','c3-paths','c3-hover','c4-lit','c4-trans']},
+    intro:[
+     {t:'Quando un colore cambia, per ora scatta di colpo. Con transition il cambio diventa una sfumatura.'},
+     {t:'transition: background-color 0.6s; vuol dire: se lo sfondo cambia, il cambio dura 0,6 secondi. Si possono elencare più proprietà separandole con una virgola.'},
+     {t:'Scrivi una regola per body e .path insieme: i due selettori si separano con una virgola.'}],
+    compito:'Scrivi una regola per body e .path con transition su background-color e color, di 0.6s.',
+    controlli:[
+     {cosa:'Il body cambia colore in modo morbido',ok:d=>{const s=stile(d,'body');return !!s&&parseFloat(s.transitionDuration)>0},aiuto:'Scrivi transition: background-color 0.6s, color 0.6s; nella regola.'},
+     {cosa:'Anche le carte cambiano in modo morbido',ok:d=>{const s=stile(d,'.path');return !!s&&parseFloat(s.transitionDuration)>0},aiuto:'Nel selettore scrivi body, .path con la virgola in mezzo, così la regola vale per entrambi.'}],
+    bravo:'Il cambio sarà una sfumatura e non uno scatto.'},
+   {id:'c4p3',titolo:'Il pulsante della luce',file:'js',
+    inizio:{html:'c4p3-html',js:'c4p3-js-ini'},soluzione:{js:'c4p3-js'},
+    intro:[
+     {t:'Nella pagina ho aggiunto un pulsante. Ora tocca al JavaScript: la prima riga lo cerca con document.querySelector e lo chiama luce.',riga:1,tab:'js'},
+     {t:'Le righe 3-5 dicono: quando luce viene premuto (click), esegui quello che sta tra le graffe. Per ora c’è solo un commento, che inizia con // e il computer ignora.',riga:3,tab:'js'},
+     {t:'Al posto del commento scrivi document.documentElement.classList.toggle(\'lit\'); document.documentElement è la radice della pagina, classList è l’elenco delle sue classi, toggle aggiunge la classe se manca e la toglie se c’è già.'},
+     {t:'Poi premi «Prova il codice» e clicca il pulsante.'}],
+    compito:'Quando premi il pulsante la pagina deve accendersi, e al clic successivo spegnersi.',
+    controlli:[
+     {cosa:'Premendo il pulsante la pagina si accende',ok:d=>{const b=sel(d,'#luce');if(!b)return false;b.click();return d.documentElement.classList.contains('lit')},aiuto:'Dentro le graffe scrivi document.documentElement.classList.toggle(\'lit\'); con gli apici attorno a lit.'},
+     {cosa:'Premendolo ancora si spegne',ok:d=>{const b=sel(d,'#luce');if(!b)return false;b.click();b.click();return !d.documentElement.classList.contains('lit')},aiuto:'Usa toggle e non add: toggle accende e spegne, add solo accende.'}],
+    bravo:'Un clic e la pagina si accende, un altro e si spegne. Funziona come nel sito vero.'}],
+  imparato:['Una classe può cambiare l’aspetto di tutta la pagina.','Con transition i cambi diventano sfumature.','classList.toggle aggiunge o toglie una classe a ogni clic.']}
 ];
 
 /* Per ogni passo si calcolano il codice di partenza (codIni) e la soluzione (codSol). Ogni passo

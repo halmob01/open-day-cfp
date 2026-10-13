@@ -108,7 +108,7 @@ indipendenti: i due gruppi si possono svolgere in parallelo.
   tipico (un tag non chiuso, una parola sbagliata) e verificando che il
   messaggio aiuti davvero.
 
-- [ ] **T11 · Contenuti: capitoli 3 e 4**
+- [x] **T11 · Contenuti: capitoli 3 e 4**
   Come T10.
 
 - [ ] **T12 · Contenuti: capitoli 5 e 6**
