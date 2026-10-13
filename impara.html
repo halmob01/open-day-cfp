@@ -115,9 +115,30 @@ ul.dl li .ico{margin-top:2px}
 .task .eyebrow{font-size:1rem;margin-bottom:4px}
 .edph{flex:1;display:grid;place-items:center;border-radius:14px;background:var(--card);box-shadow:0 0 0 2px var(--line) inset;color:var(--muted);text-align:center;padding:12px}
 .runrow{display:flex;gap:10px;align-items:center}
-.runrow .btn{min-height:42px;padding:8px 18px}
+.runrow .btn{min-height:42px;padding:8px 18px;flex:none;white-space:nowrap}
 .runrow .muted{font-size:.85rem}
 #view{flex:1;width:100%;min-height:0;border:0;border-radius:14px;background:#fff;box-shadow:0 0 0 2px var(--line)}
+
+/* l'editor: schede, numeri di riga a sinistra, testo a destra (carattere a spaziatura fissa) */
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:0;border-radius:999px;padding:6px 14px;min-height:36px;background:var(--card);box-shadow:0 0 0 2px var(--line) inset;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+.tab .lk{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.tab.err::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 2px var(--card)}
+.eds{position:relative;flex:1;min-height:0}
+.ed{position:absolute;inset:0;display:none;border-radius:14px;overflow:hidden;background:var(--card);box-shadow:0 0 0 2px var(--line) inset;font-family:var(--mono);font-size:15px;line-height:24px}
+.ed.on{display:flex}
+.gut{flex:none;width:46px;margin:0;padding:10px 8px 30px 0;text-align:right;color:var(--muted);background:rgba(0,0,0,.14);overflow:hidden;user-select:none;-webkit-user-select:none}
+.gut span{display:block;height:24px}
+.gut span.err{color:var(--bad);font-weight:700}
+.gut span.help{color:var(--good);font-weight:700}
+.code{position:relative;flex:1;min-width:0}
+.band{position:absolute;left:0;right:0;height:24px;display:none;pointer-events:none}
+.band.err{display:block;background:color-mix(in srgb,var(--bad) 24%,transparent)}
+.band.help{display:block;background:color-mix(in srgb,var(--good) 22%,transparent)}
+.code textarea{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:10px 12px;border:0;outline:0;resize:none;background:transparent;color:var(--ink);font:inherit;line-height:24px;white-space:pre;overflow:auto;tab-size:2}
+.ed:focus-within{box-shadow:0 0 0 3px var(--accent) inset}
+.ed.ro textarea{color:var(--muted);cursor:not-allowed}
 
 /* ======= SCHERMATA 3: FINE CAPITOLO ======= */
 #fine{flex:1;display:flex;flex-direction:column;gap:18px;max-width:1000px;width:100%;margin-inline:auto;padding-block:8px 24px}
@@ -149,7 +170,7 @@ ul.dl li .ico{margin-top:2px}
   <section id="indice">
     <p class="eyebrow">Costruisci il sito</p>
     <h1>Rifai questo sito con le tue mani</h1>
-    <p class="sub">Otto capitoli, un passo alla volta: scrivi il codice, guarda il risultato e il coach ti aiuta se sbagli.</p>
+    <p class="sub">Otto capitoli, un passo alla volta: scrivi il codice, guarda il risultato e il prof ti aiuta se sbagli.</p>
     <p class="avviso" role="note">Questa attività è pensata per il computer: su uno schermo piccolo l’editor è scomodo.</p>
     <div class="chapters" id="chapters"></div>
     <div class="cta">
@@ -159,7 +180,7 @@ ul.dl li .ico{margin-top:2px}
   </section>
 
   <!-- SCHERMATA 2: un passo. A sinistra l'editor, a destra l'anteprima; nella colonna laterale
-       il compito, il coach con la mascotte e i pulsanti. Editor e anteprima vengono riempiti dal JavaScript. -->
+       il compito, il prof con la mascotte e i pulsanti. Editor e anteprima vengono riempiti dal JavaScript. -->
   <section id="passo" hidden>
     <div class="top">
       <h2 id="mtitle"></h2>
@@ -171,8 +192,11 @@ ul.dl li .ico{margin-top:2px}
       <div class="benchcard">
         <div class="pane" id="paneEd">
           <div class="tabs" id="tabs" role="tablist"></div>
-          <div class="eds" id="eds"><div class="edph">L’editor arriva nel prossimo passo del lavoro.</div></div>
-          <div class="runrow"><button class="btn primary" id="prova" type="button">Prova il codice</button></div>
+          <div class="eds" id="eds"></div>
+          <div class="runrow">
+            <button class="btn primary" id="prova" type="button">Prova il codice</button>
+            <span class="muted">Ctrl+Invio per provare. Tab scrive due spazi: per uscire dall’editor con la tastiera premi Esc e poi Tab.</span>
+          </div>
         </div>
         <div class="pane" id="paneView">
           <div class="cap">Anteprima</div>
@@ -218,8 +242,9 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
    i veri otto capitoli arrivano nei compiti successivi. */
 const CAPITOLI=[
  {id:'c0',titolo:'Capitolo di prova',descr:'Serve a provare le schermate.',
-  intro:[{t:'Ciao! Io sono il coach. Ti accompagno passo dopo passo.'}],
+  intro:[{t:'Ciao! Io sono il prof. Ti accompagno passo dopo passo.'}],
   passi:[{id:'c0p1',titolo:'Passo di prova',file:'html',
+    inizio:{html:'<h1>Ciao, mondo</h1>\n<p>Scrivi qui.</p>\n',css:'h1 {\n  color: red;\n}\n',js:'// qui non c’è ancora niente\n'},
     intro:[{t:'Questo è un passo di prova: premi «Prova il codice» per vedere cosa succede quando un passo riesce.'}],
     compito:'Premi «Prova il codice».',bravo:'Ecco: quando un passo riesce la pagina si accende.'}],
   imparato:['Come è fatta una schermata.','Come si passa da un passo al successivo.','Cosa succede quando un passo riesce.']}
@@ -261,6 +286,111 @@ function celebrate(){
   let t=0;(function f(){ctx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.vx*=.99;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore()});if(++t<110)requestAnimationFrame(f);else ctx.clearRect(0,0,cv.width,cv.height)})();
 }
 
+/* ======= L'EDITOR =======
+   Un editor di codice scritto a mano, senza librerie. Ogni scheda (HTML, CSS, JS) ha:
+     - un campo di testo (textarea) dove si scrive;
+     - una colonna con i numeri di riga, che scorre insieme al testo;
+     - una fascia colorata che può evidenziare una riga (rossa per un errore, verde per un aiuto).
+   Perché i numeri coincidano con le righe, il testo non va mai a capo da solo (white-space:pre
+   nel CSS) e ogni riga è alta esattamente ALT pixel. */
+const NOMI={html:'HTML',css:'CSS',js:'JS'};
+const ALT=24,PAD=10; /* altezza di una riga e spazio sopra il testo: devono coincidere con il CSS */
+const LUCCHETTO='<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>';
+const Editor={
+  t:{},attiva:'html',onChange:()=>{},onRun:()=>{},
+
+  /* Costruisce le tre schede una sola volta, all'avvio. */
+  crea(){
+    const eds=$('#eds'),tabs=$('#tabs');eds.innerHTML='';tabs.innerHTML='';
+    ['html','css','js'].forEach(n=>{
+      const el=document.createElement('div');el.className='ed';
+      el.innerHTML=`<pre class="gut" aria-hidden="true"></pre><div class="code"><div class="band"></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="Codice ${NOMI[n]}"></textarea></div>`;
+      eds.appendChild(el);
+      const b=document.createElement('button');b.type='button';b.className='tab';b.dataset.f=n;b.setAttribute('role','tab');b.textContent=NOMI[n];
+      tabs.appendChild(b);
+      const o={el,tab:b,gut:el.querySelector('.gut'),band:el.querySelector('.band'),ta:el.querySelector('textarea'),marks:{},bloccata:false,esc:false};
+      this.t[n]=o;
+      o.ta.addEventListener('input',()=>{this.aggiorna(n);this.onChange(n)});
+      o.ta.addEventListener('scroll',()=>{o.gut.scrollTop=o.ta.scrollTop;this.fascia(n)});
+      o.ta.addEventListener('keydown',e=>this.tasto(n,e));
+      o.ta.addEventListener('blur',()=>o.esc=false);
+    });
+    tabs.addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(b)this.vai(b.dataset.f)});
+  },
+
+  /* Carica il codice di un passo. Si può scrivere solo nella scheda "attiva" del passo: le altre
+     si leggono soltanto (e mostrano un lucchetto). */
+  imposta(codice,attiva){
+    Object.keys(this.t).forEach(n=>{
+      const o=this.t[n];o.ta.value=codice[n]||'';o.marks={};o.bloccata=n!==attiva;
+      o.ta.readOnly=o.bloccata;o.el.classList.toggle('ro',o.bloccata);
+      o.tab.innerHTML=NOMI[n]+(o.bloccata?LUCCHETTO:'');o.tab.title=o.bloccata?'Questa scheda si può solo leggere in questo passo':'';
+      o.tab.classList.remove('err');o.ta.scrollTop=0;o.ta.scrollLeft=0;
+    });
+    this.vai(attiva);
+  },
+  leggi(){const r={};Object.keys(this.t).forEach(n=>r[n]=this.t[n].ta.value.replace(/\r\n?/g,'\n'));return r},
+  scrivi(n,testo){this.t[n].ta.value=testo;this.aggiorna(n)},
+
+  /* Mostra la scheda n e nasconde le altre. */
+  vai(n){
+    this.attiva=n;
+    Object.keys(this.t).forEach(k=>{const o=this.t[k];o.el.classList.toggle('on',k===n);o.tab.setAttribute('aria-selected',k===n)});
+    this.aggiorna(n);
+  },
+
+  /* Ridisegna la colonna dei numeri: un numero per riga, colorato se la riga è segnata. */
+  aggiorna(n){
+    const o=this.t[n],righe=o.ta.value.split('\n').length;let h='';
+    for(let i=1;i<=righe;i++)h+=`<span${o.marks.err===i?' class="err"':o.marks.help===i?' class="help"':''}>${i}</span>`;
+    o.gut.innerHTML=h;o.gut.scrollTop=o.ta.scrollTop;
+    o.tab.classList.toggle('err',!!o.marks.err);
+    this.fascia(n);
+  },
+
+  /* Posiziona la fascia colorata dietro la riga segnata (l'errore ha la precedenza sull'aiuto). */
+  fascia(n){
+    const o=this.t[n],tipo=o.marks.err?'err':o.marks.help?'help':'';
+    o.band.className='band'+(tipo?' '+tipo:'');
+    if(tipo)o.band.style.top=(PAD+(o.marks[tipo]-1)*ALT-o.ta.scrollTop)+'px';
+  },
+
+  /* Segna una riga (tipo 'err' o 'help'); se non si vede, scorre il testo fino a lì. */
+  segna(n,riga,tipo){
+    const o=this.t[n];o.marks[tipo]=riga;this.aggiorna(n);
+    const alto=PAD+(riga-1)*ALT;
+    if(alto<o.ta.scrollTop||alto+ALT>o.ta.scrollTop+o.ta.clientHeight-ALT)o.ta.scrollTop=Math.max(0,alto-ALT*3);
+  },
+  pulisci(tipo){Object.keys(this.t).forEach(n=>{const o=this.t[n];if(tipo)delete o.marks[tipo];else o.marks={};this.aggiorna(n)})},
+
+  /* Tasti speciali: Tab scrive due spazi, Invio mantiene il rientro, Ctrl+Invio prova il codice,
+     Esc seguito da Tab permette di uscire dall'editor con la tastiera. */
+  tasto(n,e){
+    const o=this.t[n];
+    if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();this.onRun();return}
+    if(o.bloccata)return;
+    if(e.key==='Escape'){o.esc=true;return}
+    if(e.key==='Tab'&&!e.shiftKey&&!e.ctrlKey&&!e.altKey&&!e.metaKey){
+      if(o.esc){o.esc=false;return}
+      e.preventDefault();this.inserisci(o,'  ');return;
+    }
+    o.esc=false;
+    if(e.key==='Enter'&&!e.shiftKey&&!e.altKey){
+      e.preventDefault();
+      const v=o.ta.value,s=o.ta.selectionStart,riga=v.slice(v.lastIndexOf('\n',s-1)+1,s);
+      const rientro=riga.match(/^ */)[0]+(/[{(\[]/.test(v[s-1]||'')?'  ':'');
+      this.inserisci(o,'\n'+rientro);
+    }
+  },
+  inserisci(o,testo){
+    o.ta.focus();
+    if(!document.execCommand('insertText',false,testo)){
+      o.ta.setRangeText(testo,o.ta.selectionStart,o.ta.selectionEnd,'end');
+      o.ta.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+  }
+};
+
 /* ======= SCHERMATE =======
    Come in index.html: una sola schermata è visibile alla volta. L'indice e la fine capitolo
    sono "accese" (colori chiari); il passo parte "spento" e si accende quando riesce. */
@@ -277,7 +407,7 @@ function renderIndice(){
 /* ======= UN PASSO =======
    S è lo stato del passo in corso: capitolo (ci), passo (pi), a che punto sono le spiegazioni
    iniziali (introStep, -1 se finite), quante volte è stato chiesto aiuto (hintN), se è
-   riuscito (won) e la frase temporanea del coach (flash). */
+   riuscito (won) e la frase temporanea del prof (flash). */
 let S={ci:0,pi:0,passo:null,introStep:-1,hintN:0,won:false,flash:''};
 let flashT=null;
 
@@ -289,6 +419,7 @@ function caricaPasso(ci,pi){
   mostra('passo');
   $('#mtitle').textContent=`Capitolo ${ci+1} · Passo ${pi+1}: ${p.titolo}`;
   $('#compito').textContent=p.compito;
+  Editor.imposta(p.inizio,p.file);
   render();
 }
 
@@ -350,6 +481,8 @@ $('#azzera').onclick=()=>{
 };
 
 /* ======= AVVIO ======= */
+Editor.crea();
+Editor.onRun=()=>$('#prova').click();
 store.load();setMute();renderIndice();mostra('indice');
 })();
 </script>
