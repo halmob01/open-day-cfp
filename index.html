@@ -1,18 +1,86 @@
 <!doctype html>
 <html lang="it">
+<!--
+   MAPPA DEL FILE
+   Questo sito è un file solo. Dentro ci sono tre linguaggi, ognuno con il suo compito:
+     HTML        dice QUALI elementi ci sono nella pagina (titoli, pulsanti, riquadri).
+     CSS         dice COME appaiono (colori, dimensioni, spazi). Sta tra i tag style.
+     JavaScript  dice COSA SUCCEDE quando si tocca qualcosa: è il gioco vero e proprio.
+                 Sta tra i tag script, in fondo al file.
+
+   Le parti, nell'ordine in cui compaiono:
+     1. Intestazione (head): titolo della scheda, font, regole di base.
+     2. Stile (CSS): prima i colori, poi i componenti comuni, poi ogni schermata, poi la
+        versione per telefono.
+     3. Struttura (HTML): le tre schermate del sito. Home, gioco e contatti.
+     4. Programma (JavaScript), diviso in sezioni con un titolo tra =======:
+          DATI DELLA SCUOLA   indirizzo, email e date (la parte più facile da modificare)
+          LIVELLI             le missioni dei tre giochi, scritte come dati
+          STATO               le variabili che ricordano a che punto è il gioco
+          CARICAMENTO         prepara una missione
+          SIMULAZIONE         le regole di elettricità e di rete
+          DISEGNO e RENDER    disegna banco, componenti e fili
+          ESTETISTA           il gioco di Estetica
+          SCENE, STANZA       i disegni nella colonna di destra
+          MASCOTTE, SUONI     personaggio e suoni
+          SALVAVITA E FILI    cortocircuito e collegamenti
+          INTERAZIONE         cosa succede quando si tocca lo schermo
+          SCHERMATE, CONTATTI passaggio da una schermata all'altra, pagina finale
+          INATTIVITÀ          ritorno automatico alla home
+
+   Per trovare una parte: Cerca (Ctrl+F) e scrivi il titolo, per esempio DATI DELLA SCUOLA.
+
+   Cosa si può cambiare senza rischi (prima di tutto: salva una copia del file):
+     - indirizzo, email, date e laboratori: blocco SCUOLA;
+     - titoli e frasi del coach: dentro i livelli, solo il testo tra gli apici;
+     - colori: variabili in cima allo stile (--accent e le altre).
+   Regola d'oro: cambia solo il testo dentro gli apici ' ' oppure i valori dei colori. Non
+   togliere virgole, apici, parentesi o graffe: sono la punteggiatura del codice.
+-->
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Prova il mestiere: tre mestieri, tre giochi guidati per ragazzi.">
 <title>Prova il mestiere</title>
+<!--
+   Regola minima che vale subito: gli elementi con l'attributo hidden spariscono. È così
+   che il sito nasconde le schermate che non servono in quel momento.
+-->
 <style>[hidden]{display:none!important}body{margin:0}</style>
 </head>
 <body>
 
+<!--
+   FONT: il carattere Fira Sans viene scaricato da Google Fonts. Se manca internet il browser
+   usa un carattere di riserva (vedi --font nel CSS) e il sito funziona lo stesso.
+-->
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/*
+   STILE (CSS)
+   Il CSS è l'elenco delle regole di aspetto. Ogni regola ha questa forma:
+       selettore { proprietà: valore; proprietà: valore; }
+   - Il selettore dice a quali elementi si applica. Un punto indica una classe, cioè un'etichetta
+     che si dà agli elementi: .btn vale per tutti gli elementi con class="btn". Il cancelletto
+     indica un id, cioè un nome unico: #home vale per l'elemento con id="home". Una parola sola,
+     come button, vale per tutti i pulsanti.
+   - Dentro le graffe, ogni proprietà (color, background, font-size...) riceve un valore.
+   Se due regole dicono cose diverse sullo stesso elemento, di solito vince quella scritta più in
+   basso nel file.
+*/
 /* Luce spenta = scuro con accenti rossi. Quando il gioco riesce, il sito "si accende": bianco, scritte nere, accenti rossi. */
+/*
+   COLORI: le variabili CSS.
+   Una variabile è un nome che custodisce un valore: lo si scrive una volta sola e poi lo si
+   riusa ovunque con var(--nome). Se cambi il valore qui, cambia in tutto il sito.
+   :root significa tutta la pagina. Qui si definiscono i colori di base:
+     --bg      sfondo della pagina        --card    sfondo di carte e riquadri
+     --ink     colore del testo           --muted   testo meno importante
+     --accent  il rosso dei pulsanti      --good e --bad  verde e rosso per giusto e sbagliato
+   I colori sono scritti in esadecimale: #rrggbb sono le quantità di rosso, verde e blu, ciascuna
+   da 00 a ff. #000000 è nero, #ffffff è bianco. Questo è il tema luce spenta, quello scuro.
+*/
 :root{ /* luce spenta: verde scuro con accenti rossi */
   --bg:#0f1a17; --card:#17251f; --ink:#f1fff9; --muted:#a9c4b9; --line:#2d4a3f;
   --accent:#d6404a; --accent-ink:#ffffff; --good:#4fd89a; --bad:#ff8a8f;
@@ -20,27 +88,65 @@
   --brown:#d08142; --blue:#63a7ff; --wire-g:#c9d6d0; --cable:#4fd1b8;
   --font:'Fira Sans','Segoe UI',system-ui,-apple-system,sans-serif; color-scheme:dark;
 }
+/*
+   TEMA LUCE ACCESA.
+   :root.lit vale solo quando la pagina ha anche la classe lit. Il programma aggiunge o toglie
+   questa classe quando una missione riesce: tutti i colori cambiano insieme, perché ogni regola
+   usa le variabili e non i colori scritti a mano.
+*/
 :root.lit{ /* luce accesa: bianco, scritte nere, accenti rossi */
   --bg:#ffffff; --card:#ffffff; --ink:#0b0b0b; --muted:#4d4d4d; --line:#e4e4e4;
   --accent:#c8323a; --accent-ink:#ffffff; --good:#1b9a5a; --bad:#9c1520;
   --bench:#f6f6f6; --bench-line:#e0e0e0; --plate:#ffffff; --plate-line:#c4c4c4; --metal:#d6d9dc; --metal-dark:#7d868c;
   --brown:#8b4a1f; --blue:#2f7be0; --wire-g:#3a3f4b; --cable:#12806f; color-scheme:light;
 }
+/*
+   TRANSIZIONE: quando i colori cambiano (da spento ad acceso) non scattano di colpo ma sfumano
+   in 0,6 secondi.
+*/
 body,.btn,.coach,.benchcard,.dot,.qr,.path,.card,.slot,.panel{transition:background-color .6s,color .6s,box-shadow .6s,border-color .6s}
+/*
+   REGOLE DI BASE. L'asterisco significa ogni elemento. box-sizing:border-box fa sì che la
+   larghezza di una scatola comprenda anche bordi e spazi interni: rende i calcoli più semplici.
+*/
 *{box-sizing:border-box}
 html,body{height:100%}
+/*
+   IL CORPO DELLA PAGINA. Sfondo e colore del testo vengono dalle variabili. font-size è la
+   grandezza del testo; padding-inline e padding-block sono gli spazi interni ai lati e sopra e
+   sotto; margin:0 toglie lo spazio esterno che il browser mette di suo.
+*/
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.3;padding-inline:16px;padding-block:12px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
+/*
+   ACCESSIBILITÀ. Chi usa la tastiera vede l'elemento selezionato circondato da un contorno
+   rosso ben visibile.
+*/
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+/*
+   PULSANTI. .btn è lo stile di base di ogni pulsante: forma a pillola (border-radius molto
+   alto), altezza minima 48px per essere facile da toccare col dito. .primary è il pulsante
+   principale, rosso; .big è più grande. :active è il momento in cui lo si preme.
+*/
 .btn{border:0;border-radius:999px;padding:12px 22px;font-weight:600;font-size:1.05rem;background:var(--card);color:var(--ink);box-shadow:0 0 0 2px var(--line) inset;display:inline-flex;align-items:center;gap:8px;min-height:48px;text-decoration:none}
 .btn.primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 rgba(120,0,15,.35)}
 .btn.big{font-size:1.4rem;padding:16px 34px;min-height:64px}
 .btn:active{transform:translateY(2px)}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
+/*
+   CONTENITORE. .wrap racchiude tutto il contenuto: centrato (margin-inline:auto) e largo al
+   massimo 1240px. display:flex dispone i figli in colonna, con uno spazio (gap) di 12px.
+*/
 .wrap{max-width:1240px;margin-inline:auto;min-height:100%;display:flex;flex-direction:column;gap:12px}
 h1,h2,h3{text-wrap:balance}
 
+/*
+   SCHERMATA HOME (la prima che si vede).
+   display:grid dispone gli elementi in una griglia. .paths contiene le tre carte dei mestieri
+   affiancate: repeat(3, minmax(0,1fr)) vuol dire tre colonne uguali. .path è una carta;
+   .qr è il riquadro con il codice QR.
+*/
 /* home */
 #home{flex:1;display:grid;grid-template-columns:1fr;gap:22px;align-content:center;justify-items:center;text-align:center;padding-block:10px}
 #home h1{font-size:clamp(2.3rem,5.5vw,4rem);line-height:1.02;margin:0}
@@ -52,17 +158,34 @@ h1,h2,h3{text-wrap:balance}
 .path div b,.path div span{display:block}
 .path b{font-size:1.9rem}
 .path span{color:var(--muted);font-size:1.05rem}
+/*
+   SALVA COME IMMAGINE. Il riquadro .shot è nascosto (display:none): compare solo sul telefono,
+   grazie alla regola @media più sotto. #imgov è la finestra scura che copre tutto lo schermo
+   (position:fixed e inset:0) e mostra l'immagine da salvare.
+*/
 .shot{display:none;margin:4px 0 14px}
 #imgov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
 #imgov[hidden]{display:none}
 #imgov .box{background:#fff;color:#0b0b0b;border-radius:20px;padding:16px;max-width:420px;width:100%;text-align:center}
 #imgov img{width:100%;border-radius:12px;box-shadow:0 0 0 2px #ddd;margin:8px 0 14px}
 #imgov p{margin:0 0 6px}
+/*
+   @media è una regola condizionale: vale solo se lo schermo ha certe caratteristiche. Qui: se
+   la larghezza è al massimo 919px (telefono) oppure se si usa il dito (pointer:coarse), mostra
+   il pulsante per salvare l'immagine.
+*/
 @media (max-width:919px),(pointer:coarse){.shot{display:block}}
 .qr{display:flex;gap:14px;align-items:center;background:var(--card);padding:12px 16px;border-radius:18px;box-shadow:0 0 0 2px var(--line) inset;text-align:left}
 .qr svg{width:84px;height:84px;flex:none;background:#fff;border-radius:8px;padding:4px}
 .qr b{display:block}.qr span{color:var(--muted);font-size:.95rem}
 
+/*
+   SCHERMATA DI GIOCO (#play).
+   Griglia a due colonne: a sinistra il banco di lavoro (minmax(0,1fr) è tutto lo spazio che
+   resta), a destra una colonna fissa di 360px con stanza, mascotte e pulsanti. .top è la barra
+   in alto, con il titolo, i pallini delle missioni (.dot: .now in corso, .done fatta) e i
+   pulsanti per il suono e per uscire.
+*/
 /* play */
 #play{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto 1fr;gap:12px 16px;min-height:0}
 .top{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -72,10 +195,20 @@ h1,h2,h3{text-wrap:balance}
 .dot.now{background:var(--accent);color:var(--accent-ink);box-shadow:none}
 .dot.done{background:var(--good);color:#fff;box-shadow:none}
 .ib{width:48px;height:48px;padding:0;justify-content:center}
+/*
+   IL BANCO. .benchcard è il riquadro scuro dove si fanno i collegamenti; dentro c'è il
+   disegno #bench (un SVG, vedi più avanti). touch-action:none impedisce al telefono di far
+   scorrere la pagina mentre si trascina un filo; user-select:none impedisce di selezionare il
+   testo per sbaglio.
+*/
 .benchwrap{position:relative;min-height:0;display:flex}
 .benchcard{flex:1;background:var(--bench);border-radius:24px;box-shadow:0 0 0 3px var(--bench-line) inset;display:flex;flex-direction:column;min-height:0;padding:8px}
 #bench{width:100%;height:100%;min-height:0;touch-action:none;user-select:none;-webkit-user-select:none;flex:1}
 .cap{text-align:center;color:var(--muted);font-size:.9rem;padding:2px 0 4px}
+/*
+   COLONNA LATERALE: la stanza (.roomcard), la mascotte con il fumetto (.coach) e i pulsanti
+   (.btns).
+*/
 .side{display:flex;flex-direction:column;gap:12px;min-height:0}
 .roomcard{border-radius:22px;overflow:hidden;box-shadow:0 0 0 3px var(--line);background:#13204a;line-height:0}
 .room{width:100%;height:auto;display:block}
@@ -86,6 +219,12 @@ h1,h2,h3{text-wrap:balance}
 .coach .bubble{font-size:1.25rem;font-weight:500;min-width:0}
 .btns{display:flex;gap:8px;flex-wrap:wrap}
 .btns .btn{flex:1;justify-content:center}
+/*
+   ELEMENTI DISEGNATI DENTRO L'SVG. .plate è la piastra di un componente, .lbl le etichette,
+   .ring e .screw i morsetti (i pallini a cui si attaccano i fili), .halo l'alone che appare sul
+   morsetto selezionato. Per le forme disegnate si usano fill (riempimento) e stroke (contorno)
+   al posto di background e border, che valgono solo per le scatole.
+*/
 .plate{fill:var(--plate);stroke:var(--plate-line);stroke-width:3}
 .lbl{fill:var(--muted);font-size:15px;font-weight:600;text-anchor:middle}
 .ring{fill:var(--metal);stroke:var(--metal-dark);stroke-width:3}
@@ -96,6 +235,12 @@ h1,h2,h3{text-wrap:balance}
 .term.sel .halo{opacity:1}
 .wireline{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .hit{fill:transparent;stroke:transparent}
+/*
+   ANIMAZIONI. @keyframes descrive i passaggi di un'animazione, animation la applica.
+   .flow sono i puntini che scorrono lungo il filo quando passa la corrente; .pulse è l'anello
+   che pulsa per indicare dove toccare; .ghost è il filo tratteggiato suggerito dall'aiuto;
+   .nudge è un leggero ingrandimento per attirare l'attenzione.
+*/
 .flow{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-dasharray:1 22;animation:flow .8s linear infinite;opacity:.9}
 .flow.rev{animation-direction:reverse}
 @keyframes flow{to{stroke-dashoffset:-23}}
@@ -106,17 +251,36 @@ h1,h2,h3{text-wrap:balance}
 .nudge{animation:nd .9s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes nd{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 .tog{cursor:pointer}
+/*
+   AVVISO OPS. Appare al centro quando salta il salvavita (cortocircuito). Resta nascosto
+   (display:none) finché il programma non gli aggiunge la classe .on. La classe .tripped rende
+   il banco grigio e scuro.
+*/
 #ops{position:absolute;inset:0;display:none;place-items:center;pointer-events:none;z-index:5}
 #ops.on{display:grid}
 #ops div{background:var(--bad);color:#fff;border-radius:28px;padding:18px 32px;text-align:center;font-size:2.4rem;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:shake .4s}
 #ops small{display:block;font-size:1.1rem;font-weight:500}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 .tripped #bench{filter:grayscale(.8) brightness(.7)}
+/*
+   LA TELA DEI CORIANDOLI (#cf). È trasparente, sta sopra a tutto e non intercetta i tocchi
+   (pointer-events:none): ci si disegna la pioggia di coriandoli quando una missione riesce.
+*/
 #cf{position:fixed;inset:0;pointer-events:none;z-index:20}
+/*
+   SCENE ANIMATE. I disegni nella colonna di destra hanno due parti: .pre (prima) e .post
+   (dopo). Quando la scena riceve la classe .ok, una svanisce e l'altra compare con dissolvenza.
+*/
 .scene{width:100%;height:auto;display:block}
 .scene .pre{transition:opacity .5s}.scene .post{opacity:0;transition:opacity .6s}
 .scene.ok .pre{opacity:0}.scene.ok .post{opacity:1}
 
+/*
+   GIOCO DI ESTETICA. Qui non ci sono fili ma carte da toccare. .tray è il vassoio con le
+   caselle (.slot) che si riempiono; .cgrid è la griglia di carte (.card).
+   repeat(auto-fit, minmax(150px,1fr)) vuol dire tante colonne quante ne entrano, larghe almeno
+   150px. Stati di una carta: .done già scelta, .shake sbagliata (trema), .hint suggerita.
+*/
 /* estetista */
 #cards{flex:1;display:flex;flex-direction:column;gap:14px;padding:10px;min-height:0;overflow:auto}
 .tray{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
@@ -130,6 +294,11 @@ h1,h2,h3{text-wrap:balance}
 .card.shake{animation:shake .4s;box-shadow:0 0 0 4px var(--bad) inset}
 .card.hint{animation:nd .9s ease-in-out infinite;box-shadow:0 0 0 4px var(--accent) inset}
 
+/*
+   SCHERMATA CONTATTI. Titolo, frase di apertura e quattro riquadri (.panel) disposti su due
+   colonne (.cols). Le regole .field, .chips, .chip e #fallback non sono usate da nessun
+   elemento: sono avanzate da un modulo di prenotazione che non c'è più.
+*/
 /* contatti */
 #contacts{flex:1;display:flex;flex-direction:column;gap:18px;max-width:1000px;width:100%;margin-inline:auto;padding-block:8px 24px}
 #contacts h1{font-size:clamp(2rem,5vw,3.2rem);margin:0;line-height:1.05}
@@ -151,6 +320,11 @@ h1,h2,h3{text-wrap:balance}
 #fallback textarea{min-height:140px}
 .cta{display:flex;gap:10px;flex-wrap:wrap}
 
+/*
+   RITOCCHI DI IDENTITÀ. Regole aggiunte dopo, per dare al sito il suo carattere: titoli molto
+   pesanti, pallini collegati da una linea, accenti rossi. Essendo scritte più in basso,
+   prevalgono sulle regole precedenti con lo stesso selettore (per esempio #home, .path, .dot).
+*/
 /* identità: titoli minuscoli e pesanti, anello rosso, linea con nodo */
 h1,h2,h3{font-weight:800;letter-spacing:-.01em}
 .eyebrow{color:var(--accent);font-weight:700;font-size:1.2rem;margin:0}
@@ -175,6 +349,11 @@ h1,h2,h3{font-weight:800;letter-spacing:-.01em}
 ul.dl{list-style:none;padding:0}
 ul.dl li{display:flex;gap:10px;align-items:flex-start}
 ul.dl li .ico{margin-top:2px}
+/*
+   VERSIONE PER TELEFONO. Tutto quello che sta in questo blocco vale solo se lo schermo è
+   largo al massimo 919px. La griglia a due colonne diventa una pila unica, le carte dei mestieri
+   si dispongono in riga, il codice QR sparisce (sul telefono non serve) e i testi si riducono.
+*/
 @media (max-width:919px){
   body{padding-block:8px;font-size:16px}
   .paths{grid-template-columns:1fr;gap:12px}
@@ -201,6 +380,7 @@ ul.dl li .ico{margin-top:2px}
   .card{min-height:104px;font-size:1.05rem}.card i{font-size:2.4rem}
   .cols{grid-template-columns:1fr}
 }
+/* TELEFONO IN ORIZZONTALE (poco alto): si torna a due colonne, in versione ridotta. */
 @media (max-width:919px) and (orientation:landscape) and (max-height:520px){
   #play{display:grid;grid-template-columns:minmax(0,1fr) 250px;grid-template-rows:auto 1fr}
   .side{display:flex}
@@ -213,15 +393,34 @@ ul.dl li .ico{margin-top:2px}
   .btns{order:0;padding:0}.btn{min-height:42px;padding:8px 14px;font-size:.95rem}
   .paths{grid-template-columns:repeat(3,1fr)}.path{flex-direction:column;text-align:center}
 }
+/* Ultimi ritocchi per telefono. */
 @media (max-width:919px){
         #home h1{font-size:2.7rem}
   .path{align-items:center}.path svg{width:76px;height:76px}.path b{font-size:1.6rem}
   .dot{width:30px;height:30px;margin-left:12px;border-width:5px}.dot::before{width:12px;height:5px;margin-top:-2.5px}
 }
+/*
+   ACCESSIBILITÀ. Chi ha chiesto al sistema di ridurre i movimenti (prefers-reduced-motion) vede
+   animazioni e transizioni quasi istantanee.
+*/
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
 </style>
 
+<!--
+   STRUTTURA DELLA PAGINA (HTML)
+   Un elemento HTML si scrive con un tag di apertura e uno di chiusura: <section> ... </section>.
+   Gli elementi stanno uno dentro l'altro, come scatole. Gli attributi (id, class, data-...)
+   danno agli elementi un nome o un'etichetta: il CSS e il JavaScript li usano per trovarli.
+   Le schermate sono tre (le section): home, play e contacts. Ne è visibile una sola: le altre
+   hanno l'attributo hidden. Il JavaScript le scambia con la funzione show().
+-->
 <div class="wrap" id="app">
+  <!--
+     SCHERMATA 1: HOME
+     Il titolo, tre pulsanti-carta (uno per mestiere), il pulsante per saltare il gioco e il
+     codice QR. L'attributo data-path ('el', 'net', 'est') dice al programma quale gioco aprire.
+     Gli elementi svg dentro i pulsanti sono le icone, disegnate con il codice.
+  -->
   <section id="home">
     <h1>Cosa ti interessa?</h1>
     <p class="sub">Scegli un mestiere e provalo: ci vogliono pochi minuti.</p>
@@ -240,9 +439,19 @@ ul.dl li .ico{margin-top:2px}
       </button>
     </div>
     <div class="cta" style="justify-content:center;margin-top:6px"><button class="btn" id="skipGame" type="button">Non vuoi giocare? Vai ai contatti</button></div>
+    <!--
+       CODICE QR. È un disegno SVG, uguale al file qr-sito.svg. Inquadrato con il telefono porta
+       all'indirizzo del sito. Per cambiarlo, sostituisci tutto l'elemento svg con quello nuovo.
+    -->
     <div class="qr"><svg role="img" aria-label="Codice QR del gioco" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29" shape-rendering="crispEdges"><path fill="#ffffff" d="M0 0h29v29H0z"/><path fill="none" stroke="#000000" d="M0 0.5h7m2 0h1m4 0h2m2 0h2m2 0h7m-29 1h1m5 0h1m1 0h4m3 0h2m2 0h2m1 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m1 0h2m5 0h1m3 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m3 0h1m3 0h1m4 0h2m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h2m2 0h6m2 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m2 0h4m1 0h3m1 0h2m2 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-19 1h2m1 0h1m1 0h1m1 0h1m1 0h1m-20 1h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m3 0h1m2 0h1m-28 1h3m2 0h1m2 0h3m1 0h3m1 0h1m3 0h3m2 0h1m2 0h1m-29 1h1m1 0h1m1 0h3m4 0h1m2 0h1m3 0h1m1 0h2m1 0h2m1 0h3m-25 1h2m2 0h1m1 0h2m1 0h1m1 0h1m1 0h4m1 0h1m1 0h1m2 0h1m-26 1h6m2 0h1m2 0h2m1 0h2m3 0h2m2 0h1m1 0h2m-29 1h3m1 0h2m2 0h1m7 0h1m3 0h3m2 0h1m2 0h1m-28 1h1m1 0h1m1 0h2m2 0h1m2 0h2m2 0h2m4 0h1m1 0h2m1 0h2m-29 1h2m1 0h2m4 0h3m1 0h7m1 0h2m1 0h2m1 0h1m-28 1h2m1 0h1m1 0h3m4 0h1m1 0h1m1 0h5m1 0h1m2 0h1m1 0h2m-27 1h1m5 0h1m2 0h1m1 0h1m2 0h1m3 0h1m1 0h1m2 0h2m1 0h1m-29 1h1m1 0h2m2 0h1m5 0h1m1 0h1m2 0h1m4 0h3m2 0h2m-28 1h3m1 0h1m4 0h2m1 0h1m1 0h4m1 0h2m1 0h1m1 0h1m1 0h1m-28 1h1m2 0h7m2 0h1m1 0h4m2 0h5m-17 1h4m7 0h2m3 0h1m1 0h3m-29 1h7m4 0h3m2 0h2m1 0h2m1 0h1m1 0h2m1 0h2m-29 1h1m5 0h1m9 0h3m1 0h1m3 0h2m1 0h1m-28 1h1m1 0h3m1 0h1m1 0h3m1 0h1m2 0h3m2 0h5m-25 1h1m1 0h3m1 0h1m2 0h1m1 0h1m1 0h1m2 0h6m1 0h2m1 0h3m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h4m4 0h2m1 0h1m1 0h3m2 0h1m-29 1h1m5 0h1m2 0h2m4 0h3m1 0h3m1 0h1m3 0h1m-28 1h7m1 0h1m1 0h1m1 0h1m3 0h2m2 0h3m4 0h2"/></svg><div><b>Gioca dal telefono</b><span>Inquadra il codice</span></div></div>
   </section>
 
+  <!--
+     SCHERMATA 2: GIOCO
+     La barra in alto (.top), il banco di lavoro (#bench è un disegno SVG, #cards contiene le
+     carte di Estetica) e la colonna laterale con la stanza (#playRoom), la mascotte con la sua
+     frase (#mascot e #say) e i pulsanti. Molti elementi sono vuoti: li riempie il JavaScript.
+  -->
   <section id="play" hidden>
     <div class="top">
       <h2 id="mtitle"></h2>
@@ -270,6 +479,11 @@ ul.dl li .ico{margin-top:2px}
     </div>
   </section>
 
+  <!--
+     SCHERMATA 3: CONTATTI
+     I quattro riquadri (#pWhere, #pDates, #pLabs, #pBook) sono vuoti: li compila il JavaScript
+     con i dati del blocco SCUOLA, nella funzione toContacts().
+  -->
   <section id="contacts" hidden>
     <h1 id="cTitle">Ti è piaciuto? Vieni a trovarci!</h1>
     <p class="lead" id="cLead"></p>
@@ -284,8 +498,13 @@ ul.dl li .ico{margin-top:2px}
     <div class="cta"><button class="btn primary big" id="other" type="button">Prova un altro mestiere</button></div>
   </section>
 </div>
+<!-- La tela trasparente su cui si disegnano i coriandoli. -->
 <canvas id="cf"></canvas>
 
+<!--
+   Da qui comincia il programma (JavaScript): il codice che reagisce ai tocchi e fa funzionare
+   il gioco.
+-->
 <script>
 (()=>{
 const $=s=>document.querySelector(s);
