@@ -271,7 +271,7 @@ h1,h2,h3{text-wrap:balance}
    LA TELA DEI CORIANDOLI (#cf). È trasparente, sta sopra a tutto e non intercetta i tocchi
    (pointer-events:none): ci si disegna la pioggia di coriandoli quando una missione riesce.
 */
-#cf{position:fixed;inset:0;pointer-events:none;z-index:20}
+#cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
 /*
    SCENE ANIMATE. I disegni nella colonna di destra hanno due parti: .pre (prima) e .post
    (dopo). Quando la scena riceve la classe .ok, una svanisce e l'altra compare con dissolvenza.
@@ -513,7 +513,7 @@ ul.dl li .ico{margin-top:2px}
   </section>
 </div>
 <!-- La tela trasparente su cui si disegnano i coriandoli. -->
-<canvas id="cf"></canvas>
+<canvas id="cf" hidden></canvas>
 
 <!--
    Da qui comincia il programma (JavaScript): il codice che reagisce ai tocchi e fa funzionare
@@ -1311,9 +1311,10 @@ function setMute(){$('#mute').innerHTML=muted?'<svg width="24" height="24" viewB
 function celebrate(){
   sfx.win();vib([60,40,120]);
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const cv=$('#cf'),ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+  /* la tela resta nascosta quando non serve: su alcuni iPhone una tela vuota compariva come un rettangolo nero */
+  const cv=$('#cf');cv.hidden=false;const ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
   const P=[];for(let i=0;i<150;i++)P.push({x:innerWidth/2+(Math.random()-.5)*240,y:innerHeight*.5,vx:(Math.random()-.5)*15,vy:-Math.random()*15-4,r:4+Math.random()*5,c:['#d7263d','#ff4d5e','#ffffff','#ffd1d5','#ffc400'][i%5],a:Math.random()*6,va:(Math.random()-.5)*.4});
-  let t=0;(function f(){ctx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.vx*=.99;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore()});if(++t<110)requestAnimationFrame(f);else ctx.clearRect(0,0,cv.width,cv.height)})();
+  let t=0;(function f(){ctx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.vx*=.99;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore()});if(++t<110)requestAnimationFrame(f);else{ctx.clearRect(0,0,cv.width,cv.height);cv.hidden=true}})();
 }
 
 /* ======= SALVAVITA E FILI ======= */

@@ -95,7 +95,7 @@ ul.dl li .ico{margin-top:2px}
 .btns .btn{flex:1;justify-content:center}
 .nudge{animation:nd .9s ease-in-out infinite}
 @keyframes nd{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-#cf{position:fixed;inset:0;pointer-events:none;z-index:20}
+#cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
 
 /* ======= SCHERMATA 1: INDICE DEI CAPITOLI ======= */
 #indice{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;max-width:1100px;margin-inline:auto;width:100%;padding-block:10px}
@@ -155,6 +155,8 @@ ul.dl li .ico{margin-top:2px}
 .code textarea{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:10px 12px;border:0;outline:0;resize:none;background:transparent;color:var(--ink);font:inherit;line-height:24px;white-space:pre;overflow:auto;tab-size:2}
 .ed:focus-within{box-shadow:0 0 0 3px var(--accent) inset}
 .ed.ro textarea{color:var(--muted);cursor:not-allowed}
+/* scritta "Solo lettura" sulle schede col lucchetto, ben visibile anche su telefono */
+.ed.ro::after{content:'Solo lettura';position:absolute;top:8px;right:10px;font-family:var(--font);font-size:.8rem;font-weight:600;color:var(--muted);background:var(--card);padding:2px 8px;border-radius:999px;box-shadow:0 0 0 2px var(--line) inset;pointer-events:none}
 
 /* ======= SCHERMATA 3: FINE CAPITOLO ======= */
 #fine{flex:1;display:flex;flex-direction:column;gap:18px;max-width:1000px;width:100%;margin-inline:auto;padding-block:8px 24px}
@@ -249,7 +251,7 @@ ul.dl li .ico{margin-top:2px}
     </div>
   </section>
 </div>
-<canvas id="cf"></canvas>
+<canvas id="cf" hidden></canvas>
 <div id="sonde" aria-hidden="true"></div>
 
 <!-- CODICE DEI PASSI: i pezzi di codice che compaiono negli editor (vedi «I PEZZI DI CODICE» nel JavaScript).
@@ -2017,9 +2019,10 @@ function setMute(){$('#mute').innerHTML=muted?'<svg width="24" height="24" viewB
 function celebrate(){
   sfx.win();vib([60,40,120]);
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const cv=$('#cf'),ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+  /* la tela resta nascosta quando non serve: su alcuni iPhone una tela vuota compariva come un rettangolo nero */
+  const cv=$('#cf');cv.hidden=false;const ctx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
   const P=[];for(let i=0;i<150;i++)P.push({x:innerWidth/2+(Math.random()-.5)*240,y:innerHeight*.5,vx:(Math.random()-.5)*15,vy:-Math.random()*15-4,r:4+Math.random()*5,c:['#d7263d','#ff4d5e','#ffffff','#ffd1d5','#ffc400'][i%5],a:Math.random()*6,va:(Math.random()-.5)*.4});
-  let t=0;(function f(){ctx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.vx*=.99;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore()});if(++t<110)requestAnimationFrame(f);else ctx.clearRect(0,0,cv.width,cv.height)})();
+  let t=0;(function f(){ctx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.vx*=.99;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore()});if(++t<110)requestAnimationFrame(f);else{ctx.clearRect(0,0,cv.width,cv.height);cv.hidden=true}})();
 }
 
 /* ======= L'EDITOR =======
@@ -2033,7 +2036,7 @@ const NOMI={html:'HTML',css:'CSS',js:'JS'};
 const ALT=24,PAD=10; /* altezza di una riga e spazio sopra il testo: devono coincidere con il CSS */
 const LUCCHETTO='<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>';
 const Editor={
-  t:{},attiva:'html',onChange:()=>{},onRun:()=>{},
+  t:{},attiva:'html',onChange:()=>{},onRun:()=>{},onBloccata:()=>{},
 
   /* Costruisce le tre schede una sola volta, all'avvio. */
   crea(){
@@ -2050,6 +2053,8 @@ const Editor={
       o.ta.addEventListener('scroll',()=>{o.gut.scrollTop=o.ta.scrollTop;this.fascia(n)});
       o.ta.addEventListener('keydown',e=>this.tasto(n,e));
       o.ta.addEventListener('blur',()=>o.esc=false);
+      /* toccare una scheda col lucchetto: il prof spiega dove si scrive (su telefono la tastiera non si apre e serve un perché) */
+      o.ta.addEventListener('pointerdown',()=>{if(o.bloccata)this.onBloccata(n)});
     });
     tabs.addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(b)this.vai(b.dataset.f)});
   },
@@ -2466,6 +2471,11 @@ Editor.onChange=n=>{
   clearTimeout(rit);rit=setTimeout(()=>provaCodice(S.conJs),400);
 };
 Editor.onRun=()=>{if(S.introStep<0)$('#prova').click()};
+Editor.onBloccata=n=>{
+  const f=S.passo.file,N={html:'HTML',css:'CSS',js:'JS'};
+  S.introStep=-1;S.aiuto=`La scheda ${N[n]} in questo passo si può solo leggere. Si scrive nella scheda ${N[f]}: toccala qui sopra.`;
+  render();
+};
 
 function render(){
   const p=S.passo,intro=p.intro,inIntro=S.introStep>=0;let msg,mood='hi',orig='';
